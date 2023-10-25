@@ -11,9 +11,8 @@
 <br>
 
 ### Test Checklist ☑️
-	- [ ] 
+- [ ] 논의사항
 <br>
 
 ### Screenshot(option)
 <br>
-
