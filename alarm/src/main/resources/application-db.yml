@@ -1,0 +1,10 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://k9a304.p.ssafy.io:3306/TEST?serverTimezone=UTC&useLegacyDatetimeCode=false&useSSL=false&allowPublicKeyRetrieval=true
+    username: sugarmanager_user
+    password: Icando304!
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: false
