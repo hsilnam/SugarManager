@@ -1,5 +1,7 @@
 package kr.co.sugarmanager.business.menu.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.sugarmanager.business.global.exception.ErrorCode;
 import kr.co.sugarmanager.business.global.exception.ValidationException;
 import kr.co.sugarmanager.business.menu.dto.ImageDTO;
@@ -21,11 +23,16 @@ import java.util.concurrent.CompletableFuture;
 @Slf4j
 public class MenuServiceImpl implements MenuService {
     private final KafkaTemplate<String, Object> kafkaTemplate;
+    private final ObjectMapper objectMapper;
 
     public void produceMessage(Long pk, String type, List<MultipartFile> multipartFile) {
-        for (MultipartFile file : multipartFile) {
-            ImageDTO imageDTO = createImageDTO(pk, type, file);
-            kafkaTemplate.send("image", imageDTO);
+        try {
+            for (MultipartFile file : multipartFile) {
+                ImageDTO imageDTO = createImageDTO(pk, type, file);
+                kafkaTemplate.send("image", objectMapper.writeValueAsString(imageDTO));
+            }
+        } catch (JsonProcessingException e) {
+            log.info("Json fail: {}", e);
         }
     }
 
@@ -33,11 +40,13 @@ public class MenuServiceImpl implements MenuService {
         String originalFilename = multipartFile.getName();
         String extension = originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
         checkImageFileExtension(extension);
-
         try {
             return ImageDTO.builder()
                     .pk(pk)
                     .type(type)
+                    .extension(extension)
+                    .contentType(multipartFile.getContentType())
+                    .size(multipartFile.getSize())
                     .file(multipartFile.getBytes())
                     .build();
         } catch (IOException e) {

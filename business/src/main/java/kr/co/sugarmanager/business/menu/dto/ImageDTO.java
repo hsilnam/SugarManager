@@ -10,5 +10,8 @@ import java.io.Serializable;
 public class ImageDTO implements Serializable {
     private long pk;
     private String type;
+    private String extension;
+    private long size;
+    private String contentType;
     private byte[] file;
 }
