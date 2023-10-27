@@ -28,8 +28,7 @@ public class GroupEntity extends CUDBaseEntity {
     private long pk;
 
     @Column(name = "GROUP_CODE", nullable = false, length = 10)
-    @Builder.Default
-    private String groupCode = this.generateGroupCode();
+    private String groupCode;
 
     public String generateGroupCode() {
         Random random = new Random(System.currentTimeMillis());
