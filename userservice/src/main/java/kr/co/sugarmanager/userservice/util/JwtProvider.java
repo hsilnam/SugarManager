@@ -5,7 +5,6 @@ import kr.co.sugarmanager.userservice.exception.CustomJwtException;
 import kr.co.sugarmanager.userservice.exception.ErrorCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
