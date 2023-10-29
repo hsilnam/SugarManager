@@ -2,7 +2,9 @@ package kr.co.sugarmanager.image.service;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import kr.co.sugarmanager.image.dto.ImageDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,7 +18,7 @@ import java.util.UUID;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class ImageServiceImpl implements ImageService{
+public class ImageServiceImpl implements ImageService {
 
     private final AmazonS3 amazonS3;
 
@@ -27,7 +29,14 @@ public class ImageServiceImpl implements ImageService{
     @KafkaListener(topics = "image")
     public void getMessageFromKafka(String message) {
         log.info("message: {}", message);
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            ImageDTO imageDTO = objectMapper.readValue(message, ImageDTO.class);
 
+            log.info("imageDTO: {}", imageDTO);
+        } catch (JsonProcessingException e) {
+            log.error("Json 에러: {}", e);
+        }
     }
 
     public String S3UploadService(MultipartFile multipartFile) {
@@ -40,7 +49,7 @@ public class ImageServiceImpl implements ImageService{
         try {
             amazonS3.putObject(bucket, originalFilename, multipartFile.getInputStream(), metadata);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            log.error("S3 저장 실패: {}", e);
         }
 
         return amazonS3.getUrl(bucket, originalFilename).toString();
