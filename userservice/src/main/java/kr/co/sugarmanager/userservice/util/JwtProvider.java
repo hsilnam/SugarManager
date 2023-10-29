@@ -3,6 +3,7 @@ package kr.co.sugarmanager.userservice.util;
 import io.jsonwebtoken.*;
 import kr.co.sugarmanager.userservice.exception.CustomJwtException;
 import kr.co.sugarmanager.userservice.exception.ErrorCode;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.stereotype.Component;
@@ -12,6 +13,7 @@ import java.util.Date;
 import java.util.Map;
 
 @Component
+@Slf4j
 public class JwtProvider {
     enum TokenType {
         ACCESS("accessToken"), REFRESH("refreshToken");
@@ -73,7 +75,7 @@ public class JwtProvider {
                     .getSubject();
         } catch (ExpiredJwtException e) {
             throw new CustomJwtException(ErrorCode.JWT_EXPIRED_EXCEPTION);
-        } catch (JwtException e) {
+        } catch (UnsupportedJwtException | MalformedJwtException | SignatureException | IllegalArgumentException e) {
             throw new CustomJwtException(ErrorCode.UNAUTHORIZATION_EXCEPTION);
         }
     }
@@ -87,7 +89,7 @@ public class JwtProvider {
                     .get(key);
         } catch (ExpiredJwtException e) {
             throw new CustomJwtException(ErrorCode.JWT_EXPIRED_EXCEPTION);
-        } catch (JwtException e) {
+        } catch (UnsupportedJwtException | MalformedJwtException | SignatureException | IllegalArgumentException e) {
             throw new CustomJwtException(ErrorCode.UNAUTHORIZATION_EXCEPTION);
         }
     }
@@ -98,7 +100,15 @@ public class JwtProvider {
                     .setSigningKey(secret.getBytes(StandardCharsets.UTF_8))
                     .parseClaimsJws(token);
             return !claims.getBody().getExpiration().before(new Date());
-        } catch (JwtException e) {
+        } catch (ExpiredJwtException e) {
+            return false;
+        } catch (UnsupportedJwtException e) {
+            return false;
+        } catch (MalformedJwtException e) {
+            return false;
+        } catch (SignatureException e) {
+            return false;
+        } catch (IllegalArgumentException e) {
             return false;
         }
     }
