@@ -1,6 +1,7 @@
 package kr.co.sugarmanager.image.service;
 
 import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -10,9 +11,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.UUID;
 
 @Slf4j
@@ -21,6 +23,7 @@ import java.util.UUID;
 public class ImageServiceImpl implements ImageService {
 
     private final AmazonS3 amazonS3;
+    private String path;
 
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
@@ -32,31 +35,42 @@ public class ImageServiceImpl implements ImageService {
         ObjectMapper objectMapper = new ObjectMapper();
         try {
             ImageDTO imageDTO = objectMapper.readValue(message, ImageDTO.class);
-
-            log.info("imageDTO: {}", imageDTO);
+            String fileName = uploadS3Service(imageDTO);
+            String url = getFileURL();
+            log.info("fileName: {}", fileName);
+            log.info("url: {}", url);
         } catch (JsonProcessingException e) {
             log.error("Json 에러: {}", e);
+        } catch (IOException e) {
+            log.error("S3 저장 에러: {}", e);
         }
     }
 
-    public String S3UploadService(MultipartFile multipartFile) {
-        String originalFilename = multipartFile.getOriginalFilename();
+    // 이미지 업로드
+    public String uploadS3Service(ImageDTO imageDTO) throws IOException {
+        String filename = createFileName(imageDTO.getExtension());
 
         ObjectMetadata metadata = new ObjectMetadata();
-        metadata.setContentLength(multipartFile.getSize());
-        metadata.setContentType(multipartFile.getContentType());
+        metadata.setContentLength(imageDTO.getSize());
+        metadata.setContentType(imageDTO.getContentType());
 
-        try {
-            amazonS3.putObject(bucket, originalFilename, multipartFile.getInputStream(), metadata);
-        } catch (IOException e) {
-            log.error("S3 저장 실패: {}", e);
+        try (InputStream inputStream = new ByteArrayInputStream(imageDTO.getFile())) {
+            path = imageDTO.getType() + "/" + filename;
+
+            amazonS3.putObject(bucket, path, inputStream, metadata);
+
+            return filename;
         }
-
-        return amazonS3.getUrl(bucket, originalFilename).toString();
     }
 
-    public StringBuilder createFileName(String extension) {
+    // 파일 URL
+    public String getFileURL() {
+        return amazonS3.generatePresignedUrl(new GeneratePresignedUrlRequest(bucket, path)).toString();
+    }
+
+    // 파일 이름 생성
+    public String createFileName(String extension) {
         StringBuilder sb = new StringBuilder();
-        return sb.append(UUID.randomUUID()).append(".").append(extension);
+        return String.valueOf(sb.append(UUID.randomUUID()).append(".").append(extension));
     }
 }
