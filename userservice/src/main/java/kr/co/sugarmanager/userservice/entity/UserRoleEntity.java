@@ -1,10 +1,7 @@
 package kr.co.sugarmanager.userservice.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.SQLDelete;
@@ -25,10 +22,15 @@ public class UserRoleEntity extends CUDBaseEntity {
     private long pk;
 
     @Column(name = "USER_ROLE")
-    private String role;
+    @Enumerated(EnumType.STRING)
+    private RoleType role;
 
     //Relation
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "USER_PK")
     private UserEntity user;
+
+    public void setUser(UserEntity user) {
+        this.user = user;
+    }
 }
