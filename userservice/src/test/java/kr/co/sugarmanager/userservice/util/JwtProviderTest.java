@@ -10,8 +10,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.Arrays;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -128,6 +131,42 @@ class JwtProviderTest {
                     newProvider.getSubject(token);
                 });
                 assertThat(expiredExceptionCode.getErrorCode()).isEqualTo(ErrorCode.JWT_EXPIRED_EXCEPTION);
+            }
+
+            @Test
+            public void 어세스_토큰_변조() {
+                String token = provider.createToken(payload);
+                String[] split = token.split("\\.");
+
+                split[1] = Base64.getEncoder().encodeToString("{\"change\":true}".getBytes());//payload 변조
+
+                final String modulationedToken = Arrays.stream(split).collect(Collectors.joining("."));//payload 변조 부분을 재 삽입
+
+                assertThat(provider.validateToken(modulationedToken)).isFalse();
+
+                CustomJwtException customJwtException = assertThrows(CustomJwtException.class, () -> {
+                    provider.getSubject(modulationedToken);
+                });
+
+                assertThat(customJwtException.getErrorCode()).isEqualTo(ErrorCode.UNAUTHORIZATION_EXCEPTION);
+            }
+
+            @Test
+            public void 리프레쉬_토큰_변조() {
+                String refreshToken = provider.createRefreshToken();
+                String[] split = refreshToken.split("\\.");
+
+                split[1] = Base64.getEncoder().encodeToString("{\"sub\":\"accessToken\"}".getBytes());//payload 변조
+
+                final String modulationedToken = Arrays.stream(split).collect(Collectors.joining("."));//payload 변조 부분을 재 삽입
+
+                assertThat(provider.validateToken(modulationedToken)).isFalse();
+
+                CustomJwtException customJwtException = assertThrows(CustomJwtException.class, () -> {
+                    provider.getSubject(modulationedToken);
+                });
+
+                assertThat(customJwtException.getErrorCode()).isEqualTo(ErrorCode.UNAUTHORIZATION_EXCEPTION);
             }
         }
 
