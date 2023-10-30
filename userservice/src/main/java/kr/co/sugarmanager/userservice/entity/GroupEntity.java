@@ -2,6 +2,7 @@ package kr.co.sugarmanager.userservice.entity;
 
 
 import jakarta.persistence.*;
+import kr.co.sugarmanager.userservice.util.StringUtils;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -31,22 +32,6 @@ public class GroupEntity extends CUDBaseEntity {
     private String groupCode;
 
     public String generateGroupCode() {
-        Random random = new Random(System.currentTimeMillis());
-        int numberOffset = 48;
-        int lowerOffset = 65;
-        int upperOffset = 97;
-
-        int[] offsets = {numberOffset, lowerOffset, upperOffset};
-        int[] sizes = {10, 26, 26};
-
-        StringBuffer sb = new StringBuffer();
-        while (sb.length() < 10) {
-            int offsetIndex = random.nextInt(offsets.length);
-
-            int sizeIndex = random.nextInt(sizes[offsetIndex]);
-
-            sb.append((char) (offsets[offsetIndex] + sizeIndex));
-        }
-        return sb.toString();
+        return StringUtils.generateRandomString(10);
     }
 }
