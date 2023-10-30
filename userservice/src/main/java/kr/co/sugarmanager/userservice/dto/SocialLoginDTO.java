@@ -12,6 +12,9 @@ public class SocialLoginDTO {
     public static class Request {
         @JsonProperty("access_token")
         private String accessToken;
+
+        @JsonProperty("fcm_token")
+        private String fcmToken;
     }
 
     @Builder

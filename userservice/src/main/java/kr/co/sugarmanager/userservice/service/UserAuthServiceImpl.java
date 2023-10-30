@@ -1,19 +1,20 @@
 package kr.co.sugarmanager.userservice.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import kr.co.sugarmanager.userservice.dto.SocialLoginDTO;
-import kr.co.sugarmanager.userservice.entity.RoleType;
-import kr.co.sugarmanager.userservice.entity.SocialType;
-import kr.co.sugarmanager.userservice.entity.UserEntity;
-import kr.co.sugarmanager.userservice.entity.UserRoleEntity;
+import kr.co.sugarmanager.userservice.entity.*;
 import kr.co.sugarmanager.userservice.repository.UserRepository;
 import kr.co.sugarmanager.userservice.util.JwtProvider;
+import kr.co.sugarmanager.userservice.util.StringUtils;
 import kr.co.sugarmanager.userservice.vo.KakaoProfile;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
-import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -27,58 +28,67 @@ public class UserAuthServiceImpl implements UserAuthService {
     @Override
     public SocialLoginDTO.Response socialLogin(SocialLoginDTO.Request dto) {
         KakaoProfile userInfo = kakaoOAuthService.getUserInfoWithMobile(dto.getAccessToken());
-        UserEntity userEntity = userRepository.findBySocialTypeAndSocialId(SocialType.KAKAO, String.valueOf(userInfo.getId()))
-                .orElse(UserEntity.builder()
-                        .name(Long.toString(userInfo.getId()))
-                        .nickname("kakaoUser" + userInfo.getId())
-                        .socialId(Long.toString(userInfo.getId()))
-                        .socialType(SocialType.KAKAO)
-                        .build());
+        return getResponse(userInfo, dto.getFcmToken());
+    }
 
-        userEntity.addRoles(Set.of(UserRoleEntity.builder()
-                .role(RoleType.MEMBER)
-                .build()));
+    @Transactional
+    public SocialLoginDTO.Response getResponse(KakaoProfile userInfo, String fcmToken) {
+        Optional<UserEntity> userEntity = userRepository.findBySocialTypeAndSocialId(SocialType.KAKAO, String.valueOf(userInfo.getId()));
+        UserEntity user = null;
+        if (userEntity.isEmpty()) {
+            String tempName = "GUEST_".concat(StringUtils.generateRandomString(10));
+            user = UserEntity.builder()
+                    .name(tempName)
+                    .nickname(tempName)
+                    .email(userInfo.getKakao_account().getEmail())
+                    .socialType(SocialType.KAKAO)
+                    .socialId(String.valueOf(userInfo.getId()))
+                    .build();
 
-        userRepository.save(userEntity);
+            //setting 만들기
+            UserSettingEntity setting = UserSettingEntity.builder()
+                    .sugarAlert(false)
+                    .pokeAlert(false)
+                    .challengeAlert(false)
+                    .sugarAlertHour(1)
+                    .fcmToken(fcmToken)
+                    .build();
 
-        Map<String, Object> payload = new HashMap<>();
-        payload.put("id", userEntity.getPk());
-        payload.put("roles",userEntity.getRoles());
+            //user image만들기
+            UserImageEntity profile = UserImageEntity.builder()
+                    .imageUrl(userInfo.getProperties().getProfile_image())
+                    .build();
+
+            //권한
+            Set<UserRoleEntity> roles = Set.of(
+                    UserRoleEntity.builder()
+                            .role(RoleType.MEMBER)
+                            .build()
+            );
+
+            user.addProfileImage(profile);
+            user.addSetting(setting);
+            user.addRoles(roles);
+
+            userRepository.save(user);
+        } else {
+            user = userEntity.get();
+
+            //image 업데이트
+            user.getUserImage().setImageUrl(userInfo.getKakao_account().getProfile().getProfile_image_url());
+        }
 
         return SocialLoginDTO.Response.builder()
-                .accessToken(jwtProvider.createToken(payload))
+                .accessToken(jwtProvider.createToken(new HashMap<>()))
                 .refreshToken(jwtProvider.createRefreshToken())
                 .build();
     }
 
     //임시로 client에서 소셜로그인 할 수 있도록
     @Override
+    @Transactional(propagation = Propagation.REQUIRED)
     public SocialLoginDTO.Response socialLogin(String code) {
         KakaoProfile userInfo = kakaoOAuthService.getUserInfo(code);
-        UserEntity userEntity = userRepository.findBySocialTypeAndSocialId(SocialType.KAKAO, String.valueOf(userInfo.getId()))
-                .orElse(UserEntity.builder()
-                        .name(Long.toString(userInfo.getId()))
-                        .nickname("kakaoUser" + userInfo.getId())
-                        .socialId(Long.toString(userInfo.getId()))
-                        .socialType(SocialType.KAKAO)
-                        .roles(Set.of(UserRoleEntity.builder()
-                                .role(RoleType.MEMBER)
-                                .build()))
-                        .build());
-
-        userEntity.addRoles(Set.of(UserRoleEntity.builder()
-                .role(RoleType.MEMBER)
-                .build()));
-
-        userRepository.save(userEntity);
-
-        Map<String, Object> payload = new HashMap<>();
-        payload.put("id", userEntity.getPk());
-        payload.put("roles",userEntity.getRoles());
-
-        return SocialLoginDTO.Response.builder()
-                .accessToken(jwtProvider.createToken(payload))
-                .refreshToken(jwtProvider.createRefreshToken())
-                .build();
+        return getResponse(userInfo, null);
     }
 }

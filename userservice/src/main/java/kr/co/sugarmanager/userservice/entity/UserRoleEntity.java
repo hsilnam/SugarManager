@@ -15,6 +15,7 @@ import org.hibernate.annotations.SQLDelete;
 @DynamicUpdate
 @Table(name = "USER_ROLES")
 @SQLDelete(sql = "UPDATE SET DELETED_AT ON USER_ROLES WHERE USER_ROLES_PK = ?")
+@ToString(exclude = "user")
 public class UserRoleEntity extends CUDBaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,7 +31,7 @@ public class UserRoleEntity extends CUDBaseEntity {
     @JoinColumn(name = "USER_PK")
     private UserEntity user;
 
-    public void setUser(UserEntity user) {
+    protected void setUser(UserEntity user) {
         this.user = user;
     }
 }

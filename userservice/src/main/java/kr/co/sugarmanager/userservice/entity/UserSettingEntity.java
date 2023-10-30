@@ -28,15 +28,17 @@ public class UserSettingEntity extends CUDBaseEntity {
     @Column(name = "FCM_TOKEN", nullable = false)
     private String fcmToken;
 
+    @Column(name = "SETTING_POKE_ALERT", nullable = false)
+    @ColumnDefault("false")
+    private boolean pokeAlert = false;
+
     @Column(name = "SETTING_CHALLENGE_ALERT", nullable = false)
     @ColumnDefault("false")
-    @Builder.Default
-    private boolean challengeAlert = false;
+    private boolean challengeAlert;
 
     @Column(name = "SETTING_BLOOD_SUGAR_ALERT", nullable = false)
     @ColumnDefault("false")
-    @Builder.Default
-    private boolean sugarAlert = false;
+    private boolean sugarAlert;
 
     @Column(name = "SETTING_BLOOD_SUGAR_HOUR")
     @ColumnDefault("1")
@@ -47,4 +49,25 @@ public class UserSettingEntity extends CUDBaseEntity {
     @OneToOne(fetch = FetchType.LAZY, optional = false, cascade = CascadeType.ALL)
     @JoinColumn(name = "USER_PK")
     private UserEntity user;
+
+    //Methods
+    protected void setUser(UserEntity user) {
+        this.user = user;
+    }
+
+    public boolean toggleAlert(AlertType type) {
+        switch (type) {
+            case POKE:
+                this.pokeAlert = !this.pokeAlert;
+                return this.pokeAlert;
+            case CHALLENGE:
+                this.challengeAlert = !this.challengeAlert;
+                return this.challengeAlert;
+            case BLOOD:
+                this.sugarAlert = !this.sugarAlert;
+                return this.sugarAlert;
+            default:
+                return false;
+        }
+    }
 }

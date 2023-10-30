@@ -1,5 +1,6 @@
 package kr.co.sugarmanager.userservice.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import kr.co.sugarmanager.userservice.dto.SocialLoginDTO;
 
 public interface UserAuthService {

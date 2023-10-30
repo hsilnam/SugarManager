@@ -17,6 +17,7 @@ import java.util.*;
 @DynamicUpdate
 @Table(name = "USER")
 @SQLDelete(sql = "UPDATE SET DELETED_AT ON USER WHERE USER_PK = ?")
+@ToString
 public class UserEntity extends CUDBaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -71,7 +72,7 @@ public class UserEntity extends CUDBaseEntity {
     @JoinColumn(name = "GROUP_PK")
     private GroupEntity group;
 
-    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private UserImageEntity userImage;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
@@ -81,5 +82,15 @@ public class UserEntity extends CUDBaseEntity {
     public void addRoles(Set<UserRoleEntity> roles) {
         this.roles = roles;
         roles.stream().forEach(role -> role.setUser(this));
+    }
+
+    public void addSetting(UserSettingEntity setting) {
+        this.setting = setting;
+        setting.setUser(this);
+    }
+
+    public void addProfileImage(UserImageEntity userImage) {
+        this.userImage = userImage;
+        userImage.setUser(this);
     }
 }

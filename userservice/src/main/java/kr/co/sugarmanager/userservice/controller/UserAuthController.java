@@ -1,5 +1,6 @@
 package kr.co.sugarmanager.userservice.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import kr.co.sugarmanager.userservice.dto.SocialLoginDTO;
 import kr.co.sugarmanager.userservice.service.UserAuthService;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +28,7 @@ public class UserAuthController {
     public ResponseEntity<ApiResult<SocialLoginDTO.Response>> socialLogin(
             @PathVariable("socialType") String socialType,
             @RequestBody SocialLoginDTO.Request body
-    ) {
+    ) throws JsonProcessingException {
         return result(true, userAuthService.socialLogin(body), HttpStatus.OK);
     }
 
@@ -40,7 +41,7 @@ public class UserAuthController {
 
     @GetMapping("/login/oauth2/code/kakao")
     @ResponseBody
-    public ResponseEntity<ApiResult<SocialLoginDTO.Response>> socialLoginWithJS(@RequestParam("code") String code) {
+    public ResponseEntity<ApiResult<SocialLoginDTO.Response>> socialLoginWithJS(@RequestParam("code") String code) throws JsonProcessingException {
         return result(true, userAuthService.socialLogin(code), HttpStatus.OK);
     }
 }
