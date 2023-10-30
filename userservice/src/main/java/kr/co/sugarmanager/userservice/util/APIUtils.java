@@ -9,11 +9,13 @@ import org.springframework.http.ResponseEntity;
 public class APIUtils {
 
     public static <T> ResponseEntity<ApiResult<T>> result(boolean success, T response, HttpStatus status) {
-        return new ResponseEntity<>(new ApiResult<>(success,response,null),status);
+        return new ResponseEntity<>(new ApiResult<>(success, response, null), status);
     }
 
-    public static ResponseEntity<ApiError> error(CustomException exception){
-        return new ResponseEntity(new ApiError(exception),exception.getErrorCode().getStatus());
+    public static ResponseEntity<ApiResult<ApiError>> error(CustomException exception) {
+        return new ResponseEntity<>(
+                new ApiResult<>(false, null, new ApiError(exception))
+                , exception.getErrorCode().getStatus());
     }
 
     @Getter
@@ -39,11 +41,11 @@ public class APIUtils {
             this.message = message;
         }
 
-        public ApiError(ErrorCode code){
-            this(code.getCode(),code.getMessage());
+        public ApiError(ErrorCode code) {
+            this(code.getCode(), code.getMessage());
         }
 
-        public ApiError(CustomException exception){
+        public ApiError(CustomException exception) {
             this(exception.getErrorCode());
         }
     }

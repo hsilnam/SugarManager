@@ -14,8 +14,10 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -26,6 +28,7 @@ public class UserAuthServiceImpl implements UserAuthService {
     private final JwtProvider jwtProvider;
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRED)
     public SocialLoginDTO.Response socialLogin(SocialLoginDTO.Request dto) {
         KakaoProfile userInfo = kakaoOAuthService.getUserInfoWithMobile(dto.getAccessToken());
         return getResponse(userInfo, dto.getFcmToken());
@@ -78,8 +81,12 @@ public class UserAuthServiceImpl implements UserAuthService {
             user.getUserImage().setImageUrl(userInfo.getKakao_account().getProfile().getProfile_image_url());
         }
 
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("id", user.getPk());
+        payload.put("roles", user.getRoles().stream().map(role -> role.getRole().getValue()).collect(Collectors.toList()));
+
         return SocialLoginDTO.Response.builder()
-                .accessToken(jwtProvider.createToken(new HashMap<>()))
+                .accessToken(jwtProvider.createToken(payload))
                 .refreshToken(jwtProvider.createRefreshToken())
                 .build();
     }

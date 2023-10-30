@@ -4,4 +4,4 @@ spring:
   profiles:
     include: db,jwt,eureka,oauth
 server:
-  port: 0
+  port: 8080
