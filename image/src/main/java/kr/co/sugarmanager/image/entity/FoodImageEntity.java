@@ -16,7 +16,7 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 @Table(name = "FOOD_IMAGE")
 public class FoodImageEntity {
     @Id
-    @GeneratedValue(strategy = IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "FOOD_IMAGE_PK")
     private Long foodImagePk;
 
