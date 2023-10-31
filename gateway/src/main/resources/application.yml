@@ -28,9 +28,11 @@ spring:
           predicates:
             - Path=/demo-service/** # routing start path
           filters:
+            - RewritePath=/demo-service/(?<segment>.*), /$\{segment} # Rewrite the incoming request path. When sending a request to MS, remove the '/demo-service' part from the path.
             - name: CustomFilter # CustomFilter exmaple
             - name: LoggingFilter # LoggingFilter example
               args:
                 baseMessage: demo logging filter test.
                 preLogger: true
                 postLogger: true
+
