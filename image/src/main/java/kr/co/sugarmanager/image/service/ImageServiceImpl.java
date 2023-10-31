@@ -6,6 +6,11 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.sugarmanager.image.dto.ImageDTO;
+import kr.co.sugarmanager.image.entity.FAQImageEntity;
+import kr.co.sugarmanager.image.entity.FoodImageEntity;
+import kr.co.sugarmanager.image.entity.ImageEntity;
+import kr.co.sugarmanager.image.repository.FAQImageRepository;
+import kr.co.sugarmanager.image.repository.FoodImageRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,6 +28,9 @@ import java.util.UUID;
 public class ImageServiceImpl implements ImageService {
 
     private final AmazonS3 amazonS3;
+    private final FoodImageRepository foodImageRepository;
+    private final FAQImageRepository faqImageRepository;
+    private final ObjectMapper objectMapper;
     private String path;
 
     @Value("${cloud.aws.s3.bucket}")
@@ -32,18 +40,46 @@ public class ImageServiceImpl implements ImageService {
     @KafkaListener(topics = "image")
     public void getMessageFromKafka(String message) {
         log.info("message: {}", message);
-        ObjectMapper objectMapper = new ObjectMapper();
         try {
             ImageDTO imageDTO = objectMapper.readValue(message, ImageDTO.class);
+
             String fileName = uploadS3Service(imageDTO);
             String url = getFileURL();
-            log.info("fileName: {}", fileName);
-            log.info("url: {}", url);
+
+            ImageEntity image = ImageEntity.builder()
+                    .imageFile(fileName)
+                    .imagePath(imageDTO.getImageType().toString())
+                    .imageUrl(url)
+                    .build();
+
+            switch (imageDTO.getImageType()) {
+                case FOOD -> createFoodImage(imageDTO, image);
+                case FAQ -> createFAQImage(imageDTO, image);
+                default -> log.error("Json 에러: imageDTO");
+            }
         } catch (JsonProcessingException e) {
             log.error("Json 에러: {}", e);
         } catch (IOException e) {
             log.error("S3 저장 에러: {}", e);
         }
+    }
+
+    public void createFoodImage(ImageDTO imageDTO, ImageEntity image) {
+        FoodImageEntity foodImageEntity = FoodImageEntity.builder()
+                .menuPk(imageDTO.getPk())
+                .image(image)
+                .build();
+
+        foodImageRepository.save(foodImageEntity);
+    }
+
+    public void createFAQImage(ImageDTO imageDTO, ImageEntity image) {
+        FAQImageEntity faqImageEntity = FAQImageEntity.builder()
+                .faqPk(imageDTO.getPk())
+                .image(image)
+                .build();
+
+        faqImageRepository.save(faqImageEntity);
     }
 
     // 이미지 업로드
@@ -55,7 +91,7 @@ public class ImageServiceImpl implements ImageService {
         metadata.setContentType(imageDTO.getContentType());
 
         try (InputStream inputStream = new ByteArrayInputStream(imageDTO.getFile())) {
-            path = imageDTO.getType() + "/" + filename;
+            path = imageDTO.getImageType() + "/" + filename;
 
             amazonS3.putObject(bucket, path, inputStream, metadata);
 
