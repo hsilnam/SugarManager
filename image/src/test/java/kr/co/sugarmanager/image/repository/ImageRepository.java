@@ -1,5 +1,6 @@
 package kr.co.sugarmanager.image.repository;
 
+import kr.co.sugarmanager.image.dto.ImageTypeEnum;
 import kr.co.sugarmanager.image.entity.FoodImageEntity;
 import kr.co.sugarmanager.image.entity.ImageEntity;
 import org.junit.jupiter.api.Test;
@@ -19,7 +20,7 @@ public class ImageRepository {
         //given
         ImageEntity image = ImageEntity.builder()
                 .imageFile("cat.jpg")
-                .imagePath("food")
+                .imagePath(ImageTypeEnum.FOOD.toString())
                 .imageUrl("https://sugarmanager.s3.ap-northeast-2.amazonaws.com/example/60339f23-116e-4a03-a75b-54a02e7ba524.jpeg")
                 .build();
         FoodImageEntity foodImageEntity = FoodImageEntity.builder()
