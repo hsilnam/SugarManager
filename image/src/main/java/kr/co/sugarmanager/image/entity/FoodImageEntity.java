@@ -21,7 +21,7 @@ public class FoodImageEntity {
     private Long foodImagePk;
 
     @Column(name = "MENU_PK")
-    private Long menuPk;
+    private String menuPk;
 
     @Embedded
     private ImageEntity image;

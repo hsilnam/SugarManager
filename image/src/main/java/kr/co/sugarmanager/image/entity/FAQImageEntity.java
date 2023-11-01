@@ -19,7 +19,7 @@ public class FAQImageEntity {
     private Long faqImagePk;
 
     @Column(name = "FAQ_PK")
-    private Long faqPk;
+    private String faqPk;
 
     @Embedded
     private ImageEntity image;

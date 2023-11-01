@@ -10,11 +10,11 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class ImageReciverServiceImpl implements ImageReciverService {
 
-    private final ImageSaveService imageSaveService;
+    private final ImageService imageSaveService;
 
     @KafkaListener(topics = "image")
     public void getMessage(String message) {
         log.info("message: {}", message);
-        imageSaveService.save(message);
+        imageSaveService.service(message);
     }
 }
