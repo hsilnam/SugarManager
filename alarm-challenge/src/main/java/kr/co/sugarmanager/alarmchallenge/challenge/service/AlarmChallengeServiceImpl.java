@@ -8,6 +8,7 @@ import kr.co.sugarmanager.alarmchallenge.challenge.entity.UserSettingEntity;
 import kr.co.sugarmanager.alarmchallenge.challenge.repository.ChallengeLogRepository;
 import kr.co.sugarmanager.alarmchallenge.challenge.repository.ChallengeTemplateRepository;
 import kr.co.sugarmanager.alarmchallenge.challenge.repository.SettingsRepository;
+import kr.co.sugarmanager.alarmchallenge.challenge.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -28,6 +29,7 @@ public class AlarmChallengeServiceImpl implements AlarmChallengeService{
     private final ChallengeLogRepository challengeLogRepository;
 
     // 현욱이가 만들어주면 삭제
+    private final UserRepository userRepository;
     private final SettingsRepository settingsRepository;
 
     @Transactional(readOnly = true)
@@ -39,7 +41,7 @@ public class AlarmChallengeServiceImpl implements AlarmChallengeService{
         log.info("start : {} end : {} ", start ,end);
 
         List<ChallengeLogEntity> challenges = challengeLogRepository.findAllChallenges(start, end);
-
+        log.info("challenge : {}", challenges.get(0).getCreatedAt());
         log.info("challenges : {}", challenges);
 
 
@@ -53,13 +55,14 @@ public class AlarmChallengeServiceImpl implements AlarmChallengeService{
             UserSettingEntity setting = settingsRepository.findSettingByUserId(userPk);
 
             UserInfo userInfo = UserInfo.builder()
+                    .type("CHALLENGE")
+                    .nickname(userRepository.findNicknameById(setting.getUserPk()))
                     .fcmToken(setting.getFcmToken())
                     .challengeAlert(setting.isChallengeAlert())
                     .hour(challengeTemplate.getHour())
                     .minute(challengeTemplate.getMinute())
-                    .deleted_at(challengeTemplate.getDeleted_at())
                     .build();
-            if (userInfo.isChallengeAlert() && userInfo.getDeleted_at() == null){
+            if (userInfo.isChallengeAlert() && challengeTemplate.getDeleted_at() == null){
                 userInfos.add(userInfo);
             }
             log.info("userPk : {}, userInfo : {} ", userPk, userInfo);

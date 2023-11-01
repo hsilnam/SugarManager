@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface ChallengeLogRepository extends JpaRepository<ChallengeLogEntity, Long> {
 
-    @Query("select c from ChallengeLogEntity c where c.createdAt between :today and :end" )
-    List<ChallengeLogEntity> findAllChallenges(@Param("today") LocalDateTime start, @Param("end") LocalDateTime end);
+    @Query("select c from ChallengeLogEntity c where c.createdAt between :start and :end" )
+    List<ChallengeLogEntity> findAllChallenges(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
 
 }

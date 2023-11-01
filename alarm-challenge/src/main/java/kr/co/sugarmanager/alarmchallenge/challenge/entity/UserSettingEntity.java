@@ -45,8 +45,7 @@ public class UserSettingEntity {
     @Builder.Default
     private int sugarAlertHour = 1;
 
-    //Relation
-    @Column(name = "user_pk")
+    @Column(name = "USER_PK")
     private long userPk;
 
 }

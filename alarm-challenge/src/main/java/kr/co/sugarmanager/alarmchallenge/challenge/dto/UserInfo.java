@@ -3,7 +3,6 @@ package kr.co.sugarmanager.alarmchallenge.challenge.dto;
 import com.fasterxml.jackson.annotation.JsonAlias;
 import lombok.*;
 
-import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -11,6 +10,12 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class UserInfo {
+
+    private String type;
+
+    @JsonAlias(value = "nickname")
+    private String nickname;
+
     @JsonAlias(value = "fcmToken")
     private String fcmToken;
 
@@ -22,9 +27,5 @@ public class UserInfo {
 
     @JsonAlias(value = "challenge_alert_min")
     private int minute;
-
-    @JsonAlias(value = "deleted_at")
-    private LocalDateTime deleted_at;
-
 }
 

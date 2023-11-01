@@ -22,7 +22,7 @@ public class AlarmChallengeController {
     private final AlarmChallengeService alarmChallengeService;
     String TOPIC = "alarm";
 
-    @GetMapping("/challenges")
+    @GetMapping("/challenge")
     public ResponseEntity<AlarmChallengeDTO.Response> todaysChallanges() throws JsonProcessingException {
         AlarmChallengeDTO.Response response = alarmChallengeService.todaysChallenges();
         String stringResponse = new ObjectMapper().writeValueAsString(response);
