@@ -1,0 +1,11 @@
+server:
+  port : 8080
+spring:
+  jpa:
+    hibernate:
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+  profiles:
+    include: db
+  kafka:
+    bootstrap-servers: k9a304.p.ssafy.io:9092,k9a304.p.ssafy.io:9093,k9a304.p.ssafy.io:9094
