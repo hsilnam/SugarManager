@@ -81,11 +81,11 @@ public class JwtProvider {
 
     public <T> T getClaims(String token, String key, Class<T> valueType) {
         try {
-            return (T) Jwts.parser()
+            return Jwts.parser()
                     .setSigningKey(secret.getBytes(StandardCharsets.UTF_8))
                     .parseClaimsJws(token)
                     .getBody()
-                    .get(key);
+                    .get(key,valueType);
         } catch (ExpiredJwtException e) {
             throw new CustomJwtException(ErrorCode.JWT_EXPIRED_EXCEPTION);
         } catch (UnsupportedJwtException | MalformedJwtException | SignatureException | IllegalArgumentException e) {
@@ -101,6 +101,25 @@ public class JwtProvider {
             return !claims.getBody().getExpiration().before(new Date());
         } catch (ExpiredJwtException e) {
             return false;
+        } catch (UnsupportedJwtException e) {
+            return false;
+        } catch (MalformedJwtException e) {
+            return false;
+        } catch (SignatureException e) {
+            return false;
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
+    }
+
+    public boolean validationTokenWithoutExpired(String token){
+        try {
+            Jws<Claims> claims = Jwts.parser()
+                    .setSigningKey(secret.getBytes(StandardCharsets.UTF_8))
+                    .parseClaimsJws(token);
+            return true;
+        } catch (ExpiredJwtException e) {
+            return true;
         } catch (UnsupportedJwtException e) {
             return false;
         } catch (MalformedJwtException e) {
