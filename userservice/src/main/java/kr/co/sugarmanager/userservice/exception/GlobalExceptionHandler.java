@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(CustomException.class)
-    public ResponseEntity<APIUtils.ApiError> customErrorExceptionHandler(CustomException exception) {
+    public ResponseEntity<APIUtils.ApiResult<APIUtils.ApiError>> customErrorExceptionHandler(CustomException exception) {
         return APIUtils.error(exception);
     }
 }

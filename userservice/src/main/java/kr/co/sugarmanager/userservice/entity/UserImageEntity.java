@@ -37,4 +37,13 @@ public class UserImageEntity extends CDBaseEntity {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "USER_PK")
     private UserEntity user;
+
+    //Methods
+    protected void setUser(UserEntity user) {
+        this.user = user;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
 }

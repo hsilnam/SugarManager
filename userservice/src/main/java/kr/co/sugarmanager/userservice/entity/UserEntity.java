@@ -3,15 +3,10 @@ package kr.co.sugarmanager.userservice.entity;
 import jakarta.persistence.*;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.*;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Entity
 @Builder
@@ -22,6 +17,7 @@ import java.util.List;
 @DynamicUpdate
 @Table(name = "USER")
 @SQLDelete(sql = "UPDATE SET DELETED_AT ON USER WHERE USER_PK = ?")
+@ToString
 public class UserEntity extends CUDBaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -55,11 +51,12 @@ public class UserEntity extends CUDBaseEntity {
     @Column(name = "USER_GENDER")
     private Boolean gender;
 
-    @Column(name = "USER_KAKAO", nullable = false)
-    private boolean kakao;
+    @Column(name = "USER_SOCIAL_TYPE", length = 10)
+    @Enumerated(EnumType.STRING)
+    private SocialType socialType;
 
-    @Column(name = "USER_KAKAO_PK")
-    private Long kakaoPk;
+    @Column(name = "USER_SOCIAL_ID")
+    private String socialId;
 
     @Column(name = "BLOOD_SUGAR_MAX")
     private int sugarMax;
@@ -75,10 +72,25 @@ public class UserEntity extends CUDBaseEntity {
     @JoinColumn(name = "GROUP_PK")
     private GroupEntity group;
 
-    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private UserImageEntity userImage;
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @Builder.Default
-    private List<UserRoleEntity> roles = new ArrayList<>();
+    private Set<UserRoleEntity> roles = new HashSet<>();
+
+    public void addRoles(Set<UserRoleEntity> roles) {
+        this.roles = roles;
+        roles.stream().forEach(role -> role.setUser(this));
+    }
+
+    public void addSetting(UserSettingEntity setting) {
+        this.setting = setting;
+        setting.setUser(this);
+    }
+
+    public void addProfileImage(UserImageEntity userImage) {
+        this.userImage = userImage;
+        userImage.setUser(this);
+    }
 }

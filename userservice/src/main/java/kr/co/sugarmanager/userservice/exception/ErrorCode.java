@@ -9,6 +9,7 @@ public enum ErrorCode {
     FORBIDDEN_EXCEPTION(HttpStatus.FORBIDDEN, "U002", "권한이 없습니다."),
     JWT_EXPIRED_EXCEPTION(HttpStatus.UNAUTHORIZED, "U003", "토큰 시간이 만료되었습니다.");
 
+
     private HttpStatus status;
     private String code;
     private String message;
