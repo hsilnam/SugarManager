@@ -38,7 +38,7 @@ public class ImageServiceImpl implements ImageService {
 
     // 카프카로부터 데이터 받아오기
     @KafkaListener(topics = "image")
-    public void getMessageFromKafka(String message) {
+    public void getMessage(String message) {
         log.info("message: {}", message);
         try {
             ImageDTO imageDTO = objectMapper.readValue(message, ImageDTO.class);
