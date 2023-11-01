@@ -9,7 +9,7 @@ public interface ImageService {
     void getMessage(String message);
     void createFoodImage(ImageDTO imageDTO, ImageEntity image);
     void createFAQImage(ImageDTO imageDTO, ImageEntity image);
-    String uploadS3Service(ImageDTO imageDTO) throws IOException;
-    String getFileURL();
+    String uploadS3Service(ImageDTO imageDTO, String path) throws IOException;
+    String getFileURL(String path);
     String createFileName(String extension);
 }

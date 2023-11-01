@@ -31,7 +31,6 @@ public class ImageServiceImpl implements ImageService {
     private final FoodImageRepository foodImageRepository;
     private final FAQImageRepository faqImageRepository;
     private final ObjectMapper objectMapper;
-    private String path;
 
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
@@ -43,8 +42,9 @@ public class ImageServiceImpl implements ImageService {
         try {
             ImageDTO imageDTO = objectMapper.readValue(message, ImageDTO.class);
 
-            String fileName = uploadS3Service(imageDTO);
-            String url = getFileURL();
+            String fileName = createFileName(imageDTO.getExtension());
+            String path = uploadS3Service(imageDTO, fileName);
+            String url = getFileURL(path);
 
             ImageEntity image = ImageEntity.builder()
                     .imageFile(fileName)
@@ -83,24 +83,22 @@ public class ImageServiceImpl implements ImageService {
     }
 
     // 이미지 업로드
-    public String uploadS3Service(ImageDTO imageDTO) throws IOException {
-        String filename = createFileName(imageDTO.getExtension());
-
+    public String uploadS3Service(ImageDTO imageDTO, String fileName) throws IOException {
+        StringBuilder path = new StringBuilder();
         ObjectMetadata metadata = new ObjectMetadata();
         metadata.setContentLength(imageDTO.getSize());
         metadata.setContentType(imageDTO.getContentType());
 
         try (InputStream inputStream = new ByteArrayInputStream(imageDTO.getFile())) {
-            path = imageDTO.getImageType() + "/" + filename;
+            path.append(imageDTO.getImageType()).append("/").append(fileName);
+            amazonS3.putObject(bucket, path.toString(), inputStream, metadata);
 
-            amazonS3.putObject(bucket, path, inputStream, metadata);
-
-            return filename;
+            return path.toString();
         }
     }
 
     // 파일 URL
-    public String getFileURL() {
+    public String getFileURL(String path) {
         return amazonS3.generatePresignedUrl(new GeneratePresignedUrlRequest(bucket, path)).toString();
     }
 
