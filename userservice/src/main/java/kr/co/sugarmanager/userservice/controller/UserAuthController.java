@@ -39,14 +39,6 @@ public class UserAuthController {
         return result(true, userAuthService.socialLogin(body), HttpStatus.OK);
     }
 
-    @GetMapping("/test")
-    public ResponseEntity<ApiResult<List<Object>>> forTest(
-            @AuthenticationPrincipal JwtAuthentication auth
-    ) {
-        return result(true, List.of(auth.getUsername(), auth.getPk()), HttpStatus.OK);
-    }
-
-
     //아래는 클라이언트에서 테스트용으로 만든 컨트롤러
     @GetMapping("/socialLogin")
     public String redirectSocialLogin() {
