@@ -14,7 +14,6 @@ import kr.co.sugarmanager.image.repository.FoodImageRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayInputStream;
@@ -25,7 +24,7 @@ import java.util.UUID;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class ImageServiceImpl implements ImageService {
+public class ImageSaveS3ServiceImpl implements ImageSaveService {
 
     private final AmazonS3 amazonS3;
     private final FoodImageRepository foodImageRepository;
@@ -35,9 +34,7 @@ public class ImageServiceImpl implements ImageService {
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
 
-    // 카프카로부터 데이터 받아오기
-    @KafkaListener(topics = "image")
-    public void getMessage(String message) {
+    public void save(String message) {
         log.info("message: {}", message);
         try {
             ImageDTO imageDTO = objectMapper.readValue(message, ImageDTO.class);
@@ -63,7 +60,6 @@ public class ImageServiceImpl implements ImageService {
             log.error("S3 저장 에러: {}", e);
         }
     }
-
     public void createFoodImage(ImageDTO imageDTO, ImageEntity image) {
         FoodImageEntity foodImageEntity = FoodImageEntity.builder()
                 .menuPk(imageDTO.getPk())
