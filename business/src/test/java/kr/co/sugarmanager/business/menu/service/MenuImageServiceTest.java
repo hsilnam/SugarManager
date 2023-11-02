@@ -2,16 +2,12 @@ package kr.co.sugarmanager.business.menu.service;
 
 import kr.co.sugarmanager.business.global.exception.ValidationException;
 import kr.co.sugarmanager.business.menu.dto.ImageDTO;
+import kr.co.sugarmanager.business.menu.dto.ImageTypeEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.kafka.support.SendResult;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.util.concurrent.ListenableFuture;
-import org.springframework.util.concurrent.ListenableFutureCallback;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.FileInputStream;
@@ -20,7 +16,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -34,15 +29,14 @@ public class MenuImageServiceTest {
     @Test
     void 이미지_전송을_위한_ImageDTO_생성_성공() throws Exception{
         Long pk = 1L;
-        String type = "example";
-        List<MultipartFile> multipartFiles = new ArrayList<>();
+        ImageTypeEnum imageTypeEnum = ImageTypeEnum.FOOD;
 
         String base = "src/test/java/kr/co/sugarmanager/business/menu/service/asset";
         Path logoPath = Paths.get(base, "logo.png");
         InputStream logoInputStream = new FileInputStream(logoPath.toFile());
         MockMultipartFile logoFile = new MockMultipartFile("logo.png", logoInputStream);
 
-        ImageDTO imageDTO = menuImageService.createImageDTO(pk, type, logoFile);
+        ImageDTO imageDTO = menuImageService.createImageDTO(pk, imageTypeEnum, logoFile);
 
         assertArrayEquals(logoFile.getBytes(), imageDTO.getFile());
     }
@@ -50,7 +44,7 @@ public class MenuImageServiceTest {
     @Test
     void 이미지_전송을_위한_ImageDTO_생성_실패() throws Exception{
         Long pk = 1L;
-        String type = "example";
+        ImageTypeEnum imageTypeEnum = ImageTypeEnum.FOOD;
         List<MultipartFile> multipartFiles = new ArrayList<>();
 
         String base = "src/test/java/kr/co/sugarmanager/business/menu/service/asset";
@@ -59,7 +53,7 @@ public class MenuImageServiceTest {
         MockMultipartFile logoFile = new MockMultipartFile("logo.jjj", logoInputStream);
 
         assertThrows(ValidationException.class, () -> {
-            menuImageService.createImageDTO(pk, type, logoFile);
+            menuImageService.createImageDTO(pk, imageTypeEnum, logoFile);
         });
     }
 
@@ -67,7 +61,7 @@ public class MenuImageServiceTest {
     void 이미지_데이터_전송() throws Exception {
         //given
         Long pk = 1L;
-        String type = "example";
+        ImageTypeEnum imageTypeEnum = ImageTypeEnum.FOOD;
 
         List<MultipartFile> multipartFiles = new ArrayList<>();
 
@@ -80,6 +74,6 @@ public class MenuImageServiceTest {
             multipartFiles.add(catFile);
         }
 
-        menuImageService.produceMessage(pk, type, multipartFiles);
+        menuImageService.produceMessage(pk, imageTypeEnum, multipartFiles);
     }
 }

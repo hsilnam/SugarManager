@@ -9,6 +9,9 @@ import java.io.Serializable;
 @Builder
 public class ImageDTO implements Serializable {
     private long pk;
-    private String type;
+    private ImageTypeEnum imageTypeEnum;
+    private String extension;
+    private long size;
+    private String contentType;
     private byte[] file;
 }
