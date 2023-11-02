@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AlarmChallengeController {
     private final KafkaTemplate<String, String> kafkaTemplate;
     private final AlarmChallengeService alarmChallengeService;
-    String TOPIC = "alarm";
+    String TOPIC = "alarm-challenge";
 
     @GetMapping("/challenge")
     public ResponseEntity<AlarmChallengeDTO.Response> todaysChallanges() throws JsonProcessingException {
