@@ -1,10 +1,12 @@
 package kr.co.sugarmanager.image.repository;
 
+import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import kr.co.sugarmanager.image.dto.ImageDTO;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
@@ -13,6 +15,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.UUID;
 
+@Slf4j
 @Repository
 @RequiredArgsConstructor
 public class ImageS3Repository implements ImageRepository{
@@ -48,5 +51,14 @@ public class ImageS3Repository implements ImageRepository{
     public String createFileName(String extension) {
         StringBuilder sb = new StringBuilder();
         return String.valueOf(sb.append(UUID.randomUUID()).append(".").append(extension));
+    }
+
+    @Override
+    public void deleteFile(String filePath) {
+        try {
+            amazonS3.deleteObject(bucket, filePath);
+        } catch (AmazonServiceException e) {
+            log.error("S3 Service Error: {}", e);
+        }
     }
 }

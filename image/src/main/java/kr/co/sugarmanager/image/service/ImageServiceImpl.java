@@ -34,7 +34,7 @@ public class ImageServiceImpl implements ImageService {
                 save(imageDTO);
             }
             case DELETE -> {
-                Long deleteImagePk = Long.parseLong((String) imageInfoMap.get("pk"));
+                String deleteImagePk = (String) imageInfoMap.get("filePath");
                 delete(deleteImagePk);
             }
         }
@@ -66,8 +66,8 @@ public class ImageServiceImpl implements ImageService {
     }
 
     @Override
-    public void delete(Long imagePk) {
-
+    public void delete(String filePath) {
+        imageRepository.deleteFile(filePath);
     }
 
     @Override
