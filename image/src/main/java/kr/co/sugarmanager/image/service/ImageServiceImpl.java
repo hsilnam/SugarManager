@@ -9,16 +9,13 @@ import kr.co.sugarmanager.image.entity.FoodImageEntity;
 import kr.co.sugarmanager.image.entity.ImageEntity;
 import kr.co.sugarmanager.image.repository.FAQImageRepository;
 import kr.co.sugarmanager.image.repository.FoodImageRepository;
+import kr.co.sugarmanager.image.repository.ImageRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Map;
-import java.util.UUID;
 
 @Slf4j
 @Service
@@ -28,31 +25,18 @@ public class ImageServiceImpl implements ImageService {
     private final ImageRepository imageRepository;
     private final FoodImageRepository foodImageRepository;
     private final FAQImageRepository faqImageRepository;
-    private final ObjectMapper objectMapper;
-
-    @Value("${cloud.aws.s3.bucket}")
-    private String bucket;
 
     @Override
-    public void service(String message) {
-        log.info("message: {}", message);
-        try {
-            Map<String, Object> map = objectMapper.readValue(message, Map.class);
-
-            String operationType = (String) map.get("operationTypeEnum");
-            if (operationType.equals(OperationTypeEnum.SAVE.name())) {
-                Map<String, Object> imageInfoMap = (Map<String, Object>) map.get("imageInfo");
+    public void service(OperationTypeEnum operationType, Map<String, Object> imageInfoMap) {
+        switch (operationType) {
+            case SAVE -> {
                 ImageDTO imageDTO = new ImageDTO(imageInfoMap);
                 save(imageDTO);
-            } else if (operationType.equals(OperationTypeEnum.DELETE.name())) {
-                Map<String, String> deleteMap = (Map<String, String>) map.get("imageInfo");
-                Long deleteImagePk = Long.parseLong(deleteMap.get("pk"));
+            }
+            case DELETE -> {
+                Long deleteImagePk = Long.parseLong((String) imageInfoMap.get("pk"));
                 delete(deleteImagePk);
             }
-        } catch (JsonProcessingException e) {
-            log.error("Json 에러: {}", e);
-        } catch (IOException e) {
-            log.error("S3 에러: {}", e);
         }
     }
 
