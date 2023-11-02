@@ -9,7 +9,7 @@ import java.util.Map;
 public interface ImageService {
     void service(OperationTypeEnum operationType, Map<String, Object> imageInfoMap);
     void save(ImageDTO imageDTO);
-    void delete(Long imagePk);
+    void delete(String filePath);
     void createFoodImage(ImageDTO imageDTO, ImageEntity image);
     void createFAQImage(ImageDTO imageDTO, ImageEntity image);
 }

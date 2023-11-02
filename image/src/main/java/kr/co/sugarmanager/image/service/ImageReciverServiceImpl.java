@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.sugarmanager.image.dto.OperationTypeEnum;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.kafka.KafkaException;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +29,8 @@ public class ImageReciverServiceImpl implements ImageReciverService {
             imageService.service(OperationTypeEnum.valueOf(operationType), imageInfoMap);
         } catch (JsonProcessingException e) {
             log.error("JsonProcessingException: {}", e);
+        } catch (KafkaException e) {
+            log.error("KafkaException: {}", e);
         }
     }
 }
