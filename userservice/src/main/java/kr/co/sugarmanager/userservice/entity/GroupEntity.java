@@ -20,7 +20,7 @@ import java.util.Random;
 @AllArgsConstructor
 @DynamicInsert
 @DynamicUpdate
-@Table(name = "GROUP")
+@Table(name = "GROUPS")
 @SQLDelete(sql = "UPDATE SET DELETED_AT ON GROUP WHERE GROUP_PK = ?")
 public class GroupEntity extends CUDBaseEntity {
     @Id
