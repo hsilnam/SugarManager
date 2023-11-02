@@ -55,14 +55,13 @@ public class AlarmChallengeServiceImpl implements AlarmChallengeService{
             UserSettingEntity setting = settingsRepository.findSettingByUserId(userPk);
 
             UserInfo userInfo = UserInfo.builder()
-                    .type("CHALLENGE")
                     .nickname(userRepository.findNicknameById(setting.getUserPk()))
                     .fcmToken(setting.getFcmToken())
-                    .challengeAlert(setting.isChallengeAlert())
+                    .challengeTitle(challengeTemplate.getTitle())
                     .hour(challengeTemplate.getHour())
                     .minute(challengeTemplate.getMinute())
                     .build();
-            if (userInfo.isChallengeAlert() && challengeTemplate.getDeleted_at() == null){
+            if (setting.isChallengeAlert() && challengeTemplate.getDeleted_at() == null){
                 userInfos.add(userInfo);
             }
             log.info("userPk : {}, userInfo : {} ", userPk, userInfo);

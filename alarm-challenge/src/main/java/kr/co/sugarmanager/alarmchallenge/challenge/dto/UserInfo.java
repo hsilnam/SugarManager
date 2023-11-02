@@ -11,16 +11,14 @@ import lombok.*;
 @Builder
 public class UserInfo {
 
-    private String type;
-
     @JsonAlias(value = "nickname")
     private String nickname;
 
     @JsonAlias(value = "fcmToken")
     private String fcmToken;
 
-    @JsonAlias(value = "challengeAlert")
-    private boolean challengeAlert;
+    @JsonAlias(value = "challengeTitle")
+    private String challengeTitle;
 
     @JsonAlias(value = "challenge_alert_hour")
     private int hour;
