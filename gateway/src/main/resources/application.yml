@@ -1,0 +1,43 @@
+server:
+  port: 8000
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka # eureka server url
+
+spring:
+  application:
+    name: gateway-service
+  cloud:
+    gateway:
+      default-filters:
+        # global filter example
+        - name: GlobalFilter
+          args:
+            baseMessage: Spring Cloud Gateway Global Filter
+            preLogger: true
+            postLogger: true
+      routes:
+        # TODO: setting MS
+        # demo service example
+        - id: demo-service
+          uri: lb://DEMO-SERVICE # lb:{service_name} # Write uppercase!
+          predicates:
+            - Path=/demo-service/** # routing start path
+          filters:
+            - RewritePath=/demo-service/(?<segment>.*), /$\{segment} # Rewrite the incoming request path. When sending a request to MS, remove the '/demo-service' part from the path.
+            - name: CustomFilter # CustomFilter exmaple
+            - name: LoggingFilter # LoggingFilter example
+              args:
+                baseMessage: demo logging filter test.
+                preLogger: true
+                postLogger: true
+        - id: user-service
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/user-service/api/v1/auth/**
+          filters:
+            - RewritePath=/user-service/(?<segment>.*), /$\{segment}
