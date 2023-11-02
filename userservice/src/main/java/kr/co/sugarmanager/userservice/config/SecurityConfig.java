@@ -40,6 +40,9 @@ public class SecurityConfig {
                 .httpBasic(basic -> basic.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(req ->
+                        req.requestMatchers("/api/v1/auth/**").permitAll()
+                                .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(exception ->
                         exception.accessDeniedHandler(new AccessDeniedHandler() {
