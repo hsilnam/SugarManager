@@ -1,8 +1,5 @@
 package kr.co.sugarmanager.image.service;
 
-import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
-import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.sugarmanager.image.dto.ImageDTO;
@@ -28,7 +25,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ImageServiceImpl implements ImageService {
 
-    private final AmazonS3 amazonS3;
+    private final ImageRepository imageRepository;
     private final FoodImageRepository foodImageRepository;
     private final FAQImageRepository faqImageRepository;
     private final ObjectMapper objectMapper;
@@ -62,9 +59,9 @@ public class ImageServiceImpl implements ImageService {
     @Override
     public void save(ImageDTO imageDTO) {
         try {
-            String fileName = createFileName(imageDTO.getExtension());
-            String path = uploadS3Service(imageDTO, fileName);
-            String url = getFileURL(path);
+            String fileName = imageRepository.createFileName(imageDTO.getExtension());
+            String path = imageRepository.uploadS3Service(imageDTO, fileName);
+            String url = imageRepository.getFileURL(path);
 
             ImageEntity image = ImageEntity.builder()
                     .imageFile(fileName)
@@ -107,34 +104,5 @@ public class ImageServiceImpl implements ImageService {
                 .build();
 
         faqImageRepository.save(faqImageEntity);
-    }
-
-    // 이미지 업로드
-    @Override
-    public String uploadS3Service(ImageDTO imageDTO, String fileName) throws IOException {
-        StringBuilder path = new StringBuilder();
-        ObjectMetadata metadata = new ObjectMetadata();
-        metadata.setContentLength(imageDTO.getSize());
-        metadata.setContentType(imageDTO.getContentType());
-
-        try (InputStream inputStream = new ByteArrayInputStream(imageDTO.getFile())) {
-            path.append(imageDTO.getImageType()).append("/").append(fileName);
-            amazonS3.putObject(bucket, path.toString(), inputStream, metadata);
-
-            return path.toString();
-        }
-    }
-
-    // 파일 URL
-    @Override
-    public String getFileURL(String path) {
-        return amazonS3.generatePresignedUrl(new GeneratePresignedUrlRequest(bucket, path)).toString();
-    }
-
-    // 파일 이름 생성
-    @Override
-    public String createFileName(String extension) {
-        StringBuilder sb = new StringBuilder();
-        return String.valueOf(sb.append(UUID.randomUUID()).append(".").append(extension));
     }
 }
