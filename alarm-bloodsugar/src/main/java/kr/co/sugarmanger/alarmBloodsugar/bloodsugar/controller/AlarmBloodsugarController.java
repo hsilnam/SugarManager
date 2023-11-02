@@ -22,7 +22,7 @@ public class AlarmBloodsugarController {
     private final KafkaTemplate<String, String> kafkaTemplate;
     private final AlarmBloodsugarService alarmBloodsugarService;
 
-    String TOPIC = "alarm";
+    String TOPIC = "alarm-bloodsugar";
     @GetMapping("/bloodsugar")
     public ResponseEntity<AlarmBloodsugarDTO.Response> todaysChallanges() throws JsonProcessingException {
         AlarmBloodsugarDTO.Response response = alarmBloodsugarService.bloodSugarAlarms();

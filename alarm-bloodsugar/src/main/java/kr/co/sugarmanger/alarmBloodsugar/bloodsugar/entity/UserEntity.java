@@ -19,7 +19,7 @@ import java.sql.Date;
 @AllArgsConstructor
 @DynamicInsert
 @DynamicUpdate
-@Table(name = "USER")
+@Table(name = "USERS")
 @SQLDelete(sql = "UPDATE SET DELETED_AT ON USER WHERE USER_PK = ?")
 public class UserEntity{
     @Id
