@@ -15,7 +15,7 @@ import java.util.*;
 @AllArgsConstructor
 @DynamicInsert
 @DynamicUpdate
-@Table(name = "USER")
+@Table(name = "USERS")
 @SQLDelete(sql = "UPDATE SET DELETED_AT ON USER WHERE USER_PK = ?")
 @ToString
 public class UserEntity extends CUDBaseEntity {
