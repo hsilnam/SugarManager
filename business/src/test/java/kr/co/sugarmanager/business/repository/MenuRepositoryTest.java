@@ -1,5 +1,6 @@
 package kr.co.sugarmanager.business.repository;
 
+import jakarta.transaction.Transactional;
 import kr.co.sugarmanager.business.menu.entity.FoodEntity;
 import kr.co.sugarmanager.business.menu.entity.MenuEntity;
 import kr.co.sugarmanager.business.menu.repository.FoodRepository;
@@ -7,12 +8,14 @@ import kr.co.sugarmanager.business.menu.repository.MenuRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@DataJpaTest
+@SpringBootTest
+@Transactional
 public class MenuRepositoryTest {
     @Autowired
     private MenuRepository menuRepository;
@@ -29,8 +32,9 @@ public class MenuRepositoryTest {
                 .build();
         //when
         MenuEntity saveMenu = menuRepository.save(menuEntity);
+
         FoodEntity foodEntity = FoodEntity.builder()
-                .menuPk(menuEntity.getMenuPk())
+                .menuEntity(saveMenu)
                 .foodName("test")
                 .foodCarbohydrate(13)
                 .foodProtein(4.3F)
@@ -40,6 +44,6 @@ public class MenuRepositoryTest {
 
         //then
         assertEquals(saveMenu.getUserPk(), menuEntity.getUserPk());
-        assertEquals(saveFood.getMenuPk(), foodEntity.getMenuPk());
+        assertEquals(saveFood.getFoodName(), foodEntity.getFoodName());
     }
 }

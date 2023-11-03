@@ -26,7 +26,7 @@ public class MenuServiceTest {
         foodDTOList.add(foodDTO);
 
         MenuSaveDTO.Request request = MenuSaveDTO.Request.builder()
-                .foodList(foodDTOList)
+                .foods(foodDTOList)
                 .build();
 
         //when
