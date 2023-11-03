@@ -2,14 +2,13 @@ package kr.co.sugarmanager.business.menu.entity;
 
 import jakarta.persistence.*;
 import kr.co.sugarmanager.business.global.entity.CUDEntity;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import kr.co.sugarmanager.business.menu.dto.FoodDTO;
+import lombok.*;
 
 @Entity
 @Builder
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "FOOD")
@@ -20,10 +19,9 @@ public class FoodEntity extends CUDEntity {
     private Long foodPk;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "MENU_PK")
     private MenuEntity menuEntity;
 
-    @Column(name = "MENU_PK", insertable=false, updatable=false)
+    @Column(name = "MENU_PK")
     private Long menuPk;
 
     @Column(name = "FOOD_NAME")
@@ -55,4 +53,17 @@ public class FoodEntity extends CUDEntity {
 
     @Column(name = "FOOD_GRAMS")
     private float foodGrams;
+
+    public FoodEntity(FoodDTO foodDTO) {
+        setFoodName(foodDTO.getFoodName());
+        setFoodCarbohydrate(foodDTO.getFoodCarbohydrate());
+        setFoodProtein(foodDTO.getFoodProtein());
+        setFoodDietaryFiber(foodDTO.getFoodDietaryFiber());
+        setFoodVitamin(foodDTO.getFoodVitamin());
+        setFoodMineral(foodDTO.getFoodMineral());
+        setFoodSalt(getFoodSalt());
+        setFoodSugars(foodDTO.getFoodSugars());
+        setFoodCal(foodDTO.getFoodCal());
+        setFoodGrams(foodDTO.getFoodGrams());
+    }
 }
