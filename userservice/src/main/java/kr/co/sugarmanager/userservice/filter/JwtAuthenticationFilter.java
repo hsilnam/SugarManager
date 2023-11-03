@@ -7,7 +7,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import kr.co.sugarmanager.userservice.exception.CustomJwtException;
 import kr.co.sugarmanager.userservice.util.APIUtils;
-import kr.co.sugarmanager.userservice.util.JwtProvider;
 import kr.co.sugarmanager.userservice.util.SecurityJwtService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +17,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
