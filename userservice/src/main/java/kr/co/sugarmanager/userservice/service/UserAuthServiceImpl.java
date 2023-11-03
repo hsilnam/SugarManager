@@ -37,6 +37,9 @@ public class UserAuthServiceImpl implements UserAuthService {
 
     @Transactional
     public SocialLoginDTO.Response getResponse(KakaoProfile userInfo, String fcmToken) {
+        if(userInfo == null){
+            return null;
+        }
         Optional<UserEntity> userEntity = userRepository.findBySocialTypeAndSocialId(SocialType.KAKAO, String.valueOf(userInfo.getId()));
         UserEntity user = null;
         if (userEntity.isEmpty()) {
