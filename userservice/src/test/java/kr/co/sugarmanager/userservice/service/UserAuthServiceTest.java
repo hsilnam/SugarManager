@@ -115,7 +115,7 @@ public class UserAuthServiceTest {
         });
         lenient().when(refreshTokenRepository.save(any())).thenAnswer(invocation -> {
             RefreshTokenEntity entity = invocation.getArgument(0, RefreshTokenEntity.class);
-            refreshTokenList = refreshTokenList.stream().filter(ref -> !ref.getId().equals(entity.getId())).collect(Collectors.toList());
+            refreshTokenList = refreshTokenList.stream().filter(ref -> !ref.getUserId().equals(entity.getUserId())).collect(Collectors.toList());
             refreshTokenList.add(entity);
             return entity;
         });
@@ -174,7 +174,7 @@ public class UserAuthServiceTest {
                     .build();
             refreshTokenRepository.save(RefreshTokenEntity.builder()
                     .refreshToken(refreshToken)
-                    .id(1l)
+                    .userId(1l)
                     .build());
 
             RefreshDTO.Response response = userAuthService.refreshToken(req);

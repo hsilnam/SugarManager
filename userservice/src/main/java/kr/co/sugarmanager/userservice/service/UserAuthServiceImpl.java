@@ -93,7 +93,7 @@ public class UserAuthServiceImpl implements UserAuthService {
 
         RefreshTokenEntity refreshToken = RefreshTokenEntity.builder()
                 .refreshToken(response.getRefreshToken())
-                .id(user.getPk())
+                .userId(user.getPk())
                 .build();
 
 
