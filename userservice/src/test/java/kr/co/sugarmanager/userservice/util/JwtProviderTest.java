@@ -1,7 +1,8 @@
 package kr.co.sugarmanager.userservice.util;
 
-import kr.co.sugarmanager.userservice.exception.CustomJwtException;
 import kr.co.sugarmanager.userservice.exception.ErrorCode;
+import kr.co.sugarmanager.userservice.exception.JwtExpiredException;
+import kr.co.sugarmanager.userservice.exception.JwtValidationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -10,13 +11,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest(classes = JwtProvider.class)
@@ -60,12 +59,14 @@ class JwtProviderTest {
                     assertThat(value).isEqualTo(values[i]);
                 }
 
-                int issuedAt = provider.getClaims(token, "iat", Integer.class);
-                int exp = provider.getClaims(token, "exp", Integer.class);
+                long issuedAt = provider.getClaims(token, "iat", Date.class).getTime();
+                long exp = provider.getClaims(token, "exp", Date.class).getTime();
 
-                assertThat(exp - issuedAt).isEqualTo(expired / 1000);
+                assertThat(exp - issuedAt).isEqualTo(expired);
 
-                assertThat(provider.validateToken(token)).isTrue();
+                assertDoesNotThrow(() -> {
+                    provider.validateToken(token);
+                });
             }
 
             @Test
@@ -76,12 +77,14 @@ class JwtProviderTest {
 
                 assertThat(provider.getSubject(refreshToken)).isEqualTo(JwtProvider.TokenType.REFRESH.getType());
 
-                int issuedAt = provider.getClaims(refreshToken, "iat", Integer.class);
-                int exp = provider.getClaims(refreshToken, "exp", Integer.class);
+                long issuedAt = provider.getClaims(refreshToken, "iat", Date.class).getTime();
+                long exp = provider.getClaims(refreshToken, "exp", Date.class).getTime();
 
-                assertThat(exp - issuedAt).isEqualTo(refreshExpired / 1000);
+                assertThat(exp - issuedAt).isEqualTo(refreshExpired);
 
-                assertThat(provider.validateToken(refreshToken)).isTrue();
+                assertDoesNotThrow(() -> {
+                    provider.validateToken(refreshToken);
+                });
             }
         }
 
@@ -107,13 +110,16 @@ class JwtProviderTest {
 
                 String token = newProvider.createToken(payload);
 
-                assertThat(newProvider.validateToken(token)).isFalse();
-                CustomJwtException expiredExceptionCode = assertThrows(CustomJwtException.class, () -> {
+                JwtExpiredException expiredExceptionCode = assertThrows(JwtExpiredException.class, () -> {
+                    newProvider.validateToken(token);
+                });
+
+                expiredExceptionCode = assertThrows(JwtExpiredException.class, () -> {
                     newProvider.getClaims(token, keys[0], String.class);
                 });
                 assertThat(expiredExceptionCode.getErrorCode()).isEqualTo(ErrorCode.JWT_EXPIRED_EXCEPTION);
 
-                expiredExceptionCode = assertThrows(CustomJwtException.class, () -> {
+                expiredExceptionCode = assertThrows(JwtExpiredException.class, () -> {
                     newProvider.getSubject(token);
                 });
                 assertThat(expiredExceptionCode.getErrorCode()).isEqualTo(ErrorCode.JWT_EXPIRED_EXCEPTION);
@@ -126,8 +132,10 @@ class JwtProviderTest {
 
                 String token = newProvider.createToken(payload);
 
-                assertThat(newProvider.validateToken(token)).isFalse();
-                CustomJwtException expiredExceptionCode = assertThrows(CustomJwtException.class, () -> {
+                JwtExpiredException expiredExceptionCode = assertThrows(JwtExpiredException.class, () -> {
+                    newProvider.validateToken(token);
+                });
+                expiredExceptionCode = assertThrows(JwtExpiredException.class, () -> {
                     newProvider.getSubject(token);
                 });
                 assertThat(expiredExceptionCode.getErrorCode()).isEqualTo(ErrorCode.JWT_EXPIRED_EXCEPTION);
@@ -140,15 +148,18 @@ class JwtProviderTest {
 
                 split[1] = Base64.getEncoder().encodeToString("{\"change\":true}".getBytes());//payload 변조
 
-                final String modulationedToken = Arrays.stream(split).collect(Collectors.joining("."));//payload 변조 부분을 재 삽입
+                final String modifiedToken = Arrays.stream(split).collect(Collectors.joining("."));//payload 변조 부분을 재 삽입
 
-                assertThat(provider.validateToken(modulationedToken)).isFalse();
+                JwtValidationException jwtValidationException = assertThrows(JwtValidationException.class, () -> {
+                    provider.validateToken(modifiedToken);
+                });
+                assertThat(jwtValidationException.getErrorCode()).isEqualTo(ErrorCode.JWT_BADREQUEST_EXCEPTION);
 
-                CustomJwtException customJwtException = assertThrows(CustomJwtException.class, () -> {
-                    provider.getSubject(modulationedToken);
+                JwtValidationException customJwtException = assertThrows(JwtValidationException.class, () -> {
+                    provider.getSubject(modifiedToken);
                 });
 
-                assertThat(customJwtException.getErrorCode()).isEqualTo(ErrorCode.UNAUTHORIZATION_EXCEPTION);
+                assertThat(customJwtException.getErrorCode()).isEqualTo(ErrorCode.JWT_BADREQUEST_EXCEPTION);
             }
 
             @Test
@@ -158,15 +169,18 @@ class JwtProviderTest {
 
                 split[1] = Base64.getEncoder().encodeToString("{\"sub\":\"accessToken\"}".getBytes());//payload 변조
 
-                final String modulationedToken = Arrays.stream(split).collect(Collectors.joining("."));//payload 변조 부분을 재 삽입
+                final String modifiedToken = Arrays.stream(split).collect(Collectors.joining("."));//payload 변조 부분을 재 삽입
 
-                assertThat(provider.validateToken(modulationedToken)).isFalse();
+                JwtValidationException jwtValidationException = assertThrows(JwtValidationException.class, () -> {
+                    provider.validateToken(modifiedToken);
+                });
+                assertThat(jwtValidationException.getErrorCode()).isEqualTo(ErrorCode.JWT_BADREQUEST_EXCEPTION);
 
-                CustomJwtException customJwtException = assertThrows(CustomJwtException.class, () -> {
-                    provider.getSubject(modulationedToken);
+                JwtValidationException customJwtException = assertThrows(JwtValidationException.class, () -> {
+                    provider.getSubject(modifiedToken);
                 });
 
-                assertThat(customJwtException.getErrorCode()).isEqualTo(ErrorCode.UNAUTHORIZATION_EXCEPTION);
+                assertThat(customJwtException.getErrorCode()).isEqualTo(ErrorCode.JWT_BADREQUEST_EXCEPTION);
             }
         }
 
