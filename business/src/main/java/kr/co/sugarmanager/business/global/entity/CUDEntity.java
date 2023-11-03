@@ -16,10 +16,10 @@ import java.time.LocalDateTime;
 abstract public class CUDEntity extends CEntity {
 
     @LastModifiedDate
-    @Column(name = "updated_at")
+    @Column(name = "UPDATED_AT")
     private LocalDateTime updatedAt;
 
     @Setter
-    @Column(name = "deleted_at")
+    @Column(name = "DELETED_AT")
     private LocalDateTime deletedAt;
 }

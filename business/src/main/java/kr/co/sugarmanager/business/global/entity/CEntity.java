@@ -15,6 +15,6 @@ import java.time.LocalDateTime;
 abstract public class CEntity {
 
     @CreatedDate
-    @Column(name = "created_at", updatable = false)
+    @Column(name = "CREATED_AT", updatable = false)
     private LocalDateTime createdAt;
 }
