@@ -1,5 +1,6 @@
 package kr.co.sugarmanager.business.menu.controller;
 
+import kr.co.sugarmanager.business.menu.dto.MenuDeleteDTO;
 import kr.co.sugarmanager.business.menu.dto.MenuSaveDTO;
 import kr.co.sugarmanager.business.menu.service.MenuService;
 import lombok.RequiredArgsConstructor;
@@ -30,5 +31,14 @@ public class MenuController {
         log.info("MenuSave - Authorization: {}, menuDto: {}", auth, memuDto.getFoods());
         Long userPk = 1L;       // TODO: 서버간 통신 필요
         return new ResponseEntity<>(menuService.save(userPk, imageFile, memuDto), HttpStatus.CREATED);
+    }
+
+    @PostMapping(value = "/delete", produces = APPLICATION_JSON_VALUE, consumes = {APPLICATION_JSON_VALUE})
+    public ResponseEntity<MenuDeleteDTO.Response> delete(
+            @RequestHeader("Authorization") String auth,
+            @Validated @RequestBody MenuDeleteDTO.Request menuPk) {
+        log.info("MenuDelete - Authorization: {}, menuDto: {}", auth, menuPk.getMenuPk());
+        Long userPk = 1L;       // TODO: 서버간 통신 필요
+        return new ResponseEntity<>(menuService.delete(userPk, menuPk), HttpStatus.OK);
     }
 }
