@@ -1,8 +1,8 @@
 spring:
+  application:
+    name: IMAGE-SERVICE
   profiles:
     active: secret
 
-eureka:
-  client:
-    register-with-eureka: false
-    fetch-registry: false
+server:
+  port: 8080
