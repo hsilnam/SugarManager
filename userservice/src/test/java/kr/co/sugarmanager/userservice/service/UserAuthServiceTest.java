@@ -32,7 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
-@Transactional
 @ExtendWith(MockitoExtension.class)
 public class UserAuthServiceTest {
     private final String secret = "SECRETSECRETSECRETSECRETSECRETSECRET";
