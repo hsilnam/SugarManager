@@ -1,6 +1,5 @@
 package kr.co.sugarmanager.business.menu.dto;
 
-import kr.co.sugarmanager.business.menu.entity.MenuEntity;
 import lombok.*;
 
 @Builder

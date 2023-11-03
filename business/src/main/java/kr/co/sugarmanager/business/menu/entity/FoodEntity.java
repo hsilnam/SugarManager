@@ -22,9 +22,6 @@ public class FoodEntity extends CUDEntity {
     @JoinColumn(name = "MENU_PK")
     private MenuEntity menuEntity;
 
-    @Column(name = "MENU_PK")
-    private Long menuPk;
-
     @Column(name = "FOOD_NAME")
     private String foodName;
 
