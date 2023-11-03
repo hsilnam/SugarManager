@@ -1,8 +1,9 @@
 package kr.co.sugarmanager.userservice.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import kr.co.sugarmanager.userservice.exception.ErrorCode;
+import kr.co.sugarmanager.userservice.exception.InternalServerErrorException;
 import kr.co.sugarmanager.userservice.vo.KakaoProfile;
 import kr.co.sugarmanager.userservice.vo.OAuthToken;
 import lombok.RequiredArgsConstructor;
@@ -63,10 +64,8 @@ public class KakaoOAuthService {
         OAuthToken token = null;
         try {
             token = mapper.readValue(response.getBody(), OAuthToken.class);
-        } catch (JsonMappingException e) {
-            throw new RuntimeException(e);
         } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+            throw new InternalServerErrorException(ErrorCode.JSON_BINDING_EXCEPTION);
         }
         return token.getAccess_token();
     }
@@ -88,10 +87,8 @@ public class KakaoOAuthService {
         KakaoProfile profile = null;
         try {
             profile = mapper.readValue(resourceProfileResponse.getBody(), KakaoProfile.class);
-        } catch (JsonMappingException e) {
-            e.printStackTrace();
         } catch (JsonProcessingException e) {
-            throw new RuntimeException("user info processing error");
+            throw new InternalServerErrorException(ErrorCode.JSON_BINDING_EXCEPTION);
         }
         return profile;
     }
