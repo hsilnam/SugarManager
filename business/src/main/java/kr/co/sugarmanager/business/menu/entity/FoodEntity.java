@@ -19,6 +19,7 @@ public class FoodEntity extends CUDEntity {
     private Long foodPk;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "MENU_PK")
     private MenuEntity menuEntity;
 
     @Column(name = "MENU_PK")

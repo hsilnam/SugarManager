@@ -12,7 +12,7 @@ public class MenuSaveDTO {
     @Getter
     @Setter
     public static class Request {
-        private List<FoodDTO> foodList;
+        private List<FoodDTO> foods;
     }
 
     @Builder
