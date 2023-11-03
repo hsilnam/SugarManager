@@ -1,6 +1,8 @@
 package kr.co.sugarmanager.business.menu.service;
 
+import jakarta.transaction.Transactional;
 import kr.co.sugarmanager.business.menu.dto.FoodDTO;
+import kr.co.sugarmanager.business.menu.dto.MenuDeleteDTO;
 import kr.co.sugarmanager.business.menu.dto.MenuSaveDTO;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +19,7 @@ public class MenuServiceTest {
     private MenuService menuService;
 
     @Test
+    @Transactional
     void 메뉴_저장_성공() throws Exception {
         //given
         FoodDTO foodDTO = FoodDTO.builder()
@@ -34,5 +37,16 @@ public class MenuServiceTest {
 
         //then
         assertEquals(save.isSuccess(), true);
+    }
+
+    @Test
+    @Transactional
+    void 식단_삭제_성공() throws Exception {
+        //given
+        MenuDeleteDTO.Request menuDeleteDTO = MenuDeleteDTO.Request.builder().menuPk("1").build();
+        //when
+        MenuDeleteDTO.Response delete = menuService.delete(1L, menuDeleteDTO);
+        //then
+        assertEquals(delete.isSuccess(), true);
     }
 }
