@@ -11,11 +11,12 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.ArrayList;
+import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.FactoryBasedNavigableListAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-@Transactional
 public class MenuRepositoryTest {
     @Autowired
     private MenuRepository menuRepository;
@@ -23,6 +24,7 @@ public class MenuRepositoryTest {
     private FoodRepository foodRepository;
 
     @Test
+    @Transactional
     void 식단_등록_성공() throws Exception {
         //given
         MenuEntity menuEntity = MenuEntity.builder()
@@ -45,5 +47,32 @@ public class MenuRepositoryTest {
         //then
         assertEquals(saveMenu.getUserPk(), menuEntity.getUserPk());
         assertEquals(saveFood.getFoodName(), foodEntity.getFoodName());
+    }
+
+    @Test
+    @Transactional
+    void 식단_삭제_권한_성공() throws Exception {
+        //given
+        Long menuPk = 11L;
+        Long userPk = 1L;
+
+        //when
+        Optional<MenuEntity> menu = menuRepository.findByMenuPkAndUserPk(menuPk, userPk);
+        //then
+        assertEquals(menu.isPresent(), true);
+    }
+
+    @Test
+    @Transactional
+    void 식단_삭제_권한_실패() throws Exception {
+        //given
+        Long menuPk = 11L;
+        Long userPk = 0L;
+
+        //when
+        Optional<MenuEntity> menu = menuRepository.findByMenuPkAndUserPk(menuPk, userPk);
+
+        //then
+        assertEquals(menu.isPresent(), false);
     }
 }
