@@ -1,6 +1,7 @@
 package kr.co.sugarmanager.userservice.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
@@ -23,6 +24,8 @@ public class UserInfoDTO {
     @Getter
     @Setter
     public static class Response {
+        @JsonIgnore
+        private boolean success;
         private long uid;
         private String name;
         private String nickname;

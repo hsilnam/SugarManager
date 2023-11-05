@@ -32,6 +32,7 @@ public class UserController {
                 .userPk(auth != null ? auth.getPk() : 0l)
                 .targetNickname(nickname)
                 .build();
-        return result(true, userService.getMemberInfo(req), HttpStatus.OK);
+        UserInfoDTO.Response response = userService.getMemberInfo(req);
+        return result(response.isSuccess(), response, HttpStatus.OK);
     }
 }
