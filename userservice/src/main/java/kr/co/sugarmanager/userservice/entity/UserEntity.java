@@ -3,10 +3,15 @@ package kr.co.sugarmanager.userservice.entity;
 import jakarta.persistence.*;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Table;
+import kr.co.sugarmanager.userservice.dto.UserInfoUpdateDTO;
+import kr.co.sugarmanager.userservice.exception.ValidationException;
 import lombok.*;
 import org.hibernate.annotations.*;
 
 import java.util.*;
+
+import static kr.co.sugarmanager.userservice.exception.ErrorCode.*;
+import static kr.co.sugarmanager.userservice.entity.UserInfoValidation.*;
 
 @Entity
 @Builder
@@ -79,6 +84,7 @@ public class UserEntity extends CUDBaseEntity {
     @Builder.Default
     private Set<UserRoleEntity> roles = new HashSet<>();
 
+    //custom methods
     public void addRoles(Set<UserRoleEntity> roles) {
         this.roles = roles;
         roles.stream().forEach(role -> role.setUser(this));
@@ -92,5 +98,73 @@ public class UserEntity extends CUDBaseEntity {
     public void addProfileImage(UserImageEntity userImage) {
         this.userImage = userImage;
         userImage.setUser(this);
+    }
+
+    public void updateInfo(UserInfoUpdateDTO.Request dto) {
+        setName(dto.getName());
+        setNickname(dto.getNickname());
+        setBirthday(dto.getBirthday());
+        setHeight(dto.getHeight());
+        setWeight(dto.getWeight());
+        setSugarMin(dto.getBloodSugarMin());
+        setSugarMax(dto.getBloodSugarMax());
+        setGender(dto.getGender());
+    }
+
+    //setter
+    private void setNickname(String nickname) {
+        //6~20자
+        if (!NICKNAME.validate(nickname)) {
+            throw new ValidationException(NICKNAME_NOT_VALID_EXCEPTION);
+        }
+        this.nickname = nickname;
+    }
+
+    private void setHeight(Integer height) {
+        if (!HEIGHT.validate(height)) {
+            throw new ValidationException(HEIGHT_NOT_VALID_EXCEPTION);
+        }
+        this.height = height;
+    }
+
+    private void setWeight(Integer weight) {
+        if (!WEIGHT.validate(weight)) {
+            throw new ValidationException(WEIGHT_NOT_VALID_EXCEPTION);
+        }
+        this.weight = weight;
+    }
+
+    private void setSugarMax(int sugarMax) {
+        this.sugarMax = sugarMax;
+    }
+
+    private void setSugarMin(int sugarMin) {
+        this.sugarMin = sugarMin;
+    }
+
+    private void setName(String name) {
+        if (!NAME.validate(name)) {
+            throw new ValidationException(NAME_NOT_VALID_EXCEPTION);
+        }
+        this.name = name;
+    }
+
+    private void setBirthday(Date birthday) {
+        this.birthday = birthday;
+    }
+
+    private void setGender(String gender) {
+        if (!GENDER.validate(gender)) {
+            throw new ValidationException(GENDER_NOT_VALID_EXCEPTION);
+        }
+        this.gender = gender.equalsIgnoreCase("male") ? false : true;
+    }
+
+    private void setGender(Boolean gender) {
+        this.gender = gender;
+    }
+
+    private void setUserImage(UserImageEntity userImage) {
+        this.userImage = userImage;
     }
 }
