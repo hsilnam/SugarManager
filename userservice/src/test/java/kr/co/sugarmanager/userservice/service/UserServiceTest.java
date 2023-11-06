@@ -18,15 +18,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.annotation.DirtiesContext;
 
 import java.lang.reflect.Field;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.InstanceOfAssertFactories.PATH;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.*;
@@ -245,7 +242,7 @@ public class UserServiceTest {
                     .weight(70)
                     .nickname(StringUtils.generateRandomString(UserInfoValidation.NICKNAME.getMin() + 1))
                     .name(StringUtils.generateRandomString(UserInfoValidation.NAME.getMin() + 1))
-                    .gender("male")
+                    .gender("MALE")
                     .build();
         }
 
