@@ -1,60 +1,74 @@
 package kr.co.sugarmanager.business.menu.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.transaction.Transactional;
 import kr.co.sugarmanager.business.global.exception.ErrorCode;
 import kr.co.sugarmanager.business.global.exception.ValidationException;
-import kr.co.sugarmanager.business.menu.dto.ImageDTO;
+import kr.co.sugarmanager.business.menu.dto.FoodDTO;
 import kr.co.sugarmanager.business.menu.dto.ImageTypeEnum;
+import kr.co.sugarmanager.business.menu.dto.MenuDeleteDTO;
+import kr.co.sugarmanager.business.menu.dto.MenuSaveDTO;
+import kr.co.sugarmanager.business.menu.entity.FoodEntity;
+import kr.co.sugarmanager.business.menu.entity.MenuEntity;
+import kr.co.sugarmanager.business.menu.exception.MenuException;
+import kr.co.sugarmanager.business.menu.repository.FoodRepository;
+import kr.co.sugarmanager.business.menu.repository.MenuRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
-@RequiredArgsConstructor
 @Slf4j
-public class MenuServiceImpl implements MenuService {
-    private final KafkaTemplate<String, Object> kafkaTemplate;
-    private final ObjectMapper objectMapper;
-
-    public void produceMessage(Long pk, ImageTypeEnum imageTypeEnum, List<MultipartFile> multipartFile) {
-        try {
-            for (MultipartFile file : multipartFile) {
-                ImageDTO imageDTO = createImageDTO(pk, imageTypeEnum, file);
-                kafkaTemplate.send("image", objectMapper.writeValueAsString(imageDTO));
-            }
-            kafkaTemplate.flush();
-        } catch (JsonProcessingException e) {
-            log.info("Json fail: {}", e);
+@RequiredArgsConstructor
+public class MenuServiceImpl implements MenuService{
+    private final MenuRepository menuRepository;
+    private final FoodRepository foodRepository;
+    private final MenuImageService menuImageService;
+    @Override
+    @Transactional
+    public MenuSaveDTO.Response save(Long userPk, List<MultipartFile> imageFiles, MenuSaveDTO.Request request) {
+        if (request.getFoods() == null || request.getFoods().size() == 0) {
+            throw new ValidationException(ErrorCode.MISSING_INPUT_VALUE);
         }
+
+        MenuEntity menuEntity = MenuEntity.builder()
+                .userPk(userPk)
+                .foodList(new ArrayList<>())
+                .foodImageList(new ArrayList<>())
+                .build();
+        MenuEntity menu = menuRepository.save(menuEntity);
+
+        for(FoodDTO food: request.getFoods()) {
+            FoodEntity foodEntity = new FoodEntity(food);
+            foodEntity.setMenuEntity(menu);
+            foodEntity.setMenuEntity(menu);
+            menuEntity.addFoodEntity(foodEntity);
+            foodRepository.save(foodEntity);
+        }
+
+        menuImageService.saveImage(menu.getMenuPk(), ImageTypeEnum.FOOD, imageFiles);
+
+        return MenuSaveDTO.Response
+                .builder()
+                .success(true)
+                .build();
     }
 
-    public ImageDTO createImageDTO(Long pk, ImageTypeEnum imageTypeEnum, MultipartFile multipartFile) {
-        String originalFilename = multipartFile.getName();
-        String extension = originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
-        checkImageFileExtension(extension);
-        try {
-            return ImageDTO.builder()
-                    .pk(pk)
-                    .imageTypeEnum(imageTypeEnum)
-                    .extension(extension)
-                    .contentType(multipartFile.getContentType())
-                    .size(multipartFile.getSize())
-                    .file(multipartFile.getBytes())
-                    .build();
-        } catch (IOException e) {
-            throw new ValidationException(ErrorCode.INVALID_IMAGE_TYPE_ERROR);
-        }
-    }
+    @Transactional
+    @Override
+    public MenuDeleteDTO.Response delete(Long userPk, MenuDeleteDTO.Request request) {
+        Optional<MenuEntity> menu = menuRepository.findByMenuPkAndUserPk(Long.valueOf(request.getMenuPk()), userPk);
+        if (!menu.isPresent()) throw new MenuException(ErrorCode.HANDLE_ACCESS_DENIED);
 
-    private void checkImageFileExtension(String extension) {
-        if (!extension.toLowerCase().matches("jpg|jpeg|png")) {
-            throw new ValidationException(ErrorCode.INVALID_IMAGE_TYPE_ERROR);
-        }
+        menuRepository.delete(menu.get());
+        return MenuDeleteDTO.Response
+                .builder()
+                .success(true)
+                .build();
     }
 }

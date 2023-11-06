@@ -10,9 +10,15 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ErrorResponse{
 
-    private String code;
-    private String message;
+    private boolean success;
+    private String response;
+    private ErrorDTO error;
+
+    public ErrorResponse(String code, String defaultMessage) {
+        this.success = false;
+        error = new ErrorDTO(code, defaultMessage);
+    }
     public static ErrorResponse of (ErrorCode code) {
-        return new ErrorResponse(code.getCode(), code.getMessage());
+        return new ErrorResponse(false, null, new ErrorDTO(code.getCode(), code.getMessage()));
     }
 }

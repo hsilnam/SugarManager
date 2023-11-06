@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @Slf4j
 public class MenuImageServiceTest {
     @Autowired
-    private MenuService menuImageService;
+    private MenuImageService menuImageService;
 
     @Test
     void 이미지_전송을_위한_ImageDTO_생성_성공() throws Exception{
@@ -74,6 +74,6 @@ public class MenuImageServiceTest {
             multipartFiles.add(catFile);
         }
 
-        menuImageService.produceMessage(pk, imageTypeEnum, multipartFiles);
+        menuImageService.saveImage(pk, imageTypeEnum, multipartFiles);
     }
 }
