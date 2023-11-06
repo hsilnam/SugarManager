@@ -11,5 +11,4 @@ public class FCMMessageDTO {
     private String title;
     private String body;
     private String fcmToken;
-
 }

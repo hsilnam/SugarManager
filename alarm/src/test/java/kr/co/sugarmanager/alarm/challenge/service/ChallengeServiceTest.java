@@ -1,8 +1,7 @@
 package kr.co.sugarmanager.alarm.challenge.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kr.co.sugarmanager.alarm.dto.ChallengeUserInfo;
+import kr.co.sugarmanager.alarm.dto.ChallengeUserInfoDTO;
 import kr.co.sugarmanager.alarm.dto.FCMMessageDTO;
 import kr.co.sugarmanager.alarm.service.FCMService;
 import org.junit.jupiter.api.Test;
@@ -51,7 +50,7 @@ public class ChallengeServiceTest {
         ArrayList<Object> userInfoMap = (ArrayList<Object>) map.get("userInfos");
 
         for (Object userObject : userInfoMap) {
-            ChallengeUserInfo userInfo = new ChallengeUserInfo((Map<String, Object>) userObject);
+            ChallengeUserInfoDTO userInfo = new ChallengeUserInfoDTO((Map<String, Object>) userObject);
 
             // message body
             StringBuilder body = new StringBuilder();

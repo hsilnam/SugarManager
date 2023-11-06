@@ -2,9 +2,10 @@ package kr.co.sugarmanager.alarm.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kr.co.sugarmanager.alarm.dto.BloodSugarUserInfo;
-import kr.co.sugarmanager.alarm.dto.ChallengeUserInfo;
+import kr.co.sugarmanager.alarm.dto.BloodSugarUserInfoDTO;
+import kr.co.sugarmanager.alarm.dto.ChallengeUserInfoDTO;
 import kr.co.sugarmanager.alarm.dto.FCMMessageDTO;
+import kr.co.sugarmanager.alarm.dto.PokeUserInfoDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -30,7 +31,7 @@ public class AlarmReceiveServiceImpl implements AlarmReceiveService {
             ArrayList<Object> userInfoMap = (ArrayList<Object>) map.get("userInfos");
 
             for (Object userObject : userInfoMap){
-                ChallengeUserInfo userInfo = new ChallengeUserInfo((Map<String, Object>) userObject);
+                ChallengeUserInfoDTO userInfo = new ChallengeUserInfoDTO((Map<String, Object>) userObject);
 
                 // message body
                 StringBuilder body = new StringBuilder();
@@ -60,7 +61,7 @@ public class AlarmReceiveServiceImpl implements AlarmReceiveService {
             ArrayList<Object> userInfoMap = (ArrayList<Object>) map.get("userInfos");
 
             for (Object userObject : userInfoMap){
-                BloodSugarUserInfo userInfo = new BloodSugarUserInfo((Map<String, Object>) userObject);
+                BloodSugarUserInfoDTO userInfo = new BloodSugarUserInfoDTO((Map<String, Object>) userObject);
 
                 // message body
                 StringBuilder body = new StringBuilder();
@@ -80,6 +81,37 @@ public class AlarmReceiveServiceImpl implements AlarmReceiveService {
         }
     }
 
+    @Override
+    @KafkaListener(topics = "alarm-poke")
+    public void consumePokeAlarm(String kafkaMessage) {
+        try{
+            Map<String,Object> map = objectMapper.readValue(kafkaMessage, Map.class);
+            ArrayList<Object> userInfoMap = (ArrayList<Object>) map.get("userInfos");
 
+            for (Object userObject : userInfoMap){
+                PokeUserInfoDTO userInfo = new PokeUserInfoDTO((Map<String, Object>) userObject);
 
+                // message body
+                StringBuilder body = new StringBuilder();
+                body
+                        .append(userInfo.getTargetNickname())
+                        .append("님, ")
+                        .append(userInfo.getNickname())
+                        .append("님께서 ")
+                        .append(userInfo.getChallengeTitle())
+                        .append(" 챌린지 달성 응원을 보냈습니다!");
+
+                FCMMessageDTO dto = FCMMessageDTO.builder()
+                        .title("알림")
+                        .body(body.toString())
+                        .fcmToken(userInfo.getFcmToken())
+                        .build();
+
+                fcmService.send(dto);
+
+            }
+        }catch (JsonProcessingException e){
+            log.info("error: {}", e.getMessage());
+        }
+    }
 }
