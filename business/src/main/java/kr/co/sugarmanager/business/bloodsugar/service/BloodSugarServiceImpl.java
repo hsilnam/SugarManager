@@ -2,6 +2,7 @@ package kr.co.sugarmanager.business.bloodsugar.service;
 
 import kr.co.sugarmanager.business.bloodsugar.dto.BloodSugarDeleteDTO;
 import kr.co.sugarmanager.business.bloodsugar.dto.BloodSugarSaveDTO;
+import kr.co.sugarmanager.business.bloodsugar.dto.BloodSugarSelectDTO;
 import kr.co.sugarmanager.business.bloodsugar.dto.BloodSugarUpdateDTO;
 import kr.co.sugarmanager.business.bloodsugar.entity.BloodSugarEntity;
 import kr.co.sugarmanager.business.bloodsugar.exception.BloodSugarException;
@@ -12,6 +13,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -71,5 +74,35 @@ public class BloodSugarServiceImpl implements BloodSugarService{
                 .response(null)
                 .error(null)
                 .build();
+    }
+
+    @Override
+    public BloodSugarSelectDTO.Response select(Long userPk, int year, int month, int day) {
+        List<BloodSugarEntity> selectResult = bloodSugarRepository.findByUserPkAndUpdatedAt(userPk, year, month, day);
+        int minBloodSugar = 501;
+        int maxBloodSugar = -1;
+        BloodSugarSelectDTO.Response returnDTO = BloodSugarSelectDTO.Response.builder()
+                .success(true)
+                .response(BloodSugarSelectDTO.ReturnResponse.builder().build())
+                .error(null)
+                .build();
+        returnDTO.getResponse().setList(new ArrayList<>());
+        for (BloodSugarEntity bloodSugarEntity: selectResult) {
+            minBloodSugar = Math.min(minBloodSugar, bloodSugarEntity.getLevel());
+            maxBloodSugar = Math.max(maxBloodSugar, bloodSugarEntity.getLevel());
+
+            returnDTO.getResponse().addList(BloodSugarSelectDTO.EntityResponse.builder()
+                            .bloodSugarPk(bloodSugarEntity.getBloodSugarPk())
+                            .category(bloodSugarEntity.getCategory())
+                            .content(bloodSugarEntity.getContent())
+                            .updatedAt(bloodSugarEntity.getUpdatedAt())
+                            .level(bloodSugarEntity.getLevel())
+                    .build());
+        }
+
+        returnDTO.getResponse().setBloodSugarMax(maxBloodSugar == -1 ? 0 : maxBloodSugar);
+        returnDTO.getResponse().setBloodSugarMin(minBloodSugar == 501 ? 0: minBloodSugar);
+
+        return returnDTO;
     }
 }
