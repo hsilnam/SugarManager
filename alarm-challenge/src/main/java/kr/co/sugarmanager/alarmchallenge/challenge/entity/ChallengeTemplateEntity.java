@@ -3,8 +3,6 @@ package kr.co.sugarmanager.alarmchallenge.challenge.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
@@ -47,15 +45,13 @@ public class ChallengeTemplateEntity {
     @Column(name = "challenge_alert_days")
     private int days;
 
-    @CreatedDate
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
-    @LastModifiedDate
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @Setter
+    @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
 
