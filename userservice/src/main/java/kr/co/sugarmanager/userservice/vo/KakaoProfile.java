@@ -1,10 +1,14 @@
 package kr.co.sugarmanager.userservice.vo;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class KakaoProfile {
     private long id;
     private String connected_at;
@@ -13,6 +17,8 @@ public class KakaoProfile {
 
     @Getter
     @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
     public static class Properties {
         private String nickname;
         private String profile_image;
@@ -21,6 +27,8 @@ public class KakaoProfile {
 
     @Getter
     @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
     public static class KakaoAccount {
         private Boolean profile_nickname_needs_agreement;
         private Boolean profile_image_needs_agreement;
@@ -45,6 +53,8 @@ public class KakaoProfile {
 
         @Getter
         @Builder
+        @AllArgsConstructor
+        @NoArgsConstructor
         public static class Profile {
             private String nickname;
             private String thumbnail_image_url;

@@ -1,8 +1,9 @@
 package kr.co.sugarmanager.userservice.util;
 
 import io.jsonwebtoken.*;
-import kr.co.sugarmanager.userservice.exception.CustomJwtException;
 import kr.co.sugarmanager.userservice.exception.ErrorCode;
+import kr.co.sugarmanager.userservice.exception.JwtExpiredException;
+import kr.co.sugarmanager.userservice.exception.JwtValidationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -44,6 +45,18 @@ public class JwtProvider {
         this.issuer = issuer;
     }
 
+    public String refreshToken(String refreshToken) {
+        Claims claims = this.getClaims(refreshToken);
+        return createToken(claims);
+    }
+
+    public String createRefreshToken(Map<String, Object> payload) {
+        return createToken(TokenType.REFRESH, payload, refreshExpired);
+    }
+
+    public String createToken(Claims payload) {
+        return createToken(TokenType.ACCESS, payload, refreshExpired);
+    }
 
     public String createRefreshToken() {
         return createToken(TokenType.REFRESH, null, refreshExpired);
@@ -65,6 +78,18 @@ public class JwtProvider {
                 .compact();
     }
 
+    public String createToken(TokenType subject, Claims payload, long expired) {
+        Date now = new Date();
+        return Jwts.builder()
+                .setSubject(subject.getType())
+                .addClaims(payload)
+                .setExpiration(new Date(now.getTime() + expired))
+                .signWith(SignatureAlgorithm.HS512, secret.getBytes(StandardCharsets.UTF_8))
+                .setIssuedAt(now)
+                .setIssuer(issuer)
+                .compact();
+    }
+
     public String getSubject(String token) {
         try {
             return Jwts.parser()
@@ -73,42 +98,48 @@ public class JwtProvider {
                     .getBody()
                     .getSubject();
         } catch (ExpiredJwtException e) {
-            throw new CustomJwtException(ErrorCode.JWT_EXPIRED_EXCEPTION);
+            throw new JwtExpiredException(ErrorCode.JWT_EXPIRED_EXCEPTION);
         } catch (UnsupportedJwtException | MalformedJwtException | SignatureException | IllegalArgumentException e) {
-            throw new CustomJwtException(ErrorCode.UNAUTHORIZATION_EXCEPTION);
+            throw new JwtValidationException(ErrorCode.JWT_BADREQUEST_EXCEPTION);
         }
     }
 
     public <T> T getClaims(String token, String key, Class<T> valueType) {
         try {
-            return (T) Jwts.parser()
+            return Jwts.parser()
                     .setSigningKey(secret.getBytes(StandardCharsets.UTF_8))
                     .parseClaimsJws(token)
                     .getBody()
-                    .get(key);
+                    .get(key, valueType);
         } catch (ExpiredJwtException e) {
-            throw new CustomJwtException(ErrorCode.JWT_EXPIRED_EXCEPTION);
+            throw new JwtExpiredException(ErrorCode.JWT_EXPIRED_EXCEPTION);
         } catch (UnsupportedJwtException | MalformedJwtException | SignatureException | IllegalArgumentException e) {
-            throw new CustomJwtException(ErrorCode.UNAUTHORIZATION_EXCEPTION);
+            throw new JwtValidationException(ErrorCode.JWT_BADREQUEST_EXCEPTION);
         }
     }
 
-    public boolean validateToken(String token) {
+    public Claims getClaims(String token) {
+        try {
+            return Jwts.parser()
+                    .setSigningKey(secret.getBytes(StandardCharsets.UTF_8))
+                    .parseClaimsJws(token)
+                    .getBody();
+        } catch (ExpiredJwtException e) {
+            throw new JwtExpiredException(ErrorCode.JWT_EXPIRED_EXCEPTION);
+        } catch (UnsupportedJwtException | MalformedJwtException | SignatureException | IllegalArgumentException e) {
+            throw new JwtValidationException(ErrorCode.JWT_BADREQUEST_EXCEPTION);
+        }
+    }
+
+    public void validateToken(String token) {
         try {
             Jws<Claims> claims = Jwts.parser()
                     .setSigningKey(secret.getBytes(StandardCharsets.UTF_8))
                     .parseClaimsJws(token);
-            return !claims.getBody().getExpiration().before(new Date());
         } catch (ExpiredJwtException e) {
-            return false;
-        } catch (UnsupportedJwtException e) {
-            return false;
-        } catch (MalformedJwtException e) {
-            return false;
-        } catch (SignatureException e) {
-            return false;
-        } catch (IllegalArgumentException e) {
-            return false;
+            throw new JwtExpiredException(ErrorCode.JWT_EXPIRED_EXCEPTION);
+        } catch (UnsupportedJwtException | MalformedJwtException | SignatureException | IllegalArgumentException e) {
+            throw new JwtValidationException(ErrorCode.JWT_BADREQUEST_EXCEPTION);
         }
     }
 }

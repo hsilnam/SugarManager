@@ -1,8 +1,11 @@
 package kr.co.sugarmanager.userservice.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import kr.co.sugarmanager.userservice.dto.RefreshDTO;
 import kr.co.sugarmanager.userservice.dto.SocialLoginDTO;
 import kr.co.sugarmanager.userservice.entity.*;
+import kr.co.sugarmanager.userservice.exception.AccessDenyException;
+import kr.co.sugarmanager.userservice.exception.ErrorCode;
+import kr.co.sugarmanager.userservice.repository.RefreshTokenRepository;
 import kr.co.sugarmanager.userservice.repository.UserRepository;
 import kr.co.sugarmanager.userservice.util.JwtProvider;
 import kr.co.sugarmanager.userservice.util.StringUtils;
@@ -13,10 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,6 +26,7 @@ public class UserAuthServiceImpl implements UserAuthService {
     private final KakaoOAuthService kakaoOAuthService;
     private final UserRepository userRepository;
     private final JwtProvider jwtProvider;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
@@ -36,6 +37,9 @@ public class UserAuthServiceImpl implements UserAuthService {
 
     @Transactional
     public SocialLoginDTO.Response getResponse(KakaoProfile userInfo, String fcmToken) {
+        if(userInfo == null){
+            return null;
+        }
         Optional<UserEntity> userEntity = userRepository.findBySocialTypeAndSocialId(SocialType.KAKAO, String.valueOf(userInfo.getId()));
         UserEntity user = null;
         if (userEntity.isEmpty()) {
@@ -85,10 +89,21 @@ public class UserAuthServiceImpl implements UserAuthService {
         payload.put("id", user.getPk());
         payload.put("roles", user.getRoles().stream().map(role -> role.getRole().getValue()).collect(Collectors.toList()));
 
-        return SocialLoginDTO.Response.builder()
+        SocialLoginDTO.Response response = SocialLoginDTO.Response.builder()
                 .accessToken(jwtProvider.createToken(payload))
-                .refreshToken(jwtProvider.createRefreshToken())
+                .refreshToken(jwtProvider.createRefreshToken(payload))
                 .build();
+
+        RefreshTokenEntity refreshToken = RefreshTokenEntity.builder()
+                .refreshToken(response.getRefreshToken())
+                .userId(user.getPk())
+                .build();
+
+
+        //redis에 저장
+        refreshTokenRepository.save(refreshToken);
+
+        return response;
     }
 
     //임시로 client에서 소셜로그인 할 수 있도록
@@ -97,5 +112,20 @@ public class UserAuthServiceImpl implements UserAuthService {
     public SocialLoginDTO.Response socialLogin(String code) {
         KakaoProfile userInfo = kakaoOAuthService.getUserInfo(code);
         return getResponse(userInfo, null);
+    }
+
+    @Override
+    @Transactional
+    public RefreshDTO.Response refreshToken(RefreshDTO.Request dto) {
+        String refreshToken = dto.getRefreshToken();
+
+        jwtProvider.validateToken(refreshToken);//refreshToken을 validate
+
+        refreshTokenRepository.findById(refreshToken)
+                .orElseThrow(() -> new AccessDenyException(ErrorCode.UNAUTHORIZATION_EXCEPTION));//Redis에 있는지 확인
+
+        return RefreshDTO.Response.builder()
+                .accessToken(jwtProvider.refreshToken(refreshToken))
+                .build();
     }
 }
