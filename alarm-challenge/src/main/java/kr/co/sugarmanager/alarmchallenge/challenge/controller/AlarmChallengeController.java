@@ -29,7 +29,7 @@ public class AlarmChallengeController {
     // 이거 비즈니스 서버에 옮겨야함
     @Scheduled(cron = "0 0 0 * * *")
     @GetMapping("/challenge/today")
-    public ResponseEntity<TodayChallengesDTO.Response> todaysChallenges() throws JsonProcessingException {
+    public ResponseEntity<TodayChallengesDTO.Response> todaysChallenges() {
         TodayChallengesDTO.Response response = alarmChallengeService.todaysChallenges();
         return new ResponseEntity<>(response,HttpStatus.OK);
     }
