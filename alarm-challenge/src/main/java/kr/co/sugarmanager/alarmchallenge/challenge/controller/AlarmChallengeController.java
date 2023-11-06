@@ -3,7 +3,7 @@ package kr.co.sugarmanager.alarmchallenge.challenge.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.sugarmanager.alarmchallenge.challenge.dto.AlarmChallengeDTO;
-import kr.co.sugarmanager.alarmchallenge.challenge.dto.AlarmRemindDTO;
+import kr.co.sugarmanager.alarmchallenge.challenge.dto.RemindChallengeDTO;
 import kr.co.sugarmanager.alarmchallenge.challenge.dto.TodayChallengesDTO;
 import kr.co.sugarmanager.alarmchallenge.challenge.service.AlarmChallengeService;
 import lombok.RequiredArgsConstructor;
@@ -55,12 +55,12 @@ public class AlarmChallengeController {
     private String REMIND;
 
     @Scheduled(cron = " 0 0 20 * * *")
-    @GetMapping("/remind")
-    public ResponseEntity<AlarmRemindDTO.Response> remind() throws JsonProcessingException {
-        AlarmRemindDTO.Response response = alarmChallengeService.remind();
+    @GetMapping("/challenge/remind")
+    public ResponseEntity<RemindChallengeDTO.Response> remind() throws JsonProcessingException {
+        RemindChallengeDTO.Response response = alarmChallengeService.remind();
         String stringResponse = new ObjectMapper().writeValueAsString(response);
-//        kafkaTemplate.send(REMIND,stringResponse);
-//        kafkaTemplate.flush();
+        kafkaTemplate.send(REMIND,stringResponse);
+        kafkaTemplate.flush();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

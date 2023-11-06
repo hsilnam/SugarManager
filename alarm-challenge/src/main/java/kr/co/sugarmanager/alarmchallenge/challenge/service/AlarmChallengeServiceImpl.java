@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.rmi.server.UID;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -37,7 +38,7 @@ public class AlarmChallengeServiceImpl implements AlarmChallengeService{
 
         int day = 1 << (LocalDateTime.now().getDayOfWeek().getValue()-1);
         List<ChallengeTemplateEntity> challenges = challengeTemplateRepository.findTodaysChallenges(day);
-        log.info("size : {} , challenges : {}", challenges.size(), challenges);
+//        log.info("size : {} , challenges : {}", challenges.size(), challenges);
 
         List<UserChallengeInfoDTO> userInfos = new ArrayList<>();
 
@@ -115,15 +116,54 @@ public class AlarmChallengeServiceImpl implements AlarmChallengeService{
     }
 
     @Override
-    public AlarmRemindDTO.Response remind(){
+    public RemindChallengeDTO.Response remind(){
 
-        // 가져올 유저 조건
+        // [1] 가져올 유저 조건
+        List<RemindUserInfoDTO> userInfos = new ArrayList<>();
 
-        // 챌린지 완료 횟수 count
-        LocalDateTime start = LocalDate.now().atStartOfDay(ZoneId.of("Asia/Seoul")).toLocalDateTime();
-        LocalDateTime end = start.plusDays(1);
+      List<UserSettingEntity> users = settingsRepository.findUsersWithChallengeAlarmOn();
+        for (UserSettingEntity user : users){
+            log.info("user nickname : {}", userRepository.findNicknameById(user.getPk()));
+            RemindUserInfoDTO info = RemindUserInfoDTO.builder()
+                    .nickname(userRepository.findNicknameById(user.getUserPk()))
+                    .fcmToken(user.getFcmToken())
+                    .build();
+            userInfos.add(info);
+        }
 
-        return null;
+        return RemindChallengeDTO.Response.builder()
+                .userInfos(userInfos)
+                .build();
+
+        // [1-1] 오늘 챌린지가 있는 모든 유저 가져오기
+//        int day = 1 << (LocalDateTime.now().getDayOfWeek().getValue()-1);
+//        List<ChallengeTemplateEntity> challenges = challengeTemplateRepository.findTodaysChallenges(day);
+//        log.info("size : {} , challenges : {}", challenges.size(), challenges);
+//
+//        for(ChallengeTemplateEntity challenge : challenges){
+//
+//            long userPk = challenge.getUserPk();
+//
+//            RemindUserInfoDTO userInfo = RemindUserInfoDTO.builder()
+//                    .nickname(userRepository.findNicknameById(userPk))
+//                    .fcmToken(settingsRepository.findSettingByUserId(userPk).getFcmToken())
+//                    .build();
+//
+//            // [1-2] 오늘의 챌린지 완료 횟수 count
+//            long challengePk = challenge.getPk();
+//
+//            LocalDateTime start = LocalDate.now().atStartOfDay(ZoneId.of("Asia/Seoul")).toLocalDateTime();
+//            LocalDateTime end = start.plusDays(1);
+//            int cnt = challengeLogRepository.findAllChallenges(start, end, challengePk);
+//
+//            if (cnt < challenge.getGoal() && !userInfos.contains(userInfo) ) {
+//                userInfos.add(userInfo);
+//            }
+//        }
+//
+//        return RemindChallengeDTO.Response.builder()
+//                .userInfos(userInfos)
+//                .build();
     }
 
     private List<String> convert(int challengeDays){
