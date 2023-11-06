@@ -21,7 +21,7 @@ public class BloodSugarRepositoryTest {
         //given
         BloodSugarEntity bloodSugarEntity = BloodSugarEntity.builder()
                 .userPk(1L)
-                .category(BloodSugarSaveDTO.BLOODSUGARCATEGORY.BEFORE.name())
+                .category(BLOODSUGARCATEGORY.BEFORE.name())
                 .level(200)
                 .content("test")
                 .build();

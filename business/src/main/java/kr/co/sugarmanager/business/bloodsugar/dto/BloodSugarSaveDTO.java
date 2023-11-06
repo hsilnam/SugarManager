@@ -1,10 +1,6 @@
 package kr.co.sugarmanager.business.bloodsugar.dto;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import kr.co.sugarmanager.business.bloodsugar.entity.BLOODSUGARCATEGORY;
+import com.fasterxml.jackson.annotation.JsonValue;
 import kr.co.sugarmanager.business.global.dto.ErrorResponse;
 import lombok.*;
 
@@ -15,6 +11,7 @@ public class BloodSugarSaveDTO {
     @Getter
     @Setter
     public static class Request {
+        @JsonValue
         private BLOODSUGARCATEGORY category;
         private int level;
         private String content;
