@@ -32,4 +32,25 @@ public class BloodSugarServiceImpl implements BloodSugarService{
                 .error(null)
                 .build();
     }
+
+    @Override
+    public BloodSugarUpdateDTO.Response update(Long userPk, BloodSugarUpdateDTO.Request request) {
+        BloodSugarEntity bloodSugar = bloodSugarRepository.findByBloodSugarPkAndUserPk(request.getBloodSugarPk(), userPk);
+        try {
+            if (bloodSugar == null) {
+                throw new BloodSugarException(ErrorCode.HANDLE_ACCESS_DENIED);
+            }
+            log.info(bloodSugar.toString());
+            bloodSugar.setLevel(request.getLevel());
+            bloodSugar.setCategory(request.getCategory().name());
+            bloodSugar.setContent(request.getContent());
+            return BloodSugarUpdateDTO.Response.builder()
+                    .success(true)
+                    .response(null)
+                    .error(null)
+                    .build();
+        } catch (IllegalArgumentException | ValidationException ex) {
+            throw new BloodSugarException(ErrorCode.INVALID_INPUT_VALUE);
+        }
+    }
 }
