@@ -1,5 +1,6 @@
 package kr.co.sugarmanager.business.bloodsugar.service;
 
+import kr.co.sugarmanager.business.bloodsugar.dto.BloodSugarDeleteDTO;
 import kr.co.sugarmanager.business.bloodsugar.dto.BloodSugarSaveDTO;
 import kr.co.sugarmanager.business.bloodsugar.dto.BloodSugarUpdateDTO;
 import kr.co.sugarmanager.business.bloodsugar.entity.BloodSugarEntity;
@@ -54,5 +55,21 @@ public class BloodSugarServiceImpl implements BloodSugarService{
         } catch (IllegalArgumentException | ValidationException ex) {
             throw new BloodSugarException(ErrorCode.INVALID_INPUT_VALUE);
         }
+    }
+
+    @Override
+    public BloodSugarDeleteDTO.Response delete(Long userPk, BloodSugarDeleteDTO.Request request) {
+        Optional<BloodSugarEntity> optionalBloodSugarEntity = bloodSugarRepository.findByBloodSugarPkAndUserPk(request.getBloodSugarPk(), userPk);
+        if (!optionalBloodSugarEntity.isPresent()) {
+            throw new BloodSugarException(ErrorCode.HANDLE_ACCESS_DENIED);
+        }
+
+        bloodSugarRepository.delete(optionalBloodSugarEntity.get());
+
+        return BloodSugarDeleteDTO.Response.builder()
+                .success(true)
+                .response(null)
+                .error(null)
+                .build();
     }
 }
