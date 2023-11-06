@@ -1,12 +1,15 @@
 package kr.co.sugarmanager.userservice.service;
 
+import kr.co.sugarmanager.userservice.dto.AlarmDTO;
 import kr.co.sugarmanager.userservice.dto.UserInfoDTO;
 import kr.co.sugarmanager.userservice.dto.UserInfoUpdateDTO;
 import kr.co.sugarmanager.userservice.entity.UserEntity;
+import kr.co.sugarmanager.userservice.entity.UserSettingEntity;
 import kr.co.sugarmanager.userservice.exception.AccessDenyException;
 import kr.co.sugarmanager.userservice.exception.ErrorCode;
 import kr.co.sugarmanager.userservice.exception.UserNotFoundException;
 import kr.co.sugarmanager.userservice.repository.UserRepository;
+import kr.co.sugarmanager.userservice.repository.UserSettingRepository;
 import kr.co.sugarmanager.userservice.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
+    private final UserSettingRepository userSettingRepository;
 
     @Override
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
@@ -75,6 +79,20 @@ public class UserServiceImpl implements UserService {
 
         return UserInfoUpdateDTO.Response.builder()
                 .success(true)
+                .build();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public AlarmDTO.Response getAlarm(AlarmDTO.Request req) {
+        long pk = req.getUserPk();
+        UserSettingEntity userSettingEntity = userSettingRepository.findByUser(UserEntity.builder()
+                        .pk(pk)
+                        .build())
+                .orElseThrow(() -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
+        return AlarmDTO.Response.builder()
+                .success(true)
+                .alarms(userSettingEntity.getAlarmInfos())
                 .build();
     }
 }
