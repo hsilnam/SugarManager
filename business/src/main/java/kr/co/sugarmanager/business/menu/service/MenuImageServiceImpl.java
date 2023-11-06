@@ -24,6 +24,7 @@ public class MenuImageServiceImpl implements MenuImageService {
     private final KafkaTemplate<String, Object> kafkaTemplate;
     private final ObjectMapper objectMapper;
 
+    @Override
     public void saveImage(Long pk, ImageTypeEnum imageTypeEnum, List<MultipartFile> multipartFile) {
         if (multipartFile == null) return;
         try {
@@ -37,6 +38,7 @@ public class MenuImageServiceImpl implements MenuImageService {
         }
     }
 
+    @Override
     public void deleteImage(List<Long> pkList) {
 
     }
@@ -48,6 +50,7 @@ public class MenuImageServiceImpl implements MenuImageService {
         return objectMapper.writeValueAsString(message);
     }
 
+    @Override
     public ImageDTO createImageDTO(Long pk, ImageTypeEnum imageTypeEnum, MultipartFile multipartFile) {
         String originalFilename = multipartFile.getName();
         String extension = originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
@@ -66,7 +69,7 @@ public class MenuImageServiceImpl implements MenuImageService {
         }
     }
 
-    public void checkImageFileExtension(String extension) {
+    private void checkImageFileExtension(String extension) {
         if (!extension.toLowerCase().matches("jpg|jpeg|png")) {
             throw new ValidationException(ErrorCode.INVALID_IMAGE_TYPE_ERROR);
         }

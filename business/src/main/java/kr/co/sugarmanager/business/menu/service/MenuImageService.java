@@ -10,5 +10,4 @@ public interface MenuImageService {
     void saveImage(Long pk, ImageTypeEnum imageTypeEnum, List<MultipartFile> multipartFile);
     void deleteImage(List<Long> pkList);
     ImageDTO createImageDTO(Long pk, ImageTypeEnum imageTypeEnum, MultipartFile multipartFile);
-    void checkImageFileExtension(String extension);
 }

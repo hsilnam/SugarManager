@@ -22,7 +22,7 @@ public class ImageDTO implements Serializable {
         imageInfoNode.put("pk", this.pk);
         imageInfoNode.put("imageType", this.imageTypeEnum.name());
         imageInfoNode.put("extension", this.extension);
-        imageInfoNode.put("size", size);
+        imageInfoNode.put("size", this.size);
         imageInfoNode.put("contentType", this.contentType);
         imageInfoNode.put("file", this.file);
         return imageInfoNode;
