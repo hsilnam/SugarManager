@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,9 +27,10 @@ public class AlarmChallengeController {
     @Value(value = "${TOPIC}")
     private String TOPIC;
 
+    @Scheduled(cron = "0 */9 * * * *")
     @GetMapping("/challenge")
-    public ResponseEntity<AlarmChallengeDTO.Response> todaysChallanges() throws JsonProcessingException {
-        AlarmChallengeDTO.Response response = alarmChallengeService.todaysChallenges();
+    public ResponseEntity<AlarmChallengeDTO.Response> getChallanges() throws JsonProcessingException {
+        AlarmChallengeDTO.Response response = alarmChallengeService.getChallanges();
         String stringResponse = new ObjectMapper().writeValueAsString(response);
         kafkaTemplate.send(TOPIC,stringResponse);
         kafkaTemplate.flush();

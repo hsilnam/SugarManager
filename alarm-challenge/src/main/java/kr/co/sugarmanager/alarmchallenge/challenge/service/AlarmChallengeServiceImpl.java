@@ -30,17 +30,24 @@ public class AlarmChallengeServiceImpl implements AlarmChallengeService{
 
     // 현욱이가 만들어주면 삭제
     private final UserRepository userRepository;
+
     @Transactional(readOnly = true)
     @Override
-    public AlarmChallengeDTO.Response todaysChallenges(){
+    public AlarmChallengeDTO.Response getChallanges(){
+        log.info("=====================");
+        log.info("시작한다아아아");
+        log.info("=====================");
 
+        // 가져올 알람 조건
         LocalDateTime start = LocalDate.now().atStartOfDay(ZoneId.of("Asia/Seoul")).toLocalDateTime();
         LocalDateTime end = start.plusDays(1);
-        log.info("start : {} end : {} ", start ,end);
+        LocalDateTime time = LocalDateTime.now().plusMinutes(1);
+        int hour = time.getHour();
+        int minute = time.getMinute();
 
-        List<ChallengeLogEntity> challenges = challengeLogRepository.findAllChallenges(start, end);
+        List<ChallengeLogEntity> challenges = challengeLogRepository.findAllChallenges(start,end,hour,minute);
+
         List<UserInfoDTO> userInfos = new ArrayList<>();
-
         if (challenges.size() > 0) {
 
             log.info("challenge : {}", challenges.get(0).getCreatedAt());
