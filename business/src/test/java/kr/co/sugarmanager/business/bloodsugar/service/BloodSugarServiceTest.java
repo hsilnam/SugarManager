@@ -1,10 +1,7 @@
 package kr.co.sugarmanager.business.bloodsugar.service;
 
 import jakarta.transaction.Transactional;
-import kr.co.sugarmanager.business.bloodsugar.dto.BLOODSUGARCATEGORY;
-import kr.co.sugarmanager.business.bloodsugar.dto.BloodSugarDeleteDTO;
-import kr.co.sugarmanager.business.bloodsugar.dto.BloodSugarSaveDTO;
-import kr.co.sugarmanager.business.bloodsugar.dto.BloodSugarUpdateDTO;
+import kr.co.sugarmanager.business.bloodsugar.dto.*;
 import kr.co.sugarmanager.business.bloodsugar.entity.BloodSugarEntity;
 import kr.co.sugarmanager.business.bloodsugar.exception.BloodSugarException;
 import kr.co.sugarmanager.business.bloodsugar.repository.BloodSugarRepository;
@@ -13,7 +10,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import static org.assertj.core.api.FactoryBasedNavigableListAssert.assertThat;
+import java.time.LocalDateTime;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
@@ -113,5 +111,29 @@ public class BloodSugarServiceTest {
             BloodSugarDeleteDTO.Response response = bloodSugarService.delete(2L, request);
             assertFalse(response.isSuccess());
         });
+    }
+
+    @Test
+    void 조회_성공() throws Exception {
+        //given
+
+        //when
+        BloodSugarSelectDTO.Response response = bloodSugarService.select(1L, LocalDateTime.now().getYear(), LocalDateTime.now().getMonthValue(), LocalDateTime.now().getDayOfMonth());
+
+        System.out.println(response);
+        assertTrue(response.isSuccess());
+    }
+
+    @Test
+    void 조회_실패() throws Exception {
+        //given
+        BloodSugarDeleteDTO.Request request = BloodSugarDeleteDTO.Request.builder()
+                .bloodSugarPk(bloodSugarEntity.getBloodSugarPk())
+                .build();
+
+        //when
+        BloodSugarSelectDTO.Response response = bloodSugarService.select(1L, LocalDateTime.now().getYear()+1, LocalDateTime.now().getMonthValue(), LocalDateTime.now().getDayOfMonth());
+        assertTrue(response.isSuccess());
+        assertEquals(response.getResponse().getBloodSugarMax(), 0);
     }
 }
