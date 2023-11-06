@@ -2,10 +2,7 @@ package kr.co.sugarmanager.business.bloodsugar.entity;
 
 import jakarta.persistence.*;
 import kr.co.sugarmanager.business.global.entity.CUDEntity;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
@@ -15,6 +12,8 @@ import org.hibernate.annotations.Where;
 @SQLDelete(sql = "UPDATE BLOOD_SUGAR SET DELETED_AT = now() WHERE MENU_PK = ?")
 @Where(clause = "DELETED_AT is null")
 @Getter
+@Setter
+@ToString
 @Table(name = "BLOOD_SUGAR")
 @Entity
 public class BloodSugarEntity extends CUDEntity {
@@ -25,7 +24,7 @@ public class BloodSugarEntity extends CUDEntity {
     @Column(name = "USER_PK")
     private Long userPk;
     @Column(name = "BLOOD_SUGAR_CATEGORY")
-    private BLOODSUGARCATEGORY category;
+    private String category;
     @Column(name = "BLOOD_SUGAR_LEVEL")
     private int level;
     @Column(name = "BLOOD_SUGAR_CONTENT")
