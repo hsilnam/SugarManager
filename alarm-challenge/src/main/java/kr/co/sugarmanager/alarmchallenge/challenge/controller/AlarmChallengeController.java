@@ -42,7 +42,7 @@ public class AlarmChallengeController {
     @Value(value = "${TOPIC-CHALLENGE}")
     private String CHALLENGE;
 
-//    @Scheduled(cron = "0 */9 * * * *")
+    @Scheduled(cron = "0 */9 * * * *")
     @GetMapping("/challenge")
     public ResponseEntity<AlarmChallengeDTO.Response> getChallanges() throws JsonProcessingException {
         AlarmChallengeDTO.Response response = alarmChallengeService.getChallanges();
