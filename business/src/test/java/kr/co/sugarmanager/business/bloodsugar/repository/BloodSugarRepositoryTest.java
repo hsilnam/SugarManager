@@ -1,7 +1,7 @@
 package kr.co.sugarmanager.business.bloodsugar.repository;
 
 import jakarta.transaction.Transactional;
-import kr.co.sugarmanager.business.bloodsugar.dto.BloodSugarSaveDTO;
+import kr.co.sugarmanager.business.bloodsugar.dto.BLOODSUGARCATEGORY;
 import kr.co.sugarmanager.business.bloodsugar.entity.BloodSugarEntity;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +37,7 @@ public class BloodSugarRepositoryTest {
         //given
         BloodSugarEntity bloodSugarEntity = BloodSugarEntity.builder()
                 .userPk(1L)
-                .category(BloodSugarSaveDTO.BLOODSUGARCATEGORY.BEFORE.name())
+                .category(BLOODSUGARCATEGORY.BEFORE.name())
                 .level(200)
                 .content("test")
                 .build();
@@ -45,7 +45,7 @@ public class BloodSugarRepositoryTest {
 
         BloodSugarEntity bloodSugar = bloodSugarRepository.findByBloodSugarPkAndUserPk(save.getBloodSugarPk(), 1L);
         //when
-        bloodSugar.setCategory(BloodSugarSaveDTO.BLOODSUGARCATEGORY.AFTER.name());
+        bloodSugar.setCategory(BLOODSUGARCATEGORY.AFTER.name());
         bloodSugar.setLevel(100);
         bloodSugar.setContent("test!");
         BloodSugarEntity expect = bloodSugarRepository.save(bloodSugar);
@@ -60,7 +60,7 @@ public class BloodSugarRepositoryTest {
         //given
         BloodSugarEntity bloodSugarEntity = BloodSugarEntity.builder()
                 .userPk(1L)
-                .category(BloodSugarSaveDTO.BLOODSUGARCATEGORY.BEFORE.name())
+                .category(BLOODSUGARCATEGORY.BEFORE.name())
                 .level(200)
                 .content("test")
                 .build();
