@@ -1,4 +1,4 @@
-package kr.co.sugarmanger.alarmBloodsugar.kafka;
+package kr.co.sugarmanger.alarmBloodsugar.config;
 
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;

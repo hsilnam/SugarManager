@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.sugarmanger.alarmBloodsugar.bloodsugar.dto.AlarmBloodsugarDTO;
 import kr.co.sugarmanger.alarmBloodsugar.bloodsugar.service.AlarmBloodsugarService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +23,8 @@ public class AlarmBloodsugarController {
     private final KafkaTemplate<String, String> kafkaTemplate;
     private final AlarmBloodsugarService alarmBloodsugarService;
 
-    String TOPIC = "alarm-bloodsugar";
+    @Value(value = "${TOPIC}")
+    private String TOPIC;
     @GetMapping("/bloodsugar")
     public ResponseEntity<AlarmBloodsugarDTO.Response> todaysChallanges() throws JsonProcessingException {
         AlarmBloodsugarDTO.Response response = alarmBloodsugarService.bloodSugarAlarms();

@@ -18,7 +18,7 @@ import org.hibernate.annotations.SQLDelete;
 @Table(name = "SETTING")
 @DynamicInsert
 @DynamicUpdate
-@SQLDelete(sql = "UPDATE SET DELETED_AT = NOW() ON SETTING WHERE SETTING_PK = ?")
+@SQLDelete(sql = "UPDATE SETTING SET DELETED_AT = NOW() WHERE SETTING_PK = ?")
 
 public class UserSettingEntity {
     @Id

@@ -19,7 +19,7 @@ import java.time.LocalDateTime;
 @DynamicInsert
 @DynamicUpdate
 @Table(name = "BLOOD_SUGAR")
-@SQLDelete(sql = "UPDATE SET DELETED_AT ON GROUP WHERE BLOOD_SUGAR_PK = ?")
+@SQLDelete(sql = "UPDATE BLOOD_SUGAR SET DELETED_AT = now() WHERE BLOOD_SUGAR_PK = ?")
 public class BloodSugarEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
