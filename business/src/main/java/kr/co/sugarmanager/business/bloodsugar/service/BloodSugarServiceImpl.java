@@ -11,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -35,12 +37,12 @@ public class BloodSugarServiceImpl implements BloodSugarService{
 
     @Override
     public BloodSugarUpdateDTO.Response update(Long userPk, BloodSugarUpdateDTO.Request request) {
-        BloodSugarEntity bloodSugar = bloodSugarRepository.findByBloodSugarPkAndUserPk(request.getBloodSugarPk(), userPk);
+        Optional<BloodSugarEntity> optionalBloodSugarEntity = bloodSugarRepository.findByBloodSugarPkAndUserPk(request.getBloodSugarPk(), userPk);
         try {
-            if (bloodSugar == null) {
+            if (!optionalBloodSugarEntity.isPresent()) {
                 throw new BloodSugarException(ErrorCode.HANDLE_ACCESS_DENIED);
             }
-            log.info(bloodSugar.toString());
+            BloodSugarEntity bloodSugar = optionalBloodSugarEntity.get();
             bloodSugar.setLevel(request.getLevel());
             bloodSugar.setCategory(request.getCategory().name());
             bloodSugar.setContent(request.getContent());

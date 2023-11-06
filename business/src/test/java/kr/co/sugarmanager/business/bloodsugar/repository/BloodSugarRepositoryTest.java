@@ -7,8 +7,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.Optional;
+
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @SpringBootTest
 public class BloodSugarRepositoryTest {
@@ -43,8 +45,9 @@ public class BloodSugarRepositoryTest {
                 .build();
         BloodSugarEntity save = bloodSugarRepository.save(bloodSugarEntity);
 
-        BloodSugarEntity bloodSugar = bloodSugarRepository.findByBloodSugarPkAndUserPk(save.getBloodSugarPk(), 1L);
+        Optional<BloodSugarEntity> optionalBloodSugarEntity = bloodSugarRepository.findByBloodSugarPkAndUserPk(save.getBloodSugarPk(), 1L);
         //when
+        BloodSugarEntity bloodSugar = optionalBloodSugarEntity.get();
         bloodSugar.setCategory(BLOODSUGARCATEGORY.AFTER.name());
         bloodSugar.setLevel(100);
         bloodSugar.setContent("test!");
@@ -67,9 +70,8 @@ public class BloodSugarRepositoryTest {
         BloodSugarEntity save = bloodSugarRepository.save(bloodSugarEntity);
 
         //when
-        assertThrows(NullPointerException.class, () -> {
-            BloodSugarEntity bloodSugar = bloodSugarRepository.findByBloodSugarPkAndUserPk(save.getBloodSugarPk(), 2L);
-            if (bloodSugar == null) throw new NullPointerException();
-        });
+        Optional<BloodSugarEntity> optionalBloodSugarEntity = bloodSugarRepository.findByBloodSugarPkAndUserPk(save.getBloodSugarPk(), 3L);
+
+        assertFalse(optionalBloodSugarEntity.isPresent());
     }
 }
