@@ -18,7 +18,7 @@ import java.sql.Date;
 @DynamicInsert
 @DynamicUpdate
 @Table(name = "USERS")
-@SQLDelete(sql = "UPDATE SET DELETED_AT ON USER WHERE USER_PK = ?")
+@SQLDelete(sql = "UPDATE USERS SET DELETED_AT = now() WHERE USER_PK = ?")
 public class UserEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

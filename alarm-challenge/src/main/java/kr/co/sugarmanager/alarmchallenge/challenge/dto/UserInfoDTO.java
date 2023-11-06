@@ -9,7 +9,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class UserInfo {
+public class UserInfoDTO {
 
     @JsonAlias(value = "nickname")
     private String nickname;

@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -14,12 +13,10 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "CHALLENGE_LOG")
 @EntityListeners(value = AuditingEntityListener.class)
-@DynamicUpdate
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-
 public class ChallengeLogEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -5,7 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.sugarmanager.alarmchallenge.challenge.dto.AlarmChallengeDTO;
 import kr.co.sugarmanager.alarmchallenge.challenge.service.AlarmChallengeService;
 import lombok.RequiredArgsConstructor;
+
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -20,7 +22,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class AlarmChallengeController {
     private final KafkaTemplate<String, String> kafkaTemplate;
     private final AlarmChallengeService alarmChallengeService;
-    String TOPIC = "alarm-challenge";
+
+    @Value(value = "${TOPIC}")
+    private String TOPIC;
 
     @GetMapping("/challenge")
     public ResponseEntity<AlarmChallengeDTO.Response> todaysChallanges() throws JsonProcessingException {

@@ -15,7 +15,7 @@ public class AlarmChallengeDTO {
     @AllArgsConstructor
     public static class Response {
         @Builder.Default
-        private List<UserInfo> userInfos = new ArrayList<>();
+        private List<UserInfoDTO> userInfos = new ArrayList<>();
 
     }
 

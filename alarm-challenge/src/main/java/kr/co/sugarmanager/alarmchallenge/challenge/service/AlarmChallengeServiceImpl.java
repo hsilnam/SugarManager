@@ -1,7 +1,7 @@
 package kr.co.sugarmanager.alarmchallenge.challenge.service;
 
 import kr.co.sugarmanager.alarmchallenge.challenge.dto.AlarmChallengeDTO;
-import kr.co.sugarmanager.alarmchallenge.challenge.dto.UserInfo;
+import kr.co.sugarmanager.alarmchallenge.challenge.dto.UserInfoDTO;
 import kr.co.sugarmanager.alarmchallenge.challenge.entity.ChallengeLogEntity;
 import kr.co.sugarmanager.alarmchallenge.challenge.entity.ChallengeTemplateEntity;
 import kr.co.sugarmanager.alarmchallenge.challenge.entity.UserSettingEntity;
@@ -30,8 +30,6 @@ public class AlarmChallengeServiceImpl implements AlarmChallengeService{
 
     // 현욱이가 만들어주면 삭제
     private final UserRepository userRepository;
-    private final SettingsRepository settingsRepository;
-
     @Transactional(readOnly = true)
     @Override
     public AlarmChallengeDTO.Response todaysChallenges(){
@@ -41,37 +39,40 @@ public class AlarmChallengeServiceImpl implements AlarmChallengeService{
         log.info("start : {} end : {} ", start ,end);
 
         List<ChallengeLogEntity> challenges = challengeLogRepository.findAllChallenges(start, end);
-        log.info("challenge : {}", challenges.get(0).getCreatedAt());
-        log.info("challenges : {}", challenges);
+        List<UserInfoDTO> userInfos = new ArrayList<>();
 
+        if (challenges.size() > 0) {
 
-        List<UserInfo> userInfos = new ArrayList<>();
-        for (ChallengeLogEntity challenge : challenges){
-            ChallengeTemplateEntity challengeTemplate = challengeTemplateRepository.findByChallengeId(challenge.getChallengeTemplatePk());
-            Long userPk = challengeTemplate.getUserPk();
-            log.info("userPk : {}", userPk);
+            log.info("challenge : {}", challenges.get(0).getCreatedAt());
+            log.info("challenges : {}", challenges);
 
-            // 현욱이가 만들어주면 수정
-            UserSettingEntity setting = settingsRepository.findSettingByUserId(userPk);
+            for (ChallengeLogEntity challenge : challenges){
+                ChallengeTemplateEntity challengeTemplate = challengeTemplateRepository.findByChallengeId(challenge.getChallengeTemplatePk());
+                Long userPk = challengeTemplate.getUserPk();
+                log.info("userPk : {}", userPk);
 
-            UserInfo userInfo = UserInfo.builder()
-                    .nickname(userRepository.findNicknameById(setting.getUserPk()))
-                    .fcmToken(setting.getFcmToken())
-                    .challengeTitle(challengeTemplate.getTitle())
-                    .hour(challengeTemplate.getHour())
-                    .minute(challengeTemplate.getMinute())
-                    .build();
-            if (setting.isChallengeAlert() && challengeTemplate.getDeleted_at() == null){
-                userInfos.add(userInfo);
+                // 현욱이가 만들어주면 수정
+                UserSettingEntity setting = settingsRepository.findSettingByUserId(userPk);
+
+                UserInfoDTO userInfo = UserInfoDTO.builder()
+                        .nickname(userRepository.findNicknameById(setting.getUserPk()))
+                        .fcmToken(setting.getFcmToken())
+                        .challengeTitle(challengeTemplate.getTitle())
+                        .hour(challengeTemplate.getHour())
+                        .minute(challengeTemplate.getMinute())
+                        .build();
+                if (setting.isChallengeAlert() && challengeTemplate.getDeleted_at() == null){
+                    userInfos.add(userInfo);
+                }
+                log.info("userPk : {}, userInfo : {} ", userPk, userInfo);
             }
-            log.info("userPk : {}, userInfo : {} ", userPk, userInfo);
+            log.info("userInfos size : {}", userInfos.size());
         }
-
-        log.info("userInfos size : {}", userInfos.size());
-
         return AlarmChallengeDTO.Response.builder()
                 .userInfos(userInfos)
                 .build();
     }
+
+    private final SettingsRepository settingsRepository;
 
 }
