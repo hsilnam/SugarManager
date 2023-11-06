@@ -25,7 +25,7 @@ public class BloodSugarEntity extends CUDEntity {
     @Column(name = "USER_PK")
     private Long userPk;
     @Column(name = "BLOOD_SUGAR_CATEGORY")
-    private BLOODSUGARCATEGORY cateory;
+    private BLOODSUGARCATEGORY category;
     @Column(name = "BLOOD_SUGAR_LEVEL")
     private int level;
     @Column(name = "BLOOD_SUGAR_CONTENT")

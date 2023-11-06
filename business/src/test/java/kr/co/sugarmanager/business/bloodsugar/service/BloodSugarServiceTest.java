@@ -20,7 +20,7 @@ public class BloodSugarServiceTest {
     void 등록_성공() throws Exception {
         //given
         BloodSugarSaveDTO.Request request = BloodSugarSaveDTO.Request.builder()
-                .cateory(BLOODSUGARCATEGORY.BEFORE)
+                .category(BLOODSUGARCATEGORY.BEFORE)
                 .level(400)
                 .content("test")
                 .build();

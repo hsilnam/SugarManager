@@ -15,7 +15,7 @@ public class BloodSugarServiceImpl implements BloodSugarService{
     public BloodSugarSaveDTO.Response save(Long userPk, BloodSugarSaveDTO.Request request) {
         BloodSugarEntity bloodSugar = BloodSugarEntity.builder()
                 .userPk(userPk)
-                .cateory(request.getCateory())
+                .category(request.getCategory())
                 .level(request.getLevel())
                 .content(request.getContent())
                 .build();

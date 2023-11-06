@@ -15,7 +15,7 @@ public class BloodSugarSaveDTO {
     @Getter
     @Setter
     public static class Request {
-        private BLOODSUGARCATEGORY cateory;
+        private BLOODSUGARCATEGORY category;
         private int level;
         private String content;
     }
