@@ -1,6 +1,5 @@
 package kr.co.sugarmanager.alarmchallenge.challenge.dto;
 
-import com.fasterxml.jackson.annotation.JsonAlias;
 import lombok.*;
 
 
