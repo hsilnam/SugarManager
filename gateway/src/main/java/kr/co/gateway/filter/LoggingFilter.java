@@ -1,4 +1,4 @@
-package kr.co.gateway.config;
+package kr.co.gateway.filter;
 
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -31,7 +31,7 @@ public class LoggingFilter extends AbstractGatewayFilterFactory<LoggingFilter.Co
             if (config.isPreLogger()) {
                 log.info("Logging PRE Filter: request id -> {}", request.getId());
             }
-            return chain.filter(exchange).then(Mono.fromRunnable(()->{
+            return chain.filter(exchange).then(Mono.fromRunnable(() -> {
                 if (config.isPostLogger()) {
                     log.info("Logging POST Filter: response code -> {}", response.getStatusCode());
                 }
