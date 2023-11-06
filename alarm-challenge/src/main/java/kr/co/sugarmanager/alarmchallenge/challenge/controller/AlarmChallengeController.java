@@ -26,16 +26,11 @@ public class AlarmChallengeController {
     private final KafkaTemplate<String, String> kafkaTemplate;
     private final AlarmChallengeService alarmChallengeService;
 
-    @Value(value = "${TOPIC-TODAY}")
-    private String TODAY;
-
+    // 이거 비즈니스 서버에 옮겨야함
     @Scheduled(cron = "0 0 0 * * *")
     @GetMapping("/challenge/today")
     public ResponseEntity<TodayChallengesDTO.Response> todaysChallenges() throws JsonProcessingException {
         TodayChallengesDTO.Response response = alarmChallengeService.todaysChallenges();
-        String stringResponse = new ObjectMapper().writeValueAsString(response);
-        kafkaTemplate.send(TODAY, stringResponse);
-        kafkaTemplate.flush();
         return new ResponseEntity<>(response,HttpStatus.OK);
     }
 
