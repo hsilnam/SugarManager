@@ -1,5 +1,6 @@
 package kr.co.sugarmanager.userservice.controller;
 
+import kr.co.sugarmanager.userservice.dto.AlarmDTO;
 import kr.co.sugarmanager.userservice.dto.UserInfoDTO;
 
 import static kr.co.sugarmanager.userservice.util.APIUtils.*;
@@ -43,5 +44,17 @@ public class UserController {
         req.setUserPk(auth != null ? auth.getPk() : 0l);
         UserInfoUpdateDTO.Response response = userService.updateMemberInfo(req);
         return result(response.isSuccess(), response, HttpStatus.OK);
+    }
+
+    @GetMapping("/alarm")
+    public ResponseEntity<ApiResult<AlarmDTO.Response>> getUsersAlarm(
+            @AuthenticationPrincipal JwtAuthentication auth
+    ) {
+        AlarmDTO.Request req = AlarmDTO.Request.builder()
+                .userPk(auth != null ? auth.getPk() : 0l)
+                .build();
+
+        AlarmDTO.Response res = userService.getAlarm(req);
+        return result(res.isSuccess(), res, HttpStatus.OK);
     }
 }
