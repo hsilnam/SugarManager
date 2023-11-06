@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import java.util.List;
 
@@ -13,6 +15,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@SQLDelete(sql = "UPDATE MENU SET DELETED_AT = now() WHERE MENU_PK = ?")
+@Where(clause = "DELETED_AT is null")
 @Getter
 @Table(name = "MENU")
 public class MenuEntity extends CUDEntity {

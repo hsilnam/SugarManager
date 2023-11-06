@@ -65,9 +65,7 @@ public class MenuServiceImpl implements MenuService{
         Optional<MenuEntity> menu = menuRepository.findByMenuPkAndUserPk(Long.valueOf(request.getMenuPk()), userPk);
         if (!menu.isPresent()) throw new MenuException(ErrorCode.HANDLE_ACCESS_DENIED);
 
-        menu.get().setDeletedAt(LocalDateTime.now());
-
-        menuRepository.save(menu.get());
+        menuRepository.delete(menu.get());
         return MenuDeleteDTO.Response
                 .builder()
                 .success(true)
