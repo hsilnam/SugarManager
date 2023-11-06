@@ -4,6 +4,7 @@ import kr.co.sugarmanager.userservice.dto.UserInfoDTO;
 
 import static kr.co.sugarmanager.userservice.util.APIUtils.*;
 
+import kr.co.sugarmanager.userservice.dto.UserInfoUpdateDTO;
 import kr.co.sugarmanager.userservice.service.UserService;
 import kr.co.sugarmanager.userservice.util.JwtAuthentication;
 import lombok.RequiredArgsConstructor;
@@ -12,10 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/member")
@@ -34,6 +32,16 @@ public class UserController {
                 .targetNickname(nickname)
                 .build();
         UserInfoDTO.Response response = userService.getMemberInfo(req);
+        return result(response.isSuccess(), response, HttpStatus.OK);
+    }
+
+    @PostMapping(value = "/edit", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ApiResult<Object>> updateMemberInfo(
+            @AuthenticationPrincipal JwtAuthentication auth,
+            @RequestBody UserInfoUpdateDTO.Request req
+    ) {
+        req.setUserPk(auth != null ? auth.getPk() : 0l);
+        UserInfoUpdateDTO.Response response = userService.updateMemberInfo(req);
         return result(response.isSuccess(), response, HttpStatus.OK);
     }
 }

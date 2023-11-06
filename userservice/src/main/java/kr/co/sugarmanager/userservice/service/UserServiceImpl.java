@@ -1,6 +1,7 @@
 package kr.co.sugarmanager.userservice.service;
 
 import kr.co.sugarmanager.userservice.dto.UserInfoDTO;
+import kr.co.sugarmanager.userservice.dto.UserInfoUpdateDTO;
 import kr.co.sugarmanager.userservice.entity.UserEntity;
 import kr.co.sugarmanager.userservice.exception.AccessDenyException;
 import kr.co.sugarmanager.userservice.exception.ErrorCode;
@@ -34,6 +35,7 @@ public class UserServiceImpl implements UserService {
                 || (owner.getGroup() != null && target.getGroup() != null
                 && owner.getGroup().getGroupCode().equals(target.getGroup().getGroupCode()))) {
             return UserInfoDTO.Response.builder()
+                    .success(true)
                     .uid(target.getPk())
                     .name(target.getName())
                     .email(target.getEmail())
@@ -49,5 +51,24 @@ public class UserServiceImpl implements UserService {
         } else {
             throw new AccessDenyException(ErrorCode.FORBIDDEN_EXCEPTION);
         }
+    }
+
+    @Override
+    @Transactional(isolation = Isolation.SERIALIZABLE)//닉네임 중복을 피하기 위해 SERIALIZABLE
+    public UserInfoUpdateDTO.Response updateMemberInfo(UserInfoUpdateDTO.Request req) {
+        //중복 닉네임 검사
+        if (userRepository.findByNickname(req.getNickname()).isPresent()) {
+            return UserInfoUpdateDTO.Response.builder()
+                    .success(false)
+                    .build();
+        }
+        long userPk = req.getUserPk();
+        UserEntity user = userRepository.findById(userPk)
+                .orElseThrow(() -> new AccessDenyException(ErrorCode.UNAUTHORIZATION_EXCEPTION));
+        user.updateInfo(req);
+
+        return UserInfoUpdateDTO.Response.builder()
+                .success(true)
+                .build();
     }
 }
