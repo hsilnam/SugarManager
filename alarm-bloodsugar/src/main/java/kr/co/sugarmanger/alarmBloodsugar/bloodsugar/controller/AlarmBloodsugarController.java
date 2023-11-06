@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,8 +26,10 @@ public class AlarmBloodsugarController {
 
     @Value(value = "${TOPIC}")
     private String TOPIC;
+
+    @Scheduled(cron = "0 * * * * *")
     @GetMapping("/bloodsugar")
-    public ResponseEntity<AlarmBloodsugarDTO.Response> todaysChallanges() throws JsonProcessingException {
+    public ResponseEntity<AlarmBloodsugarDTO.Response> bloodSugarAlarms() throws JsonProcessingException {
         AlarmBloodsugarDTO.Response response = alarmBloodsugarService.bloodSugarAlarms();
         String stringResponse = new ObjectMapper().writeValueAsString(response);
         kafkaTemplate.send(TOPIC,stringResponse);

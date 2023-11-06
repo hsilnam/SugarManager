@@ -15,7 +15,7 @@ public class AlarmBloodsugarDTO {
     @AllArgsConstructor
     public static class Response {
         @Builder.Default
-        List<UserInfo> userInfos = new ArrayList<>();
+        List<UserInfoDTO> userInfos = new ArrayList<>();
 
     }
 }

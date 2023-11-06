@@ -1,6 +1,5 @@
 package kr.co.sugarmanger.alarmBloodsugar.bloodsugar.dto;
 
-import com.fasterxml.jackson.annotation.JsonAlias;
 import lombok.*;
 
 @Getter
@@ -11,11 +10,7 @@ import lombok.*;
 public class UserInfoDTO {
 
     private String type;
-
-    @JsonAlias(value = "nickname")
     private String nickname;
-
-    @JsonAlias(value = "fcmToken")
     private String fcmToken;
 
 }
