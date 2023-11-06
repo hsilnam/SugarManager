@@ -15,7 +15,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(InternalServerErrorException.class)
     public ResponseEntity<ApiResult<ApiError>> internalServerErrorExceptionHandler(InternalServerErrorException exception) {
         if (log.isErrorEnabled()) {
-            log.error("[Server Error]", exception);
+            log.error("[Custom Server Error]", exception);
+            log.info("[Custom Server Error] {},{}",exception,exception.getErrorCode().getMessage());
         }
         return APIUtils.error(exception);
     }
@@ -23,7 +24,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResult<ApiError>> otherExceptionHandler(Exception exception) {
         if (log.isErrorEnabled()) {
-            log.error("[Server Error]", exception.getCause());
+            log.error("[Etc Server Error]", exception.getCause());
+            log.info("[Etc Server Error] {},{}",exception.getCause(),exception.getMessage());
         }
         return APIUtils.error(new CustomException(ErrorCode.INTERNAL_SERVER_ERROR_EXCEPTION));
     }
