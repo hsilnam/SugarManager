@@ -16,9 +16,11 @@ import java.util.Map;
 @Configuration
 @EnableKafka
 public class KafkaConfig {
-    @Value("${spring.kafka.bootstrap-servers}")
+    @Value("${kafka.bootstrap-servers}")
     private String address;
-    private final String groupId = "alarm-group";
+
+    @Value("${group-id}")
+    private String groupId;
 
     @Bean
     public ConsumerFactory<String, String> consumerFactory(){

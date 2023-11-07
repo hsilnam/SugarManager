@@ -3,7 +3,7 @@ server:
 
 spring:
   profiles:
-    active: secret, db
+    active: secret, db, eureka
 
 eureka:
   client:

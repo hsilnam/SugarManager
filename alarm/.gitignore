@@ -7,7 +7,8 @@ build/
 
 ## Custion ##
 application-*.properties
-
+firebase/
+google-services.json
 
 ### STS ###
 .apt_generated
