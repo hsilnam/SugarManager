@@ -22,7 +22,7 @@ public class AlarmReceiveServiceImpl implements AlarmReceiveService {
     private final FCMService fcmService;
 
     @Override
-    @KafkaListener(topics = "alarm-challenge")
+    @KafkaListener(topics = "${TOPIC-CHALLENGE}")
     public void consumeChallengeAlarm(String kafkaMessage){
 
         log.info("message : {}", kafkaMessage);
@@ -53,7 +53,7 @@ public class AlarmReceiveServiceImpl implements AlarmReceiveService {
     }
 
     @Override
-    @KafkaListener(topics = "alarm-bloodsugar")
+    @KafkaListener(topics = "{TOPIC-BLOODSUGAR}")
     public void consumeBloodSugarAlarm(String kafkaMessage) {
         log.info("message : {}", kafkaMessage);
         try {
@@ -82,7 +82,7 @@ public class AlarmReceiveServiceImpl implements AlarmReceiveService {
     }
 
     @Override
-    @KafkaListener(topics = "alarm-poke")
+    @KafkaListener(topics = "${TOPIC-POKE}")
     public void consumePokeAlarm(String kafkaMessage) {
         try{
             Map<String,Object> map = objectMapper.readValue(kafkaMessage, Map.class);
