@@ -3,6 +3,9 @@ package kr.co.sugarmanager.business.challenge.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.SQLDelete;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
@@ -15,6 +18,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@SQLDelete(sql = "UPDATE CHALLENGE_TEMPLATE SET DELETED_AT = now() WHERE CHALLENGE_TEMPLATE_PK = ?")
 public class ChallengeTemplateEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,20 +41,23 @@ public class ChallengeTemplateEntity {
     private boolean alert;
 
     @Column(name = "challenge_alert_hour")
-    private int hour;
+    private Integer hour;
 
     @Column(name = "challenge_alert_min")
-    private int minute;
+    private Integer minute;
 
     @Column(name = "challenge_alert_days")
     private int days;
 
+    @CreatedDate
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
+    @LastModifiedDate
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    @Setter
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
