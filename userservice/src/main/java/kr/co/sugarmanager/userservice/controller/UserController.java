@@ -1,6 +1,7 @@
 package kr.co.sugarmanager.userservice.controller;
 
 import kr.co.sugarmanager.userservice.dto.AlarmDTO;
+import kr.co.sugarmanager.userservice.dto.AlarmUpdateDTO;
 import kr.co.sugarmanager.userservice.dto.UserInfoDTO;
 
 import static kr.co.sugarmanager.userservice.util.APIUtils.*;
@@ -23,7 +24,7 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
     private final UserService userService;
 
-    @GetMapping(value = "/{nickname}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{nickname}")
     public ResponseEntity<ApiResult<UserInfoDTO.Response>> getMemberInfo(
             @PathVariable String nickname,
             @AuthenticationPrincipal JwtAuthentication auth
@@ -56,5 +57,15 @@ public class UserController {
 
         AlarmDTO.Response res = userService.getAlarm(req);
         return result(res.isSuccess(), res, HttpStatus.OK);
+    }
+
+    @PostMapping(value = "/alarm/save", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ApiResult<Object>> updateAlarm(
+            @AuthenticationPrincipal JwtAuthentication auth,
+            @RequestBody AlarmUpdateDTO.Request request
+    ) {
+        request.setUserPk(auth != null ? auth.getPk() : 0l);
+        AlarmUpdateDTO.Response response = userService.setAlarm(request);
+        return result(response.isSuccess(), response, HttpStatus.OK);
     }
 }
