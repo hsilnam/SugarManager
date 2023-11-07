@@ -18,5 +18,5 @@ public abstract class CDBaseEntity {
     private LocalDateTime createdAt;
 
     @Column(name = "DELETED_AT")
-    private LocalDateTime deletdAt;
+    private LocalDateTime deletedAt;
 }
