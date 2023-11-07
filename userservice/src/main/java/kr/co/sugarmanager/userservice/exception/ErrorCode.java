@@ -1,5 +1,6 @@
 package kr.co.sugarmanager.userservice.exception;
 
+import kr.co.sugarmanager.userservice.entity.AlertType;
 import kr.co.sugarmanager.userservice.entity.UserInfoValidation;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
@@ -16,6 +17,7 @@ public enum ErrorCode {
     //서버관련
     INTERNAL_SERVER_ERROR_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR, "S001", "서버에러입니다."),
     JSON_BINDING_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR, "S002", "서버 에러입니다."),
+    SQL_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR, "S003", "서버 에러입니다."),
 
     //유효성 관련
     NICKNAME_NOT_VALID_EXCEPTION(HttpStatus.BAD_REQUEST, "UV_001", UserInfoValidation.NICKNAME),
@@ -23,7 +25,8 @@ public enum ErrorCode {
     HEIGHT_NOT_VALID_EXCEPTION(HttpStatus.BAD_REQUEST, "UV_003", UserInfoValidation.HEIGHT),
     WEIGHT_NOT_VALID_EXCEPTION(HttpStatus.BAD_REQUEST, "UV_004", UserInfoValidation.WEIGHT),
     GENDER_NOT_VALID_EXCEPTION(HttpStatus.BAD_REQUEST, "UV_005", UserInfoValidation.GENDER),
-    NICKNAME_DUPLICATED_EXCEPTION(HttpStatus.OK, "UV_006", "중복된 닉네임입니다.");
+    NICKNAME_DUPLICATED_EXCEPTION(HttpStatus.OK, "UV_006", "중복된 닉네임입니다."),
+    CATEGORY_NOT_VALID_EXCEPTION(HttpStatus.BAD_REQUEST, "UV_007", AlertType.getDomain());
     private HttpStatus status;
     private String code;
     private String message;
