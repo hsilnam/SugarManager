@@ -31,39 +31,6 @@ public class AlarmChallengeServiceImpl implements AlarmChallengeService{
     private final UserRepository userRepository;
     private final SettingsRepository settingsRepository;
 
-    // 오늘의 챌린지 모두 가져오기
-    @Transactional(readOnly = true)
-    @Override
-    public TodayChallengesDTO.Response todaysChallenges(){
-
-        int day = 1 << (LocalDateTime.now().getDayOfWeek().getValue()-1);
-        List<ChallengeTemplateEntity> challenges = challengeTemplateRepository.findTodaysChallenges(day);
-//        log.info("size : {} , challenges : {}", challenges.size(), challenges);
-
-        List<UserChallengeInfoDTO> userInfos = new ArrayList<>();
-
-        for(ChallengeTemplateEntity challenge : challenges){
-
-            int challengeDays = challenge.getDays();
-            List<String> days = convert(challengeDays);
-
-            UserChallengeInfoDTO userInfo = UserChallengeInfoDTO.builder()
-                    .challengeTitle(challenge.getTitle())
-                    .goal(challenge.getGoal())
-                    .type(challenge.getType())
-                    .alert(challenge.isAlert())
-                    .hour(challenge.getHour())
-                    .minute(challenge.getMinute())
-                    .days(days)
-                    .build();
-            userInfos.add(userInfo);
-        }
-
-        return TodayChallengesDTO.Response.builder()
-                .userInfos(userInfos)
-                .build();
-    }
-
     // 10분마다 챌린지 알람 가져오기
     @Transactional(readOnly = true)
     @Override

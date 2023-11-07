@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.sugarmanager.alarmchallenge.challenge.dto.AlarmChallengeDTO;
 import kr.co.sugarmanager.alarmchallenge.challenge.dto.RemindChallengeDTO;
-import kr.co.sugarmanager.alarmchallenge.challenge.dto.TodayChallengesDTO;
 import kr.co.sugarmanager.alarmchallenge.challenge.service.AlarmChallengeService;
 import lombok.RequiredArgsConstructor;
 
@@ -26,17 +25,8 @@ public class AlarmChallengeController {
     private final KafkaTemplate<String, String> kafkaTemplate;
     private final AlarmChallengeService alarmChallengeService;
 
-    // 이거 비즈니스 서버에 옮겨야함
-    @Scheduled(cron = "0 0 0 * * *")
-    @GetMapping("/challenge/today")
-    public ResponseEntity<TodayChallengesDTO.Response> todaysChallenges() {
-        TodayChallengesDTO.Response response = alarmChallengeService.todaysChallenges();
-        return new ResponseEntity<>(response,HttpStatus.OK);
-    }
-
     @Value(value = "${TOPIC-CHALLENGE}")
     private String CHALLENGE;
-
     @Scheduled(cron = "0 */9 * * * *")
     @GetMapping("/challenge")
     public ResponseEntity<AlarmChallengeDTO.Response> getChallanges() throws JsonProcessingException {
@@ -46,9 +36,9 @@ public class AlarmChallengeController {
         kafkaTemplate.flush();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
     @Value(value = "${TOPIC-REMIND}")
     private String REMIND;
-
     @Scheduled(cron = " 0 0 20 * * *")
     @GetMapping("/challenge/remind")
     public ResponseEntity<RemindChallengeDTO.Response> remind() throws JsonProcessingException {

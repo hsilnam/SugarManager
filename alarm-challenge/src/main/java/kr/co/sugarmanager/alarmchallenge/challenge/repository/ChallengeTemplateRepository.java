@@ -14,9 +14,6 @@ public interface ChallengeTemplateRepository extends JpaRepository<ChallengeTemp
     @Query("select t from ChallengeTemplateEntity t where BITAND(t.days, :day) > 0 and t.hour = :hour and t.minute = :minute")
     List<ChallengeTemplateEntity> findChallenges(@Param("day") int day, @Param("hour")int hour, @Param("minute") int minute);
 
-    @Query("select t from ChallengeTemplateEntity t where BITAND(t.days, :day) > 0")
-    List<ChallengeTemplateEntity> findTodaysChallenges(@Param("day") int day);
-
     @Query("select distinct (t.userPk) from ChallengeTemplateEntity t where BITAND(t.days, :day) > 0")
     List<Long> findUsersWithChallenges (@Param("day") int day);
 }
