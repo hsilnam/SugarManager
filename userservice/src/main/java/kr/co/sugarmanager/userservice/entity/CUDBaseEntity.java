@@ -23,5 +23,5 @@ public abstract class CUDBaseEntity {
     private LocalDateTime updatedAt;
 
     @Column(name = "DELETED_AT")
-    private LocalDateTime deletdAt;
+    private LocalDateTime deletedAt;
 }
