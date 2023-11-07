@@ -35,15 +35,17 @@ public class AlarmReceiveServiceImpl implements AlarmReceiveService {
 
                 // message body
                 StringBuilder body = new StringBuilder();
-                body.append(userInfo.getNickname()).append("님 ").append(userInfo.getChallengeTitle()).append(" 챌린지를 완료하셨나요?");
+                body.append(userInfo.getNickname()).append("님 ").append(userInfo.getChallengeTitle()).append("챌린지 목록을 확인하러 가보세요!");
 
                 FCMMessageDTO dto = FCMMessageDTO.builder()
-                        .title("알림")
+                        .title("오늘의 챌린지를 모두 완료하셨나요?")
                         .body(body.toString())
                         .fcmToken(userInfo.getFcmToken())
                         .build();
 
-                fcmService.send(dto);
+                if (dto.getTitle() != null && dto.getBody() != null && dto.getFcmToken() != null) {
+                    fcmService.send(dto);
+                }
             }
 
 
@@ -68,12 +70,14 @@ public class AlarmReceiveServiceImpl implements AlarmReceiveService {
                 body.append(userInfo.getNickname()).append("님 ").append(" 혈당을 기록할 시간이에요!");
 
                 FCMMessageDTO dto = FCMMessageDTO.builder()
-                        .title("알림")
+                        .title("혈당 기록 알림")
                         .body(body.toString())
                         .fcmToken(userInfo.getFcmToken())
                         .build();
 
-                fcmService.send(dto);
+                if (dto.getTitle() != null && dto.getBody() != null && dto.getFcmToken() != null) {
+                    fcmService.send(dto);
+                }
             }
 
         } catch (JsonProcessingException e){
@@ -102,12 +106,14 @@ public class AlarmReceiveServiceImpl implements AlarmReceiveService {
                         .append(" 챌린지 달성 응원을 보냈습니다!");
 
                 FCMMessageDTO dto = FCMMessageDTO.builder()
-                        .title("알림")
+                        .title("챌린지 응원 알림")
                         .body(body.toString())
                         .fcmToken(userInfo.getFcmToken())
                         .build();
 
-                fcmService.send(dto);
+                if (dto.getTitle() != null && dto.getBody() != null && dto.getFcmToken() != null) {
+                    fcmService.send(dto);
+                }
 
             }
         }catch (JsonProcessingException e){
