@@ -1,13 +1,12 @@
 package kr.co.sugarmanager.userservice.service;
 
 import kr.co.sugarmanager.userservice.dto.AlarmDTO;
+import kr.co.sugarmanager.userservice.dto.AlarmUpdateDTO;
 import kr.co.sugarmanager.userservice.dto.UserInfoDTO;
 import kr.co.sugarmanager.userservice.dto.UserInfoUpdateDTO;
 import kr.co.sugarmanager.userservice.entity.UserEntity;
 import kr.co.sugarmanager.userservice.entity.UserSettingEntity;
-import kr.co.sugarmanager.userservice.exception.AccessDenyException;
-import kr.co.sugarmanager.userservice.exception.ErrorCode;
-import kr.co.sugarmanager.userservice.exception.UserNotFoundException;
+import kr.co.sugarmanager.userservice.exception.*;
 import kr.co.sugarmanager.userservice.repository.UserRepository;
 import kr.co.sugarmanager.userservice.repository.UserSettingRepository;
 import lombok.RequiredArgsConstructor;
@@ -87,6 +86,21 @@ public class UserServiceImpl implements UserService {
         return AlarmDTO.Response.builder()
                 .success(true)
                 .alarms(userSettingEntity.getAlarmInfos())
+                .build();
+    }
+
+    @Override
+    @Transactional
+    public AlarmUpdateDTO.Response setAlarm(AlarmUpdateDTO.Request req) {
+        long count = userSettingRepository.setAlarm(req.getUserPk(), req.getCategory(), req.isStatus());
+        if (count == 0) {//업데이트 한 칼럼이 존재하지 않음
+            throw new UserNotFoundException(ErrorCode.USER_NOT_FOUND_EXCEPTION);
+        } else if (count > 1) {//혹시모르게 2개이상의 칼럼이 업데이트되었다면, 정합성 오류기때문에 error throw하며 rollback
+            throw new InternalServerErrorException(ErrorCode.SQL_EXCEPTION);
+        }
+
+        return AlarmUpdateDTO.Response.builder()
+                .success(true)
                 .build();
     }
 }
