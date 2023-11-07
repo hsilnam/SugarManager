@@ -1,7 +1,9 @@
 package kr.co.sugarmanager.business.bloodsugar.entity;
 
 import jakarta.persistence.*;
+import kr.co.sugarmanager.business.bloodsugar.exception.BloodSugarException;
 import kr.co.sugarmanager.business.global.entity.CUDEntity;
+import kr.co.sugarmanager.business.global.exception.ErrorCode;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
@@ -9,7 +11,7 @@ import org.hibernate.annotations.Where;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@SQLDelete(sql = "UPDATE BLOOD_SUGAR SET DELETED_AT = now() WHERE MENU_PK = ?")
+@SQLDelete(sql = "UPDATE BLOOD_SUGAR SET DELETED_AT = now() WHERE BLOOD_SUGAR_PK = ?")
 @Where(clause = "DELETED_AT is null")
 @Getter
 @Setter
@@ -29,4 +31,20 @@ public class BloodSugarEntity extends CUDEntity {
     private int level;
     @Column(name = "BLOOD_SUGAR_CONTENT")
     private String content;
+
+    @Builder
+    public BloodSugarEntity(Long userPk, String category, int level, String content) {
+        this.userPk = userPk;
+        this.category = category;
+        setLevel(level);
+        this.level = level;
+        this.content = content;
+    }
+
+    public void setLevel(int level) {
+        if (level <= 0 || level > 500) {
+            throw new BloodSugarException(ErrorCode.INVALID_INPUT_VALUE);
+        }
+        this.level = level;
+    }
 }

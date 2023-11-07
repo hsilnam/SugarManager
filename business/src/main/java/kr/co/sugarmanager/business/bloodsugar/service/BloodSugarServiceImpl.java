@@ -25,18 +25,22 @@ public class BloodSugarServiceImpl implements BloodSugarService{
 
     @Override
     public BloodSugarSaveDTO.Response save(Long userPk, BloodSugarSaveDTO.Request request) {
-        BloodSugarEntity bloodSugar = BloodSugarEntity.builder()
-                .userPk(userPk)
-                .category(request.getCategory().name())
-                .level(request.getLevel())
-                .content(request.getContent())
-                .build();
-        bloodSugarRepository.save(bloodSugar);
-        return BloodSugarSaveDTO.Response.builder()
-                .success(true)
-                .response(null)
-                .error(null)
-                .build();
+        try {
+            BloodSugarEntity bloodSugar = BloodSugarEntity.builder()
+                    .userPk(userPk)
+                    .category(request.getCategory().name())
+                    .level(request.getLevel())
+                    .content(request.getContent())
+                    .build();
+            bloodSugarRepository.save(bloodSugar);
+            return BloodSugarSaveDTO.Response.builder()
+                    .success(true)
+                    .response(null)
+                    .error(null)
+                    .build();
+        } catch (NullPointerException e) {
+            throw new BloodSugarException(ErrorCode.MISSING_INPUT_VALUE);
+        }
     }
 
     @Override
@@ -50,6 +54,7 @@ public class BloodSugarServiceImpl implements BloodSugarService{
             bloodSugar.setLevel(request.getLevel());
             bloodSugar.setCategory(request.getCategory().name());
             bloodSugar.setContent(request.getContent());
+            bloodSugarRepository.save(bloodSugar);
             return BloodSugarUpdateDTO.Response.builder()
                     .success(true)
                     .response(null)
