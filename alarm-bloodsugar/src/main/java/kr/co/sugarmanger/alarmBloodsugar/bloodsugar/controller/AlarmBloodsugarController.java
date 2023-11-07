@@ -24,7 +24,7 @@ public class AlarmBloodsugarController {
     private final KafkaTemplate<String, String> kafkaTemplate;
     private final AlarmBloodsugarService alarmBloodsugarService;
 
-    @Value(value = "${TOPIC}")
+    @Value(value = "${TOPIC-BLOODSUGAR}")
     private String TOPIC;
 
     @Scheduled(cron = "0 * * * * *")
