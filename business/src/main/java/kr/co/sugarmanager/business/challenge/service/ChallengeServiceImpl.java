@@ -1,6 +1,7 @@
 package kr.co.sugarmanager.business.challenge.service;
 
 import kr.co.sugarmanager.business.challenge.dto.ChallengeAddDTO;
+import kr.co.sugarmanager.business.challenge.dto.ChallengeDeleteDTO;
 import kr.co.sugarmanager.business.challenge.dto.TodayChallengesDTO;
 import kr.co.sugarmanager.business.challenge.dto.UserChallengeInfoDTO;
 import kr.co.sugarmanager.business.challenge.entity.ChallengeTemplateEntity;
@@ -109,6 +110,17 @@ public class ChallengeServiceImpl implements ChallengeService {
         challengeTemplateRepository.save(challenge);
 
         return ChallengeAddDTO.Response.builder()
+                .success(true)
+                .build();
+    }
+
+    @Transactional
+    @Override
+    public ChallengeDeleteDTO.Response deleteChallenge(Long userPk, ChallengeDeleteDTO.Request dto){
+
+        challengeTemplateRepository.deleteById(dto.getChallengePk());
+
+        return ChallengeDeleteDTO.Response.builder()
                 .success(true)
                 .build();
     }
