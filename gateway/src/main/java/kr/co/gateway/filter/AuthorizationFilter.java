@@ -54,7 +54,7 @@ public class AuthorizationFilter extends AbstractGatewayFilterFactory<Authorizat
             ServerHttpResponse response = exchange.getResponse();
 
             String path = request.getURI().getPath();
-            log.info("[Authorization Filter] {}", request.getRemoteAddress());
+            log.info("[Authorization Filter] Start : {}", request.getRemoteAddress());
             boolean isWhiteList = Arrays.stream(Config.whiteList)
                     .anyMatch(pattern -> antPathMatcher.match(pattern, path));
             if (!isWhiteList) {//필터가 적용되는 path라면 jwt토큰 검증
@@ -89,8 +89,10 @@ public class AuthorizationFilter extends AbstractGatewayFilterFactory<Authorizat
                         .header("X-Authorization-Role", roles.stream().collect(Collectors.joining(",")))
                         .build();
             }
-
-            return chain.filter(exchange);
+            log.info("[Authorization Filter] before chain.filter");
+            return chain.filter(exchange).then(Mono.fromRunnable(()->{
+                log.info("[Authorization Filter] End : {}", request.getRemoteAddress());
+            }));
         };
     }
 
