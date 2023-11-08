@@ -22,7 +22,18 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
     private final UserService userService;
 
-    @GetMapping(value = {"", "/{nickname}"}, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ApiResult<UserInfoDTO.Response>> getMyInfo(
+            @AuthenticationPrincipal JwtAuthentication auth
+    ) {
+        UserInfoDTO.Request req = UserInfoDTO.Request.builder()
+                .userPk(auth != null ? auth.getPk() : 0l)
+                .build();
+        UserInfoDTO.Response response = userService.getMemberInfo(req);
+        return result(response.isSuccess(), response, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/{nickname}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResult<UserInfoDTO.Response>> getMemberInfo(
             @PathVariable(required = false) String nickname,
             @AuthenticationPrincipal JwtAuthentication auth
