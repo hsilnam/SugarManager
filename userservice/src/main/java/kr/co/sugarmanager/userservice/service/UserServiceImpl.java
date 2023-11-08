@@ -7,6 +7,7 @@ import kr.co.sugarmanager.userservice.exception.AccessDenyException;
 import kr.co.sugarmanager.userservice.exception.ErrorCode;
 import kr.co.sugarmanager.userservice.exception.UserNotFoundException;
 import kr.co.sugarmanager.userservice.repository.UserRepository;
+import kr.co.sugarmanager.userservice.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -28,9 +29,13 @@ public class UserServiceImpl implements UserService {
         UserEntity owner = userRepository.findById(userPk)
                 .orElseThrow(() -> new AccessDenyException(ErrorCode.UNAUTHORIZATION_EXCEPTION));
 
-        UserEntity target = userRepository.findByNickname(targetNickname)
-                .orElseThrow(() -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
-
+        UserEntity target = null;
+        if (StringUtils.isBlank(targetNickname)) {
+            target = owner;
+        } else {
+            target = userRepository.findByNickname(targetNickname)
+                    .orElseThrow(() -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
+        }
         if (owner.getPk() == target.getPk()
                 || (owner.getGroup() != null && target.getGroup() != null
                 && owner.getGroup().getGroupCode().equals(target.getGroup().getGroupCode()))) {
@@ -38,6 +43,7 @@ public class UserServiceImpl implements UserService {
                     .success(true)
                     .uid(target.getPk())
                     .name(target.getName())
+                    .nickname(target.getNickname())
                     .email(target.getEmail())
                     .gender(target.getGender() == null ? null : target.getGender() ? "여자" : "남자")
                     .birthday(target.getBirthday())
