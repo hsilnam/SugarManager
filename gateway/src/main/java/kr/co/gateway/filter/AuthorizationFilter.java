@@ -54,12 +54,13 @@ public class AuthorizationFilter extends AbstractGatewayFilterFactory<Authorizat
             ServerHttpResponse response = exchange.getResponse();
 
             String path = request.getURI().getPath();
-
+            log.info("[Authorization Filter] {}", request.getRemoteAddress());
             boolean isWhiteList = Arrays.stream(Config.whiteList)
                     .anyMatch(pattern -> antPathMatcher.match(pattern, path));
             if (!isWhiteList) {//필터가 적용되는 path라면 jwt토큰 검증
                 if (!containsAuthorization(request)) {
                     //error
+                    log.error("[AuthorizationFilter] Not Contained Authorization Header");
                     return onError(response, new UnauthorizationException(ErrorCode.UNAUTHORIZATION_EXCEPTION));
                 }
 
@@ -69,6 +70,7 @@ public class AuthorizationFilter extends AbstractGatewayFilterFactory<Authorizat
                     jwtProvider.validateToken(token);
                     //error
                 } catch (CustomJwtException e) {
+                    log.error("[AuthoriztionFilter] JWT Exception!", e);
                     return onError(response, e);
                 } catch (Exception e) {
                     return onError(response, new InternalServerErrorException(ErrorCode.INTERNAL_SERVER_ERROR_EXCEPTION));
