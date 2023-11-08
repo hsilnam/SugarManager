@@ -1,5 +1,6 @@
 package kr.co.sugarmanager.business.challenge.repository;
 
+import kr.co.sugarmanager.business.challenge.dto.UserChallengeAllDTO;
 import kr.co.sugarmanager.business.challenge.entity.ChallengeTemplateEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -13,5 +14,8 @@ public interface ChallengeTemplateRepository extends JpaRepository<ChallengeTemp
 
     @Query("select distinct (t.userPk) from ChallengeTemplateEntity t where BITAND(t.days, :day) > 0")
     List<Long> findUsersWithChallenges (@Param("day") int day);
+
+    @Query("select t from ChallengeTemplateEntity t where t.userPk = :userPk")
+    List<ChallengeTemplateEntity> findAllChallengesByUser(@Param("userPk") Long userPk);
 }
 

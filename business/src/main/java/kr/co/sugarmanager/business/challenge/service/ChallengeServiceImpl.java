@@ -1,10 +1,9 @@
 package kr.co.sugarmanager.business.challenge.service;
 
-import kr.co.sugarmanager.business.challenge.dto.ChallengeAddDTO;
-import kr.co.sugarmanager.business.challenge.dto.ChallengeDeleteDTO;
-import kr.co.sugarmanager.business.challenge.dto.TodayChallengesDTO;
-import kr.co.sugarmanager.business.challenge.dto.UserChallengeInfoDTO;
+import kr.co.sugarmanager.business.challenge.dto.*;
+import kr.co.sugarmanager.business.challenge.entity.ChallengeLogEntity;
 import kr.co.sugarmanager.business.challenge.entity.ChallengeTemplateEntity;
+import kr.co.sugarmanager.business.challenge.repository.ChallengeLogRepository;
 import kr.co.sugarmanager.business.challenge.repository.ChallengeTemplateRepository;
 import kr.co.sugarmanager.business.global.exception.ErrorCode;
 import kr.co.sugarmanager.business.global.exception.ValidationException;
@@ -13,7 +12,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -24,7 +25,7 @@ import java.util.Objects;
 @Transactional
 public class ChallengeServiceImpl implements ChallengeService {
     private final ChallengeTemplateRepository challengeTemplateRepository;
-//    private final ChallengeLogRepository challengeLogRepository;
+    private final ChallengeLogRepository challengeLogRepository;
 
     // 현욱이가 만들어주면 삭제
 //    private final UserRepository userRepository;
@@ -47,6 +48,7 @@ public class ChallengeServiceImpl implements ChallengeService {
             List<String> days = convertToList(challengeDays);
 
             UserChallengeInfoDTO userInfo = UserChallengeInfoDTO.builder()
+                    .challengePk(challenge.getPk())
                     .challengeTitle(challenge.getTitle())
                     .goal(challenge.getGoal())
                     .type(challenge.getType())
@@ -123,6 +125,43 @@ public class ChallengeServiceImpl implements ChallengeService {
         return ChallengeDeleteDTO.Response.builder()
                 .success(true)
                 .build();
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public UserChallengeAllDTO.Response userChallengesAll(Long userPk){
+
+        LocalDateTime start = LocalDate.now().atStartOfDay(ZoneId.of("Asia/Seoul")).toLocalDateTime();
+        LocalDateTime end = start.plusDays(1);
+
+        List<ChallengeTemplateEntity> userChallenges = challengeTemplateRepository.findAllChallengesByUser(1l);
+
+        List<UserChallengeAllDTO.Info> challenges = new ArrayList<>();
+
+        for (ChallengeTemplateEntity challenge : userChallenges){
+            long challengePk = challenge.getPk();
+            int logs = challengeLogRepository.findChallengeLogs(start, end, challengePk);
+            List<String> days = convertToList(challenge.getDays());
+
+            UserChallengeAllDTO.Info info = UserChallengeAllDTO.Info.builder()
+                    .challengePk(challenge.getPk())
+                    .type(ChallengeTypeEnum.valueOf(challenge.getType()))
+                    .title(challenge.getTitle())
+                    .count(logs)
+                    .goal(challenge.getGoal())
+                    .alert(challenge.isAlert())
+                    .hour(challenge.getHour())
+                    .minute(challenge.getMinute())
+                    .days(days)
+                    .build();
+            challenges.add(info);
+        }
+        return UserChallengeAllDTO.Response.builder()
+                .success(true)
+                .response(challenges)
+                .build();
+
+
     }
 
     private List<String> convertToList(int challengeDays){

@@ -14,7 +14,7 @@ public interface ChallengeLogRepository extends JpaRepository<ChallengeLogEntity
             "left join ChallengeTemplateEntity t on c.challengeTemplatePk = t.pk " +
             "where " +
             "c.createdAt between :start and :end and c.challengeTemplatePk = :challengePk")
-    Integer findAllChallenges(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end, @Param("challengePk") Long challengePk);
+    Integer findChallengeLogs(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end, @Param("challengePk") Long challengePk);
 
 }
 

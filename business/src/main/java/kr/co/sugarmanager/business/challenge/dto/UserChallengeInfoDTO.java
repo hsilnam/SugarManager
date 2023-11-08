@@ -12,6 +12,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserChallengeInfoDTO {
+    private long challengePk;
     private String challengeTitle;
     private int goal;
     private String type;

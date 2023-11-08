@@ -3,6 +3,7 @@ package kr.co.sugarmanager.business.challenge.controller;
 import kr.co.sugarmanager.business.challenge.dto.ChallengeAddDTO;
 import kr.co.sugarmanager.business.challenge.dto.ChallengeDeleteDTO;
 import kr.co.sugarmanager.business.challenge.dto.TodayChallengesDTO;
+import kr.co.sugarmanager.business.challenge.dto.UserChallengeAllDTO;
 import kr.co.sugarmanager.business.challenge.service.ChallengeService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,6 +38,11 @@ public class ChallengeController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @GetMapping("/{userPk}")
+    public ResponseEntity<UserChallengeAllDTO.Response> userChallengesAll(Long userPk){
+        UserChallengeAllDTO.Response resopnse = challengeService.userChallengesAll(userPk);
+        return new ResponseEntity<>(resopnse, HttpStatus.OK);
+    }
 
 
 }
