@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: secret
+    active: secret, db
 
 eureka:
   client:

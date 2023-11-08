@@ -6,10 +6,10 @@ import kr.co.sugarmanager.business.tip.repository.TipRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @Slf4j
@@ -17,20 +17,22 @@ import java.util.Optional;
 public class TipServiceImpl implements TipService{
 
     private final TipRepository tipRepository;
+    @Override
+    @Transactional
     public TipDTO.Response tipOfTheDay(){
-        log.info("============================");
-        TipEntity tip = tipRepository.findTipOfTheDay();
-        log.info("tip info : {}", tip.getTitle());
 
-//        List<TipDTO.Tip> tips = new ArrayList<>();
-//        TipDTO.Tip tip = TipDTO.Tip.builder()
-//                .title(tipEntity.getTitle())
-//                .content(tipEntity.getContent())
-//                .build();
-//        tips.add(tip);
+        TipEntity tipEntity = tipRepository.findTipOfTheDay();
+
+        List<TipDTO.Tip> tips = new ArrayList<>();
+        TipDTO.Tip tip = TipDTO.Tip.builder()
+                .title(tipEntity.getTitle())
+                .content(tipEntity.getContent())
+                .build();
+        tips.add(tip);
 
         return TipDTO.Response.builder()
-                .response(null)
+                .success(true)
+                .response(tips)
                 .build();
     }
 }
