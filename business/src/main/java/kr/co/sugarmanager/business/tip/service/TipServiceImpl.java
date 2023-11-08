@@ -18,7 +18,7 @@ public class TipServiceImpl implements TipService{
 
     private final TipRepository tipRepository;
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public TipDTO.Response tipOfTheDay(){
 
         TipEntity tipEntity = tipRepository.findTipOfTheDay();
