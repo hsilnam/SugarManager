@@ -7,6 +7,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -14,10 +17,17 @@ public class TipServiceImpl implements TipService{
 
     private final TipRepository tipRepository;
     public TipDTO.Response tipOfTheDay(){
-        TipEntity tip = tipRepository.findTipOfTheDay();
+        TipEntity tipEntity = tipRepository.findTipOfTheDay();
+
+        List<TipDTO.Tip> tips = new ArrayList<>();
+        TipDTO.Tip tip = TipDTO.Tip.builder()
+                .title(tipEntity.getTitle())
+                .content(tipEntity.getContent())
+                .build();
+        tips.add(tip);
+
         return TipDTO.Response.builder()
-                .title(tip.getTitle())
-                .content(tip.getContent())
+                .response(tips)
                 .build();
     }
 }
