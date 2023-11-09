@@ -26,25 +26,28 @@ public class AlarmChallengeController {
     private final AlarmChallengeService alarmChallengeService;
 
     @Value(value = "${TOPIC}")
-    private String CHALLENGE;
-    @Scheduled(cron = "0 */9 * * * *")
+    private String TOPIC;
+    @Scheduled(cron = "0 9 * * * *")
+    @Scheduled(cron = "0 19 * * * *")
+    @Scheduled(cron = "0 29 * * * *")
+    @Scheduled(cron = "0 39 * * * *")
+    @Scheduled(cron = "0 49 * * * *")
+    @Scheduled(cron = "0 59 * * * *")
     @GetMapping("/challenge")
     public ResponseEntity<AlarmChallengeDTO.Response> getChallanges() throws JsonProcessingException {
         AlarmChallengeDTO.Response response = alarmChallengeService.getChallanges();
         String stringResponse = new ObjectMapper().writeValueAsString(response);
-        kafkaTemplate.send(CHALLENGE,stringResponse);
+        kafkaTemplate.send(TOPIC,stringResponse);
         kafkaTemplate.flush();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @Value(value = "${TOPIC}")
-    private String REMIND;
     @Scheduled(cron = " 0 0 20 * * *")
     @GetMapping("/challenge/remind")
     public ResponseEntity<RemindChallengeDTO.Response> remind() throws JsonProcessingException {
         RemindChallengeDTO.Response response = alarmChallengeService.remind();
         String stringResponse = new ObjectMapper().writeValueAsString(response);
-        kafkaTemplate.send(REMIND,stringResponse);
+        kafkaTemplate.send(TOPIC,stringResponse);
         kafkaTemplate.flush();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
