@@ -11,6 +11,7 @@ import kr.co.sugarmanager.business.global.exception.ValidationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.convert.support.ConvertingPropertyEditorAdapter;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,14 +43,14 @@ public class ChallengeServiceImpl implements ChallengeService {
         List<ChallengeTemplateEntity> challenges = challengeTemplateRepository.findTodaysChallenges(day);
 //        log.info("size : {} , challenges : {}", challenges.size(), challenges);
 
-        List<UserChallengeInfoDTO> userInfos = new ArrayList<>();
+        List<ChallengeInfoDTO> userInfos = new ArrayList<>();
 
         for (ChallengeTemplateEntity challenge : challenges) {
 
             int challengeDays = challenge.getDays();
             List<String> days = convertToList(challengeDays);
 
-            UserChallengeInfoDTO userInfo = UserChallengeInfoDTO.builder()
+            ChallengeInfoDTO userInfo = ChallengeInfoDTO.builder()
                     .challengePk(challenge.getPk())
                     .challengeTitle(challenge.getTitle())
                     .goal(challenge.getGoal())
@@ -188,6 +189,37 @@ public class ChallengeServiceImpl implements ChallengeService {
     }
 
     // 단일 챌린지 조회
+    public UserChallengeInfoDTO.Response userChallengeInfo(Long userPk, Long challengePk) {
+
+        LocalDateTime start = LocalDate.now().atStartOfDay(ZoneId.of("Asia/Seoul")).toLocalDateTime();
+        LocalDateTime end = start.plusDays(1);
+
+        UserChallengeAllDTO.Info info = new UserChallengeAllDTO.Info();
+
+        try {
+            ChallengeTemplateEntity challenge = challengeTemplateRepository.findChallengeByPk(challengePk);
+
+            Integer logs = challengeLogRepository.findChallengeLogs(start, end, challengePk);
+            List<String> days = convertToList(challenge.getDays());
+            info = UserChallengeAllDTO.Info.builder()
+                    .challengePk(challengePk)
+                    .type(ChallengeTypeEnum.valueOf(challenge.getType()))
+                    .title(challenge.getTitle())
+                    .count(logs)
+                    .goal(challenge.getGoal())
+                    .alert(challenge.isAlert())
+                    .hour(challenge.getHour())
+                    .minute(challenge.getMinute())
+                    .days(days)
+                    .build();
+        } catch (Exception e){
+            log.info(e.getMessage());
+        }
+        return UserChallengeInfoDTO.Response.builder()
+                .success(true)
+                .response(info)
+                .build();
+    }
 
     private List<String> convertToList(int challengeDays){
         List<String> days = new ArrayList<>();
