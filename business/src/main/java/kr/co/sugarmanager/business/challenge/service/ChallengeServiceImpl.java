@@ -196,23 +196,30 @@ public class ChallengeServiceImpl implements ChallengeService {
         int result = 0;
 
         for (String day : daysInfo) {
-            if (Objects.equals(day, "일")) {
-                result += 1;
-            } else if (Objects.equals(day, "월")) {
-                result += 2;
-            } else if (Objects.equals(day, "화")) {
-                result += 4;
-            } else if (Objects.equals(day, "수")) {
-                result += 8;
-            } else if (Objects.equals(day, "목")) {
-                result += 16;
-            } else if (Objects.equals(day, "금")) {
-                result += 32;
-            } else if (Objects.equals(day, "토")) {
-                result += 64;
+            switch (day) {
+                case "일":
+                    result += 1;
+                    break;
+                case "월":
+                    result += 2;
+                    break;
+                case "화":
+                    result += 4;
+                    break;
+                case "수":
+                    result += 8;
+                    break;
+                case "목":
+                    result += 16;
+                    break;
+                case "금":
+                    result += 32;
+                    break;
+                case "토":
+                    result += 64;
+                    break;
             }
         }
-
         return result;
     }
 }
