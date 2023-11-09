@@ -38,6 +38,33 @@ spring:
           filters:
             - RewritePath=/user-service/(?<segment>.*), /$\{segment}
 
+        - id: business-service
+          uri: lb://BUSINESS-SERVICE
+          predicates:
+            - Path=/business-service/api/v1/**
+          filters:
+            - RewritePath=/business-service/(?<segment>.*), /$\{segment}
+
+        - id: alarm-service
+          uri: lb://ALARM-SERVICE
+          predicates:
+            - Path=/alarm-service/api/v1/**
+          filters:
+            - RewritePath=/alarm-service/(?<segment>.*), /$\{segment}
+
+        - id:  alarm-challenge-service
+          uri: lb://ALARM-CHALLENGE-SERVICE
+          predicates:
+            - Path=/alarm-challenge-service/api/v1/**
+          filters:
+            - RewritePath=/alarm-challenge-service/(?<segment>.*), /$\{segment}
+
+        - id: alarm-bloodsugar-service
+          uri: lb://ALARM-BLOOD-SERVICE
+          predicates:
+            - Path=/alarm-bloodsugar-service/api/v1/**
+          filters:
+            - RewritePath=/alarm-bloodsugar-service/(?<segment>.*), /$\{segment}
 
   profiles:
     include: jwt,eureka
