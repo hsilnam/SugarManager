@@ -9,8 +9,8 @@ import lombok.*;
 @Builder
 public class UserInfoDTO {
 
-    private String type;
-    private String nickname;
+    private String title;
+    private String body;
     private String fcmToken;
 
 }
