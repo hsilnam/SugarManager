@@ -1,8 +1,7 @@
 spring:
+  application:
+    name: BUSINESS-SERVICE
   profiles:
-    active: secret
-
-eureka:
-  client:
-    register-with-eureka: false
-    fetch-registry: false
+    active: secret, eureka
+server:
+  port: 8080
