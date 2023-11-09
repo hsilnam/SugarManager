@@ -1,9 +1,6 @@
 package kr.co.sugarmanager.business.challenge.controller;
 
-import kr.co.sugarmanager.business.challenge.dto.ChallengeAddDTO;
-import kr.co.sugarmanager.business.challenge.dto.ChallengeDeleteDTO;
-import kr.co.sugarmanager.business.challenge.dto.TodayChallengesDTO;
-import kr.co.sugarmanager.business.challenge.dto.UserChallengeAllDTO;
+import kr.co.sugarmanager.business.challenge.dto.*;
 import kr.co.sugarmanager.business.challenge.service.ChallengeService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,8 +37,15 @@ public class ChallengeController {
 
     @GetMapping("/{userPk}")
     public ResponseEntity<UserChallengeAllDTO.Response> userChallengesAll(Long userPk){
-        UserChallengeAllDTO.Response resopnse = challengeService.userChallengesAll(userPk);
-        return new ResponseEntity<>(resopnse, HttpStatus.OK);
+        UserChallengeAllDTO.Response response = challengeService.userChallengesAll(userPk);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping("/poke/info")
+//    public ResponseEntity<ChallengePokeDTO.Response> infoForPoke(Long userPk, ChallengePokeDTO.Request dto){
+    public ResponseEntity<ChallengePokeDTO.Response> infoForPoke(@RequestBody ChallengePokeDTO.Request dto){
+        ChallengePokeDTO.Response response = challengeService.infoForPoke(dto);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 
