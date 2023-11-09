@@ -1,0 +1,14 @@
+# Server
+server:
+  port: 8761
+
+# MS ID
+spring:
+  application:
+    name: service-registry
+
+# Eureka (Do not register self)
+eureka:
+  client:
+    register-with-eureka: false
+    fetch-registry: false
