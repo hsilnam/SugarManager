@@ -1,8 +1,0 @@
-spring:
-  application:
-    name: ALARM-BLOOD-SERVICE
-  profiles:
-    active: secret, db, eureka
-
-server:
-  port : 8080
