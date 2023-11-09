@@ -58,16 +58,22 @@ public class AlarmChallengeServiceImpl implements AlarmChallengeService{
                 Long userPk = challenge.getUserPk();
                 log.info("userPk : {}", userPk);
 
+                // message title
+                StringBuilder title = new StringBuilder();
+                title.append(challenge.getTitle()).append(" 알림");
+
+                // message body
+                StringBuilder body = new StringBuilder();
+                body.append(userRepository.findNicknameById(userPk)).append("님 ").append(challenge.getTitle()).append(" 챌린지를 할 시간입니다!");
+
                 // 현욱이가 만들어주면 수정
                 try {
                     UserSettingEntity setting = settingsRepository.findSettingByUserId(userPk);
                     if (challenge.isAlert() && challenge.getDeletedAt() == null){
                         UserInfoDTO userInfo = UserInfoDTO.builder()
-                                .nickname(userRepository.findNicknameById(setting.getUserPk()))
+                                .title(title.toString())
+                                .body(body.toString())
                                 .fcmToken(setting.getFcmToken())
-                                .challengeTitle(challenge.getTitle())
-                                .hour(challenge.getHour())
-                                .minute(challenge.getMinute())
                                 .build();
                         userInfos.add(userInfo);
                     }
@@ -86,13 +92,19 @@ public class AlarmChallengeServiceImpl implements AlarmChallengeService{
     public RemindChallengeDTO.Response remind(){
 
         // [1] 가져올 유저 조건
-        List<RemindUserInfoDTO> userInfos = new ArrayList<>();
+        List<UserInfoDTO> userInfos = new ArrayList<>();
 
-      List<UserSettingEntity> users = settingsRepository.findUsersWithChallengeAlarmOn();
+        List<UserSettingEntity> users = settingsRepository.findUsersWithChallengeAlarmOn();
         for (UserSettingEntity user : users){
+
+            // message body
+            StringBuilder body = new StringBuilder();
+            body.append(userRepository.findNicknameById(user.getUserPk())).append("님 ").append("챌린지 목록을 확인하러 가보세요!");
+
             log.info("user nickname : {}", userRepository.findNicknameById(user.getPk()));
-            RemindUserInfoDTO info = RemindUserInfoDTO.builder()
-                    .nickname(userRepository.findNicknameById(user.getUserPk()))
+            UserInfoDTO info = UserInfoDTO.builder()
+                    .title("오늘의 챌린지를 모두 완료하셨나요?")
+                    .body(body.toString())
                     .fcmToken(user.getFcmToken())
                     .build();
             userInfos.add(info);
