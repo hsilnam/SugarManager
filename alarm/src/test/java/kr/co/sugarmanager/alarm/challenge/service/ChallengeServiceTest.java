@@ -1,8 +1,8 @@
 package kr.co.sugarmanager.alarm.challenge.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import kr.co.sugarmanager.alarm.dto.ChallengeUserInfoDTO;
 import kr.co.sugarmanager.alarm.dto.FCMMessageDTO;
+import kr.co.sugarmanager.alarm.dto.KafkaMessageDTO;
 import kr.co.sugarmanager.alarm.service.FCMService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,18 +50,11 @@ public class ChallengeServiceTest {
         ArrayList<Object> userInfoMap = (ArrayList<Object>) map.get("userInfos");
 
         for (Object userObject : userInfoMap) {
-            ChallengeUserInfoDTO userInfo = new ChallengeUserInfoDTO((Map<String, Object>) userObject);
-
-            // message body
-            StringBuilder body = new StringBuilder();
-            body.append(userInfo.getNickname()).append("님 ").append(userInfo.getChallengeTitle()).append(" 챌린지를 완료하셨나요?");
-
-            System.out.println("================");
-            System.out.println(body);
+            KafkaMessageDTO userInfo = new KafkaMessageDTO((Map<String, Object>) userObject);
 
             FCMMessageDTO dto = FCMMessageDTO.builder()
-                    .title("알림")
-                    .body(body.toString())
+                    .title(userInfo.getTitle())
+                    .body(userInfo.getBody())
                     .fcmToken(userInfo.getFcmToken())
                     .build();
 
