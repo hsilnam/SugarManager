@@ -5,10 +5,12 @@ import kr.co.sugarmanager.business.challenge.entity.ChallengeLogEntity;
 import kr.co.sugarmanager.business.challenge.entity.ChallengeTemplateEntity;
 import kr.co.sugarmanager.business.challenge.repository.ChallengeLogRepository;
 import kr.co.sugarmanager.business.challenge.repository.ChallengeTemplateRepository;
+import kr.co.sugarmanager.business.global.exception.CustomException;
 import kr.co.sugarmanager.business.global.exception.ErrorCode;
 import kr.co.sugarmanager.business.global.exception.ValidationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.convert.support.ConvertingPropertyEditorAdapter;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -162,6 +164,29 @@ public class ChallengeServiceImpl implements ChallengeService {
                 .build();
 
 
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+//    public ChallengePokeDTO.Response infoForPoke(Long userPk, ChallengePokeDTO.Request dto){
+    public ChallengePokeDTO.Response infoForPoke(ChallengePokeDTO.Request dto){
+
+        ChallengePokeDTO.Info info = new ChallengePokeDTO.Info();
+
+        try {
+            ChallengeTemplateEntity challenge = challengeTemplateRepository.findChallengeByPk(dto.getChallengePk());
+            info = ChallengePokeDTO.Info.builder()
+                    .challengeTitle(challenge.getTitle())
+                    .userPk(challenge.getUserPk())
+                    .build();
+        } catch(Exception e){
+            log.info(e.getMessage());
+        }
+
+        return ChallengePokeDTO.Response.builder()
+                .success(true)
+                .response(info)
+                .build();
     }
 
     private List<String> convertToList(int challengeDays){
