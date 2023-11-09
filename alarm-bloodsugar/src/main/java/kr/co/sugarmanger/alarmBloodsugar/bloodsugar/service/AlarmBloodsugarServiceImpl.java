@@ -58,12 +58,15 @@ public class AlarmBloodsugarServiceImpl implements  AlarmBloodsugarService{
                 BloodSugarEntity record = bloodSugarRepository.checkRecord(start, end);
                 log.info("check data: {} ", record);
 
+                // message body
+                StringBuilder body = new StringBuilder();
+                body.append(userRepository.findNicknameById(userSetting.getUserPk())).append("님 ").append(" 혈당을 기록할 시간이에요!");
+
                 // [2-3] 대상자일 경우 추가
                 if (record == null) {
                     UserInfoDTO user = UserInfoDTO.builder()
-                            .type("BLOODSUGAR")
-                            // 현욱이가 만들어주면 수정
-                            .nickname(userRepository.findNicknameById(userSetting.getUserPk()))
+                            .title("혈당 기록 알림")
+                            .body(body.toString())
                             .fcmToken(userSetting.getFcmToken())
                             .build();
                     users.add(user);
