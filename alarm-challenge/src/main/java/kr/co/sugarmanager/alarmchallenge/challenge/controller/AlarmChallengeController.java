@@ -25,7 +25,7 @@ public class AlarmChallengeController {
     private final KafkaTemplate<String, String> kafkaTemplate;
     private final AlarmChallengeService alarmChallengeService;
 
-    @Value(value = "${TOPIC-CHALLENGE}")
+    @Value(value = "${TOPIC}")
     private String CHALLENGE;
     @Scheduled(cron = "0 */9 * * * *")
     @GetMapping("/challenge")
@@ -37,7 +37,7 @@ public class AlarmChallengeController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @Value(value = "${TOPIC-REMIND}")
+    @Value(value = "${TOPIC}")
     private String REMIND;
     @Scheduled(cron = " 0 0 20 * * *")
     @GetMapping("/challenge/remind")
