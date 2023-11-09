@@ -9,10 +9,8 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class UserInfoDTO {
-    private String nickname;
+    private String title;
+    private String body;
     private String fcmToken;
-    private String challengeTitle;
-    private int hour;
-    private int minute;
 }
 
