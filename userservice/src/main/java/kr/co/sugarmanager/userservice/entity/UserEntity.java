@@ -73,7 +73,7 @@ public class UserEntity extends CUDBaseEntity {
     @OneToOne(mappedBy = "user", fetch = FetchType.LAZY, optional = false, cascade = {CascadeType.PERSIST, CascadeType.REMOVE, CascadeType.MERGE})
     private UserSettingEntity setting;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "GROUP_PK")
     private GroupEntity group;
 
@@ -98,6 +98,16 @@ public class UserEntity extends CUDBaseEntity {
     public void addProfileImage(UserImageEntity userImage) {
         this.userImage = userImage;
         userImage.setUser(this);
+    }
+
+    public GroupEntity joinGroup(GroupEntity group) {
+        return this.group = group;
+    }
+
+    public GroupEntity exitGroup() {
+        GroupEntity group = this.group;
+        this.group = null;
+        return group;
     }
 
     public void updateInfo(UserInfoUpdateDTO.Request dto) {
