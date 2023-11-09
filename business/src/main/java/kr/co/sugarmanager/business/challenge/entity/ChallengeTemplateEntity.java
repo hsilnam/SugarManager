@@ -1,6 +1,7 @@
 package kr.co.sugarmanager.business.challenge.entity;
 
 import jakarta.persistence.*;
+import kr.co.sugarmanager.business.global.entity.CUDEntity;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.SQLDelete;
@@ -19,7 +20,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Builder
 @SQLDelete(sql = "UPDATE CHALLENGE_TEMPLATE SET DELETED_AT = now() WHERE CHALLENGE_TEMPLATE_PK = ?")
-public class ChallengeTemplateEntity {
+public class ChallengeTemplateEntity extends CUDEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "challenge_template_pk")
@@ -48,17 +49,5 @@ public class ChallengeTemplateEntity {
 
     @Column(name = "challenge_alert_days")
     private int days;
-
-    @CreatedDate
-    @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt;
-
-    @LastModifiedDate
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
-
-    @Setter
-    @Column(name = "deleted_at")
-    private LocalDateTime deletedAt;
 
 }
