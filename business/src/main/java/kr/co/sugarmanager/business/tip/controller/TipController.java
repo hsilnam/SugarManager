@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class TipController {
     private final TipService tipService;
 
-    @GetMapping("/")
+    @GetMapping("")
     public ResponseEntity<TipDTO.Response> tipOfTheDay(){
         TipDTO.Response response = tipService.tipOfTheDay();
         return new ResponseEntity<>(response, HttpStatus.OK);
