@@ -7,7 +7,5 @@ public interface ChallengeService {
     ChallengeAddDTO.Response addChallenge(Long userPk, ChallengeAddDTO.Request dto);
     ChallengeDeleteDTO.Response deleteChallenge(Long userPk, ChallengeDeleteDTO.Request dto);
     UserChallengeAllDTO.Response userChallengesAll(Long userPk);
-
-//    ChallengePokeDTO.Response infoForPoke(Long userPk, ChallengePokeDTO.Request dto);
-    ChallengePokeDTO.Response infoForPoke(ChallengePokeDTO.Request dto);
+    ChallengePokeDTO.Response infoForPoke(Long userPk, ChallengePokeDTO.Request dto);
 }

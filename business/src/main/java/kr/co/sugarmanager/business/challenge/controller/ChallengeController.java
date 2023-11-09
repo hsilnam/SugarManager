@@ -42,9 +42,8 @@ public class ChallengeController {
     }
 
     @GetMapping("/poke/info")
-//    public ResponseEntity<ChallengePokeDTO.Response> infoForPoke(Long userPk, ChallengePokeDTO.Request dto){
-    public ResponseEntity<ChallengePokeDTO.Response> infoForPoke(@RequestBody ChallengePokeDTO.Request dto){
-        ChallengePokeDTO.Response response = challengeService.infoForPoke(dto);
+    public ResponseEntity<ChallengePokeDTO.Response> infoForPoke(Long userPk, ChallengePokeDTO.Request dto){
+        ChallengePokeDTO.Response response = challengeService.infoForPoke(userPk, dto);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

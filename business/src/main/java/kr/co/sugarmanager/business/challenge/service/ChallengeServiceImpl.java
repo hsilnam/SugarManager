@@ -168,9 +168,7 @@ public class ChallengeServiceImpl implements ChallengeService {
 
     @Override
     @Transactional(readOnly = true)
-//    public ChallengePokeDTO.Response infoForPoke(Long userPk, ChallengePokeDTO.Request dto){
-    public ChallengePokeDTO.Response infoForPoke(ChallengePokeDTO.Request dto){
-
+    public ChallengePokeDTO.Response infoForPoke(Long userPk, ChallengePokeDTO.Request dto){
         ChallengePokeDTO.Info info = new ChallengePokeDTO.Info();
 
         try {
@@ -188,6 +186,8 @@ public class ChallengeServiceImpl implements ChallengeService {
                 .response(info)
                 .build();
     }
+
+    // 단일 챌린지 조회
 
     private List<String> convertToList(int challengeDays){
         List<String> days = new ArrayList<>();
