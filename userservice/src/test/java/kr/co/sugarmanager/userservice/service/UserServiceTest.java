@@ -8,6 +8,7 @@ import kr.co.sugarmanager.userservice.exception.ErrorCode;
 import kr.co.sugarmanager.userservice.exception.UserNotFoundException;
 import kr.co.sugarmanager.userservice.exception.ValidationException;
 import kr.co.sugarmanager.userservice.repository.UserRepository;
+import kr.co.sugarmanager.userservice.repository.UserSettingRepository;
 import kr.co.sugarmanager.userservice.util.JwtProvider;
 import kr.co.sugarmanager.userservice.util.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,6 +37,8 @@ public class UserServiceTest {
 
     @Mock
     private UserRepository userRepository;
+    @Mock
+    private UserSettingRepository userSettingRepository;
 
     private long expired = 1000000l;
     private long refreshExpired = 10000000l;

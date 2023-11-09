@@ -29,9 +29,11 @@ public class GroupEntity extends CUDBaseEntity {
     private long pk;
 
     @Column(name = "GROUP_CODE", nullable = false, length = 10)
-    private String groupCode;
+    @Builder.Default
+    private String groupCode = generateGroupCode();
 
-    public String generateGroupCode() {
+    //custom methods
+    private static String generateGroupCode() {
         return StringUtils.generateRandomString(10);
     }
 }
