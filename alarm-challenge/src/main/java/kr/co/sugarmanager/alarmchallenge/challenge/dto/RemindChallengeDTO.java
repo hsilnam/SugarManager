@@ -16,6 +16,6 @@ public class RemindChallengeDTO {
     @NoArgsConstructor
     public static class Response{
         @Builder.Default
-        private List<RemindUserInfoDTO> userInfos = new ArrayList<>();
+        private List<UserInfoDTO> userInfos = new ArrayList<>();
     }
 }
