@@ -45,13 +45,6 @@ spring:
           filters:
             - RewritePath=/business-service/(?<segment>.*), /$\{segment}
 
-        - id: alarm-service
-          uri: lb://ALARM-SERVICE
-          predicates:
-            - Path=/alarm-service/api/v1/**
-          filters:
-            - RewritePath=/alarm-service/(?<segment>.*), /$\{segment}
-
         - id:  alarm-challenge-service
           uri: lb://ALARM-CHALLENGE-SERVICE
           predicates:
