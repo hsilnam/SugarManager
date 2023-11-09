@@ -1,14 +1,22 @@
 package kr.co.sugarmanager.userservice.entity;
 
 import jakarta.persistence.*;
+import kr.co.sugarmanager.userservice.dto.AlarmDTO;
+import kr.co.sugarmanager.userservice.exception.ErrorCode;
+import kr.co.sugarmanager.userservice.exception.InternalServerErrorException;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.SQLDelete;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 @Builder
@@ -19,6 +27,7 @@ import org.hibernate.annotations.SQLDelete;
 @DynamicInsert
 @DynamicUpdate
 @SQLDelete(sql = "UPDATE SET DELETED_AT = NOW() ON SETTING WHERE SETTING_PK = ?")
+@Slf4j
 public class UserSettingEntity extends CUDBaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -69,5 +78,23 @@ public class UserSettingEntity extends CUDBaseEntity {
             default:
                 return false;
         }
+    }
+
+    public List<AlarmDTO.AlarmInfo> getAlarmInfos() {
+        return Arrays.stream(AlertType.values())
+                .map(alertType -> {
+                    try {
+                        boolean value = (boolean) UserSettingEntity.class.getDeclaredField(alertType.getMember()).get(this);
+                        return AlarmDTO.AlarmInfo.builder()
+                                .category(alertType)
+                                .status(value)
+                                .build();
+                    } catch (Exception e) {
+                        if (log.isErrorEnabled()) {
+                            log.error("[AlarmInfo Error] 매핑 도중 오류가 발생했습니다.", e);
+                        }
+                        throw new InternalServerErrorException(ErrorCode.INTERNAL_SERVER_ERROR_EXCEPTION);
+                    }
+                }).collect(Collectors.toList());
     }
 }
