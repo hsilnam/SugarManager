@@ -15,7 +15,7 @@ public class TipDTO {
     @AllArgsConstructor
     public static class Response{
         private boolean success;
-        private List<Tip> response;
+        private Tip response;
         private ErrorResponse error;
     }
 

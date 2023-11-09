@@ -23,16 +23,14 @@ public class TipServiceImpl implements TipService{
 
         TipEntity tipEntity = tipRepository.findTipOfTheDay();
 
-        List<TipDTO.Tip> tips = new ArrayList<>();
         TipDTO.Tip tip = TipDTO.Tip.builder()
                 .title(tipEntity.getTitle())
                 .content(tipEntity.getContent())
                 .build();
-        tips.add(tip);
 
         return TipDTO.Response.builder()
                 .success(true)
-                .response(tips)
+                .response(tip)
                 .build();
     }
 }
