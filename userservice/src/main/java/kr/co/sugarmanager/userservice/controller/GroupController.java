@@ -24,10 +24,11 @@ public class GroupController {
 
     @PostMapping("/create")
     public ResponseEntity<ApiResult<GroupCreateDTO.Response>> createGroup(
-            @AuthenticationPrincipal JwtAuthentication auth,
-            @RequestBody GroupCreateDTO.Request req
+            @AuthenticationPrincipal JwtAuthentication auth
     ) {
-        req.setUserPk(auth != null ? auth.getPk() : 0l);
+        GroupCreateDTO.Request req = GroupCreateDTO.Request.builder()
+                .userPk(auth != null ? auth.getPk() : 0l)
+                .build();
         GroupCreateDTO.Response res = groupService.createGroup(req);
         return result(res.isSuccess(), res, HttpStatus.CREATED);
     }
