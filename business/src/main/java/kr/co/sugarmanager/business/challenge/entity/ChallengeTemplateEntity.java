@@ -5,11 +5,8 @@ import kr.co.sugarmanager.business.global.entity.CUDEntity;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.SQLDelete;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
+import org.hibernate.annotations.Where;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "CHALLENGE_TEMPLATE")
@@ -20,6 +17,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Builder
 @SQLDelete(sql = "UPDATE CHALLENGE_TEMPLATE SET DELETED_AT = now() WHERE CHALLENGE_TEMPLATE_PK = ?")
+@Where(clause = "DELETED_AT is null")
 public class ChallengeTemplateEntity extends CUDEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
