@@ -3,6 +3,7 @@ package kr.co.sugarmanager.alarmchallenge.challenge.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.Where;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
@@ -15,6 +16,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@Where(clause = "DELETED_AT is null")
 public class ChallengeTemplateEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
