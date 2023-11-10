@@ -40,9 +40,12 @@ public class GroupServiceImpl implements GroupService {
         GroupEntity group = GroupEntity.builder()
                 .build();
 
+        groupRepository.save(group);
+
         user.joinGroup(group);
 
         return GroupCreateDTO.Response.builder()
+                .success(true)
                 .groupCode(group.getGroupCode())
                 .build();
     }
