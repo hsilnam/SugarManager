@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -16,15 +17,7 @@ public class TimelineMonthDTO {
     @NoArgsConstructor
     public static class Response{
         private boolean success;
-        private List<Info> response;
+        private List<LocalDate> response;
         private ErrorResponse error;
-    }
-    @Builder
-    @Getter
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class Info{
-        private LocalDateTime date;
-        private boolean records;
     }
 }

@@ -11,10 +11,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.Array;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 
 @Slf4j
@@ -39,31 +39,35 @@ public class TimelineServiceImpl implements TimelineService{
             throw new ValidationException(ErrorCode.INVALID_INPUT_VALUE);
         }
         // [1-3] 해당 닉네임이 없을 때
-//        if(userRepository.findIdByNickname(nickname) == null){
-//            throw new ValidationException(ErrorCode.NO_SUCH_USER);
-//        }
+        if(userRepository.findIdByNickname(nickname) == null){
+            throw new ValidationException(ErrorCode.NO_SUCH_USER);
+        }
         // [1-4] 토큰 유효성 검사 (리팩토링 때 ㄱㄱ)
 
 
         Long searchUserPk = userRepository.findIdByNickname(nickname);
         log.info("nickname : {} year : {} month : {}", nickname, year, month);
+
         // [2] 해당 월의 기록들 불러오기
-        List<LocalDateTime> total = new ArrayList<>();
-        List<LocalDateTime> bloodsugar = bloodSugarRepository.findBloodSugarRecordsForMonth(searchUserPk,year, month);
-        List<LocalDateTime> menu = menuRepository.findMenuRecordsForMonth(searchUserPk,year,month);
-        for (LocalDateTime record : bloodsugar){
+        List<LocalDate> total = new ArrayList<>();
+        List<LocalDate> bloodsugar = bloodSugarRepository.findBloodSugarRecordsForMonth(searchUserPk,year, month);
+        List<LocalDate> menu = menuRepository.findMenuRecordsForMonth(searchUserPk,year,month);
+        for (LocalDate record : bloodsugar){
             if (!total.contains(record)){
                 total.add(record);
             }
         }
-        for (LocalDateTime record : menu){
+        for (LocalDate record : menu){
             if (!total.contains(record)){
                 total.add(record);
             }
         }
+        Collections.sort(total);
         log.info(Arrays.toString(new List[]{total}));
 
-
-        return null;
+        return TimelineMonthDTO.Response.builder()
+                .success(true)
+                .response(total)
+                .build();
     }
 }
