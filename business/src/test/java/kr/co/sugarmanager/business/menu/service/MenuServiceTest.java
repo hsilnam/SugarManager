@@ -49,4 +49,12 @@ public class MenuServiceTest {
         //then
         assertEquals(delete.isSuccess(), true);
     }
+
+    @Test
+    @Transactional
+    void 식단_조회_성공() throws Exception {
+        // given
+        // when
+        // then
+    }
 }
