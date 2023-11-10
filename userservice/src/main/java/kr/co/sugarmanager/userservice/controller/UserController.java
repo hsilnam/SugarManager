@@ -1,12 +1,9 @@
 package kr.co.sugarmanager.userservice.controller;
 
-import kr.co.sugarmanager.userservice.dto.AlarmDTO;
-import kr.co.sugarmanager.userservice.dto.AlarmUpdateDTO;
-import kr.co.sugarmanager.userservice.dto.UserInfoDTO;
+import kr.co.sugarmanager.userservice.dto.*;
 
 import static kr.co.sugarmanager.userservice.util.APIUtils.*;
 
-import kr.co.sugarmanager.userservice.dto.UserInfoUpdateDTO;
 import kr.co.sugarmanager.userservice.service.UserService;
 import kr.co.sugarmanager.userservice.util.JwtAuthentication;
 import lombok.RequiredArgsConstructor;
@@ -67,5 +64,15 @@ public class UserController {
         request.setUserPk(auth != null ? auth.getPk() : 0l);
         AlarmUpdateDTO.Response response = userService.setAlarm(request);
         return result(response.isSuccess(), response, HttpStatus.OK);
+    }
+
+    @PostMapping("/poke")
+    public ResponseEntity<ApiResult<PokeDTO.Response>> poke(
+            @AuthenticationPrincipal JwtAuthentication auth,
+            @RequestBody PokeDTO.Request req
+    ) {
+        req.setUserPk(auth != null ? auth.getPk() : 0l);
+        PokeDTO.Response res = userService.poke(req);
+        return result(res.isSuccess(), res, HttpStatus.OK);
     }
 }

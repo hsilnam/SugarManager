@@ -1,6 +1,7 @@
 package kr.co.sugarmanager.userservice.exception;
 
 import kr.co.sugarmanager.userservice.entity.AlertType;
+import kr.co.sugarmanager.userservice.entity.PokeType;
 import kr.co.sugarmanager.userservice.entity.UserInfoValidation;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
@@ -33,7 +34,8 @@ public enum ErrorCode {
     WEIGHT_NOT_VALID_EXCEPTION(HttpStatus.BAD_REQUEST, "UV_004", UserInfoValidation.WEIGHT),
     GENDER_NOT_VALID_EXCEPTION(HttpStatus.BAD_REQUEST, "UV_005", UserInfoValidation.GENDER),
     NICKNAME_DUPLICATED_EXCEPTION(HttpStatus.OK, "UV_006", "중복된 닉네임입니다."),
-    CATEGORY_NOT_VALID_EXCEPTION(HttpStatus.BAD_REQUEST, "UV_007", AlertType.getDomain());
+    CATEGORY_NOT_VALID_EXCEPTION(HttpStatus.BAD_REQUEST, "UV_007", AlertType.getDomain()),
+    POKE_CATERORY_NOT_VALID_EXCEPTION(HttpStatus.BAD_REQUEST, "UV_008", PokeType.getDomain());
     private HttpStatus status;
     private String code;
     private String message;

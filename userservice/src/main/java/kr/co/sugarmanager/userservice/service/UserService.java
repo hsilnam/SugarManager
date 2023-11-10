@@ -1,9 +1,6 @@
 package kr.co.sugarmanager.userservice.service;
 
-import kr.co.sugarmanager.userservice.dto.AlarmDTO;
-import kr.co.sugarmanager.userservice.dto.AlarmUpdateDTO;
-import kr.co.sugarmanager.userservice.dto.UserInfoDTO;
-import kr.co.sugarmanager.userservice.dto.UserInfoUpdateDTO;
+import kr.co.sugarmanager.userservice.dto.*;
 
 public interface UserService {
     UserInfoDTO.Response getMemberInfo(UserInfoDTO.Request req);
@@ -13,4 +10,6 @@ public interface UserService {
     AlarmDTO.Response getAlarm(AlarmDTO.Request req);
 
     AlarmUpdateDTO.Response setAlarm(AlarmUpdateDTO.Request req);
+
+    PokeDTO.Response poke(PokeDTO.Request req);
 }

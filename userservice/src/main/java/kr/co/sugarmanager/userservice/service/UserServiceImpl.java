@@ -1,12 +1,12 @@
 package kr.co.sugarmanager.userservice.service;
 
-import kr.co.sugarmanager.userservice.dto.AlarmDTO;
-import kr.co.sugarmanager.userservice.dto.AlarmUpdateDTO;
-import kr.co.sugarmanager.userservice.dto.UserInfoDTO;
-import kr.co.sugarmanager.userservice.dto.UserInfoUpdateDTO;
+import kr.co.sugarmanager.userservice.dto.*;
+import kr.co.sugarmanager.userservice.entity.ChallengeEntity;
+import kr.co.sugarmanager.userservice.entity.PokeType;
 import kr.co.sugarmanager.userservice.entity.UserEntity;
 import kr.co.sugarmanager.userservice.entity.UserSettingEntity;
 import kr.co.sugarmanager.userservice.exception.*;
+import kr.co.sugarmanager.userservice.repository.ChallengeRepository;
 import kr.co.sugarmanager.userservice.repository.UserRepository;
 import kr.co.sugarmanager.userservice.repository.UserSettingRepository;
 import kr.co.sugarmanager.userservice.util.StringUtils;
@@ -21,7 +21,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
+    private final ChallengeRepository challengeRepository;
     private final UserSettingRepository userSettingRepository;
+    private final ProducerService producerService;
 
     @Override
     @Transactional(readOnly = true, isolation = Isolation.READ_COMMITTED)
@@ -108,5 +110,63 @@ public class UserServiceImpl implements UserService {
         return AlarmUpdateDTO.Response.builder()
                 .success(true)
                 .build();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public PokeDTO.Response poke(PokeDTO.Request req) {
+        long userPk = req.getUserPk();
+        String nickname = req.getNickname();
+        PokeType type = req.getType();
+        if (type == null) {
+            throw new ValidationException(ErrorCode.CATEGORY_NOT_VALID_EXCEPTION);
+        }
+        Long challengeId = req.getChallengeId();
+        UserEntity user = userRepository.findById(userPk)
+                .orElseThrow(() -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
+        UserEntity target = userRepository.findByNickname(nickname)
+                .orElseThrow(() -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND_EXCEPTION));
+
+        //찌르기 권한이 있다면
+        if (user.getGroup() != null && target.getGroup() != null
+                && user.getGroup().getGroupCode().equals(target.getGroup().getGroupCode())) {
+            //상대가 poke에 대한 알람을 설정했으면 go
+            if (target.getSetting().isPokeAlert()) {
+                StringBuffer titleBuffer = new StringBuffer();
+                StringBuffer bodyBuffer = new StringBuffer();
+                titleBuffer.append(user.getNickname()).append(" 님의 찌르기입니다.");
+                switch (type) {
+                    case CHALLENGE:
+                        ChallengeEntity challenge = challengeRepository.findById(challengeId)
+                                .orElseThrow(() -> new ChallengeNotFoundException(ErrorCode.CHALLENGE_NOT_FOUND_EXCEPTION));
+                        bodyBuffer.append(challenge.getTitle());
+                        break;
+                    case BLOODSUGAR:
+                        bodyBuffer.append("혈당을 체크하세요!");
+                        break;
+                    default:
+                        throw new ValidationException(ErrorCode.POKE_CATERORY_NOT_VALID_EXCEPTION);
+                }
+
+                //kafka에 메세지 넣기
+                producerService.sendMessage(MessageDTO.builder()
+                        .fcmToken(target.getSetting().getFcmToken())
+                        .title(titleBuffer.toString())
+                        .body(bodyBuffer.toString())
+                        .build());
+                return PokeDTO.Response.builder()
+                        .success(true)
+                        .nickname(target.getNickname())
+                        .challengeId(challengeId)
+                        .type(type)
+                        .build();
+            } else {
+                return PokeDTO.Response.builder()
+                        .success(false)
+                        .build();
+            }
+        } else {
+            throw new AccessDenyException(ErrorCode.FORBIDDEN_EXCEPTION);
+        }
     }
 }
