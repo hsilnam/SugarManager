@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import java.sql.Date;
 
@@ -21,6 +22,7 @@ import java.sql.Date;
 @DynamicUpdate
 @Table(name = "USERS")
 @SQLDelete(sql = "UPDATE USERS SET DELETED_AT WHERE USER_PK = ?")
+@Where(clause = "DELETED_AT is null")
 public class UserEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
