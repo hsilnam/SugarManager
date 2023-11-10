@@ -14,6 +14,9 @@ public enum ErrorCode {
     INVALID_PATH_VALUE(HttpStatus.BAD_REQUEST,"C006","요청이 잘못됐습니다."),
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "C007", "서버 에러"),
 
+    // 유저
+    NO_SUCH_USER(HttpStatus.NOT_FOUND, "U001", "없는 사용자입니다."),
+
     // 식단 등록
     INVALID_IMAGE_TYPE_ERROR(HttpStatus.BAD_REQUEST, "M001", "이미지가 형식이 잘못되었습니다.");
 
