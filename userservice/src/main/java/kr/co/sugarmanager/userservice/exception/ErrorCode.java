@@ -18,6 +18,9 @@ public enum ErrorCode {
     GROUP_NOT_JOIN_EXCEPTION(HttpStatus.BAD_REQUEST, "G001", "그룹에 가입한 상태가 아닙니다."),
     GROUP_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, "G002", "해당 그룹은 존재하지 않습니다."),
 
+    //챌린지
+    CHALLENGE_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, "C001", "해당 챌린지가 존재하지않습니다."),
+
     //서버관련
     INTERNAL_SERVER_ERROR_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR, "S001", "서버에러입니다."),
     JSON_BINDING_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR, "S002", "서버 에러입니다."),
