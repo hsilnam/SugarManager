@@ -1,16 +1,13 @@
 package kr.co.sugarmanager.business.challenge.service;
 
 import kr.co.sugarmanager.business.challenge.dto.*;
-import kr.co.sugarmanager.business.challenge.entity.ChallengeLogEntity;
 import kr.co.sugarmanager.business.challenge.entity.ChallengeTemplateEntity;
 import kr.co.sugarmanager.business.challenge.repository.ChallengeLogRepository;
 import kr.co.sugarmanager.business.challenge.repository.ChallengeTemplateRepository;
-import kr.co.sugarmanager.business.global.exception.CustomException;
 import kr.co.sugarmanager.business.global.exception.ErrorCode;
 import kr.co.sugarmanager.business.global.exception.ValidationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.convert.support.ConvertingPropertyEditorAdapter;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,7 +16,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @Service
 @Slf4j
@@ -42,14 +38,14 @@ public class ChallengeServiceImpl implements ChallengeService {
         List<ChallengeTemplateEntity> challenges = challengeTemplateRepository.findTodaysChallenges(day);
 //        log.info("size : {} , challenges : {}", challenges.size(), challenges);
 
-        List<UserChallengeInfoDTO> userInfos = new ArrayList<>();
+        List<ChallengeInfoDTO> userInfos = new ArrayList<>();
 
         for (ChallengeTemplateEntity challenge : challenges) {
 
             int challengeDays = challenge.getDays();
             List<String> days = convertToList(challengeDays);
 
-            UserChallengeInfoDTO userInfo = UserChallengeInfoDTO.builder()
+            ChallengeInfoDTO userInfo = ChallengeInfoDTO.builder()
                     .challengePk(challenge.getPk())
                     .challengeTitle(challenge.getTitle())
                     .goal(challenge.getGoal())
@@ -121,9 +117,10 @@ public class ChallengeServiceImpl implements ChallengeService {
     @Transactional
     @Override
     public ChallengeDeleteDTO.Response deleteChallenge(Long userPk, ChallengeDeleteDTO.Request dto){
-
-        challengeTemplateRepository.deleteById(dto.getChallengePk());
-
+        List<Long> deleteList = dto.getDeleteList();
+        for(Long challengePk : deleteList){
+            challengeTemplateRepository.deleteById(challengePk);
+        }
         return ChallengeDeleteDTO.Response.builder()
                 .success(true)
                 .build();
@@ -168,9 +165,7 @@ public class ChallengeServiceImpl implements ChallengeService {
 
     @Override
     @Transactional(readOnly = true)
-//    public ChallengePokeDTO.Response infoForPoke(Long userPk, ChallengePokeDTO.Request dto){
-    public ChallengePokeDTO.Response infoForPoke(ChallengePokeDTO.Request dto){
-
+    public ChallengePokeDTO.Response infoForPoke(Long userPk, ChallengePokeDTO.Request dto){
         ChallengePokeDTO.Info info = new ChallengePokeDTO.Info();
 
         try {
@@ -184,6 +179,39 @@ public class ChallengeServiceImpl implements ChallengeService {
         }
 
         return ChallengePokeDTO.Response.builder()
+                .success(true)
+                .response(info)
+                .build();
+    }
+
+    // 단일 챌린지 조회
+    public UserChallengeInfoDTO.Response userChallengeInfo(Long userPk, Long challengePk) {
+
+        LocalDateTime start = LocalDate.now().atStartOfDay(ZoneId.of("Asia/Seoul")).toLocalDateTime();
+        LocalDateTime end = start.plusDays(1);
+
+        UserChallengeAllDTO.Info info = new UserChallengeAllDTO.Info();
+
+        try {
+            ChallengeTemplateEntity challenge = challengeTemplateRepository.findChallengeByPk(challengePk);
+
+            Integer logs = challengeLogRepository.findChallengeLogs(start, end, challengePk);
+            List<String> days = convertToList(challenge.getDays());
+            info = UserChallengeAllDTO.Info.builder()
+                    .challengePk(challengePk)
+                    .type(ChallengeTypeEnum.valueOf(challenge.getType()))
+                    .title(challenge.getTitle())
+                    .count(logs)
+                    .goal(challenge.getGoal())
+                    .alert(challenge.isAlert())
+                    .hour(challenge.getHour())
+                    .minute(challenge.getMinute())
+                    .days(days)
+                    .build();
+        } catch (Exception e){
+            log.info(e.getMessage());
+        }
+        return UserChallengeInfoDTO.Response.builder()
                 .success(true)
                 .response(info)
                 .build();

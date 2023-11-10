@@ -4,6 +4,7 @@ import kr.co.sugarmanager.business.challenge.dto.*;
 import kr.co.sugarmanager.business.challenge.service.ChallengeService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -41,10 +42,15 @@ public class ChallengeController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @GetMapping("/{userPk}/{challengePk}")
+    public ResponseEntity<UserChallengeInfoDTO.Response> userChallengeInfo(Long userPk, @PathVariable Long challengePk){
+        UserChallengeInfoDTO.Response response = challengeService.userChallengeInfo(userPk, challengePk);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
     @GetMapping("/poke/info")
-//    public ResponseEntity<ChallengePokeDTO.Response> infoForPoke(Long userPk, ChallengePokeDTO.Request dto){
-    public ResponseEntity<ChallengePokeDTO.Response> infoForPoke(@RequestBody ChallengePokeDTO.Request dto){
-        ChallengePokeDTO.Response response = challengeService.infoForPoke(dto);
+    public ResponseEntity<ChallengePokeDTO.Response> infoForPoke(Long userPk, ChallengePokeDTO.Request dto){
+        ChallengePokeDTO.Response response = challengeService.infoForPoke(userPk, dto);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
