@@ -6,13 +6,15 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 public class ChallengeDeleteDTO {
     @Builder
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
     public static class Request{
-        private long challengePk;
+        private List<Long> deleteList;
     }
 
     @Builder

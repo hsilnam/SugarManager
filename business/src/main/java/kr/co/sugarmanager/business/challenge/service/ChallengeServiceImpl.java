@@ -1,17 +1,13 @@
 package kr.co.sugarmanager.business.challenge.service;
 
 import kr.co.sugarmanager.business.challenge.dto.*;
-import kr.co.sugarmanager.business.challenge.entity.ChallengeLogEntity;
 import kr.co.sugarmanager.business.challenge.entity.ChallengeTemplateEntity;
 import kr.co.sugarmanager.business.challenge.repository.ChallengeLogRepository;
 import kr.co.sugarmanager.business.challenge.repository.ChallengeTemplateRepository;
-import kr.co.sugarmanager.business.global.exception.CustomException;
 import kr.co.sugarmanager.business.global.exception.ErrorCode;
 import kr.co.sugarmanager.business.global.exception.ValidationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.convert.support.ConvertingPropertyEditorAdapter;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -122,9 +118,10 @@ public class ChallengeServiceImpl implements ChallengeService {
     @Transactional
     @Override
     public ChallengeDeleteDTO.Response deleteChallenge(Long userPk, ChallengeDeleteDTO.Request dto){
-
-        challengeTemplateRepository.deleteById(dto.getChallengePk());
-
+        List<Long> deleteList = dto.getDeleteList();
+        for(Long challengePk : deleteList){
+            challengeTemplateRepository.deleteById(challengePk);
+        }
         return ChallengeDeleteDTO.Response.builder()
                 .success(true)
                 .build();
