@@ -5,6 +5,7 @@ import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
@@ -20,6 +21,7 @@ import java.time.LocalDateTime;
 @DynamicUpdate
 @Table(name = "BLOOD_SUGAR")
 @SQLDelete(sql = "UPDATE BLOOD_SUGAR SET DELETED_AT = now() WHERE BLOOD_SUGAR_PK = ?")
+@Where(clause = "DELETED_AT is null")
 public class BloodSugarEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
