@@ -11,8 +11,6 @@ import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.SQLDelete;
 
-import java.util.Random;
-
 @Entity
 @Builder
 @Getter
@@ -20,8 +18,8 @@ import java.util.Random;
 @AllArgsConstructor
 @DynamicInsert
 @DynamicUpdate
-@Table(name = "GROUPS")
-@SQLDelete(sql = "UPDATE SET DELETED_AT ON GROUP WHERE GROUP_PK = ?")
+@Table(name = "USER_GROUP")
+@SQLDelete(sql = "UPDATE SET DELETED_AT = NOW() ON USER_GROUP WHERE GROUP_PK = ?")
 public class GroupEntity extends CUDBaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
