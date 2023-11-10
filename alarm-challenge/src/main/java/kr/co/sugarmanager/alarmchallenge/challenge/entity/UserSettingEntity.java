@@ -2,14 +2,12 @@ package kr.co.sugarmanager.alarmchallenge.challenge.entity;
 
 
 import jakarta.persistence.*;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.DynamicInsert;
-import org.hibernate.annotations.DynamicUpdate;
-import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.*;
 
 @Getter
 @Builder
@@ -20,6 +18,7 @@ import org.hibernate.annotations.SQLDelete;
 @DynamicInsert
 @DynamicUpdate
 @SQLDelete(sql = "UPDATE SETTING SET DELETED_AT = now() WHERE SETTING_PK = ?")
+@Where(clause = "DELETED_AT is null")
 
 public class UserSettingEntity {
     @Id
