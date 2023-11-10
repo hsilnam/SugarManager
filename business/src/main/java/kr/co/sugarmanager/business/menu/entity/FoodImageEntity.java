@@ -1,11 +1,13 @@
 package kr.co.sugarmanager.business.menu.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
+
 @Entity
+@SQLDelete(sql = "UPDATE FOOD_IMAGE SET DELETED_AT = now() WHERE FOOD_IMAGE_PK = ?")
+@Where(clause = "DELETED_AT is null")
 @Builder
 @Getter
 @NoArgsConstructor
