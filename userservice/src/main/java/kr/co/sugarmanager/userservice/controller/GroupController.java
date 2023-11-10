@@ -65,8 +65,4 @@ public class GroupController {
         return result(res.isSuccess(), res, HttpStatus.OK);
     }
 
-    @PostMapping("/poke")
-    public ResponseEntity<ApiResult<Object>> poke() {
-        return null;
-    }
 }
