@@ -6,9 +6,11 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Where;
 
 @Entity
 @Table(name = "CHALLENGE_TEMPLATE")
+@Where(clause = "DELETED_AT IS NOT NULL")
 @Getter
 @Builder
 @AllArgsConstructor
