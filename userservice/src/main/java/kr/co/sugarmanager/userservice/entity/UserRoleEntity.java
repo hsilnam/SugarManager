@@ -5,6 +5,7 @@ import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 @Entity
 @Builder
@@ -15,7 +16,7 @@ import org.hibernate.annotations.SQLDelete;
 @DynamicUpdate
 @Table(name = "USER_ROLES")
 @SQLDelete(sql = "UPDATE SET DELETED_AT ON USER_ROLES WHERE USER_ROLES_PK = ?")
-@ToString(exclude = "user")
+@Where(clause = "DELETED_AT IS NULL")
 public class UserRoleEntity extends CUDBaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

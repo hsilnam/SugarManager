@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 @Entity
 @Builder
@@ -20,6 +21,7 @@ import org.hibernate.annotations.SQLDelete;
 @DynamicUpdate
 @Table(name = "USER_GROUP")
 @SQLDelete(sql = "UPDATE SET DELETED_AT = NOW() ON USER_GROUP WHERE GROUP_PK = ?")
+@Where(clause = "DELETED_AT IS NULL")
 public class GroupEntity extends CUDBaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

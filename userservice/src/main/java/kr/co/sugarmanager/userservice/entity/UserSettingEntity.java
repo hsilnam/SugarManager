@@ -1,6 +1,8 @@
 package kr.co.sugarmanager.userservice.entity;
 
 import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Table;
 import kr.co.sugarmanager.userservice.dto.AlarmDTO;
 import kr.co.sugarmanager.userservice.exception.ErrorCode;
 import kr.co.sugarmanager.userservice.exception.InternalServerErrorException;
@@ -9,10 +11,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.DynamicInsert;
-import org.hibernate.annotations.DynamicUpdate;
-import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.*;
 
 import java.util.Arrays;
 import java.util.List;
@@ -27,6 +26,7 @@ import java.util.stream.Collectors;
 @DynamicInsert
 @DynamicUpdate
 @SQLDelete(sql = "UPDATE SET DELETED_AT = NOW() ON SETTING WHERE SETTING_PK = ?")
+@Where(clause = "DELETED_AT IS NULL")
 @Slf4j
 public class UserSettingEntity extends CUDBaseEntity {
     @Id
