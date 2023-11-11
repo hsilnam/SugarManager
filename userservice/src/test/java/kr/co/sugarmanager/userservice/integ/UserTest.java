@@ -271,6 +271,53 @@ public class UserTest {
             }
         }
 
+        @Nested
+        @DisplayName("nickname")
+        public class Nickname {
+            @Test
+            public void 닉네임_변경_성공() throws Exception {
+                req.setNickname(StringUtils.generateRandomString(UserInfoValidation.NICKNAME.getMin() + 1));
+                mvc.perform(getBuilder("/api/v1/member/edit", POST, header, req))
+                        .andExpect(status().isOk());
+            }
+
+            @Test
+            public void 닉네임_변경_실패_중복() throws Exception {
+                req.setNickname(userList.get(1).getNickname());
+                mvc.perform(getBuilder("/api/v1/member/edit", POST, header, req))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.success", is(false)))
+                        .andExpect(jsonPath("$.response", nullValue()))
+                        .andExpect(jsonPath("$.error", nullValue()));
+
+                assertUpdateFail(owner);
+            }
+
+            @Test
+            public void 닉네임_변경_실패_길이_부족() throws Exception {
+                req.setNickname(StringUtils.generateRandomString(UserInfoValidation.NICKNAME.getMin() - 1));
+                ResultActions action = mvc.perform(getBuilder("/api/v1/member/edit", POST, header, req))
+                        .andExpect(status().isBadRequest());
+                assertError(action, ErrorCode.NICKNAME_NOT_VALID_EXCEPTION);
+            }
+
+            @Test
+            public void 닉네임_변경_실패_길이_초과() throws Exception {
+                req.setNickname(StringUtils.generateRandomString(UserInfoValidation.NICKNAME.getMax() + 1));
+                ResultActions action = mvc.perform(getBuilder("/api/v1/member/edit", POST, header, req))
+                        .andExpect(status().isBadRequest());
+                assertError(action, ErrorCode.NICKNAME_NOT_VALID_EXCEPTION);
+            }
+
+            @Test
+            public void 닉네임_변경_실패_특수문자() throws Exception {
+                req.setNickname(StringUtils.generateRandomString(UserInfoValidation.NICKNAME.getMin()).concat("!"));
+                ResultActions action = mvc.perform(getBuilder("/api/v1/member/edit", POST, header, req))
+                        .andExpect(status().isBadRequest());
+                assertError(action, ErrorCode.NICKNAME_NOT_VALID_EXCEPTION);
+            }
+        }
+
         private void assertUpdate(UserEntity updated, UserInfoUpdateDTO.Request req) {
             assertAll("update",
                     () -> assertThat(updated.getNickname()).isEqualTo(req.getNickname()),
