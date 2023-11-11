@@ -66,7 +66,7 @@ public class ChallengeServiceImpl implements ChallengeService {
 
     @Transactional
     @Override
-    public ChallengeAddDTO.Response addChallenge(Long userPk, ChallengeAddDTO.Request dto){
+    public ChallengeAddDTO.Response addChallenge(ChallengeAddDTO.Request dto){
 
         // [1] 유효성 검사
 
@@ -116,7 +116,7 @@ public class ChallengeServiceImpl implements ChallengeService {
 
     @Transactional
     @Override
-    public ChallengeDeleteDTO.Response deleteChallenge(Long userPk, ChallengeDeleteDTO.Request dto){
+    public ChallengeDeleteDTO.Response deleteChallenge(ChallengeDeleteDTO.Request dto){
         List<Long> deleteList = dto.getDeleteList();
         for(Long challengePk : deleteList){
             challengeTemplateRepository.deleteById(challengePk);
@@ -165,7 +165,7 @@ public class ChallengeServiceImpl implements ChallengeService {
 
     @Override
     @Transactional(readOnly = true)
-    public ChallengePokeDTO.Response infoForPoke(Long userPk, ChallengePokeDTO.Request dto){
+    public ChallengePokeDTO.Response infoForPoke(ChallengePokeDTO.Request dto){
         ChallengePokeDTO.Info info = new ChallengePokeDTO.Info();
 
         try {
