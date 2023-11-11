@@ -28,14 +28,17 @@ public enum ErrorCode {
     SQL_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR, "S003", "서버 에러입니다."),
 
     //유효성 관련
-    NICKNAME_NOT_VALID_EXCEPTION(HttpStatus.BAD_REQUEST, "UV_001", UserInfoValidation.NICKNAME),
-    NAME_NOT_VALID_EXCEPTION(HttpStatus.BAD_REQUEST, "UV_002", UserInfoValidation.NAME),
-    HEIGHT_NOT_VALID_EXCEPTION(HttpStatus.BAD_REQUEST, "UV_003", UserInfoValidation.HEIGHT),
-    WEIGHT_NOT_VALID_EXCEPTION(HttpStatus.BAD_REQUEST, "UV_004", UserInfoValidation.WEIGHT),
-    GENDER_NOT_VALID_EXCEPTION(HttpStatus.BAD_REQUEST, "UV_005", UserInfoValidation.GENDER),
-    NICKNAME_DUPLICATED_EXCEPTION(HttpStatus.OK, "UV_006", "중복된 닉네임입니다."),
-    CATEGORY_NOT_VALID_EXCEPTION(HttpStatus.BAD_REQUEST, "UV_007", AlertType.getDomain()),
-    POKE_CATERORY_NOT_VALID_EXCEPTION(HttpStatus.BAD_REQUEST, "UV_008", PokeType.getDomain());
+    NICKNAME_DUPLICATED_EXCEPTION(HttpStatus.OK, "UV_001", "중복된 닉네임입니다."),
+    CATEGORY_NOT_VALID_EXCEPTION(HttpStatus.BAD_REQUEST, "UV_002", AlertType.getDomain()),
+    POKE_CATERORY_NOT_VALID_EXCEPTION(HttpStatus.BAD_REQUEST, "UV_003", PokeType.getDomain()),
+    NICKNAME_NOT_VALID_EXCEPTION(HttpStatus.BAD_REQUEST, "UV_004", UserInfoValidation.NICKNAME),
+    NAME_NOT_VALID_EXCEPTION(HttpStatus.BAD_REQUEST, "UV_005", UserInfoValidation.NAME),
+    HEIGHT_NOT_VALID_EXCEPTION(HttpStatus.BAD_REQUEST, "UV_006", UserInfoValidation.HEIGHT),
+    WEIGHT_NOT_VALID_EXCEPTION(HttpStatus.BAD_REQUEST, "UV_007", UserInfoValidation.WEIGHT),
+    GENDER_NOT_VALID_EXCEPTION(HttpStatus.BAD_REQUEST, "UV_008", UserInfoValidation.GENDER),
+    BLOODSUGARMIN_NOT_VALID_EXCEPTION(HttpStatus.BAD_REQUEST, "UV_009", UserInfoValidation.BLOODSUGARMIN),
+    BLOODSUGARMAX_NOT_VALID_EXCEPTION(HttpStatus.BAD_REQUEST, "UV_0010", UserInfoValidation.BLOODSUGARMAX);
+
     private HttpStatus status;
     private String code;
     private String message;

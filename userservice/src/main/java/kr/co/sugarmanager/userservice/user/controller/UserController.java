@@ -40,7 +40,7 @@ public class UserController {
     ) {
         req.setUserPk(auth != null ? auth.getPk() : 0l);
         UserInfoUpdateDTO.Response response = userService.updateMemberInfo(req);
-        return result(response.isSuccess(), response, HttpStatus.OK);
+        return result(response.isSuccess(), null, HttpStatus.OK);
     }
 
     @GetMapping("/alarm")

@@ -1,7 +1,6 @@
 package kr.co.sugarmanager.userservice.group.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 public class GroupJoinDTO {
@@ -13,8 +12,6 @@ public class GroupJoinDTO {
     public static class Request {
         @JsonIgnore
         private long userPk;
-
-        @JsonProperty("group_code")
         private String groupCode;
     }
 

@@ -69,15 +69,15 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(isolation = Isolation.SERIALIZABLE)//닉네임 중복을 피하기 위해 SERIALIZABLE
     public UserInfoUpdateDTO.Response updateMemberInfo(UserInfoUpdateDTO.Request req) {
+        long userPk = req.getUserPk();
+        UserEntity user = userRepository.findById(userPk)
+                .orElseThrow(() -> new AccessDenyException(ErrorCode.UNAUTHORIZATION_EXCEPTION));
         //중복 닉네임 검사
-        if (userRepository.findByNickname(req.getNickname()).isPresent()) {
+        if (userRepository.findByNicknameExclude(req.getNickname(),user.getNickname()).isPresent()) {
             return UserInfoUpdateDTO.Response.builder()
                     .success(false)
                     .build();
         }
-        long userPk = req.getUserPk();
-        UserEntity user = userRepository.findById(userPk)
-                .orElseThrow(() -> new AccessDenyException(ErrorCode.UNAUTHORIZATION_EXCEPTION));
         user.updateInfo(req);
 
         return UserInfoUpdateDTO.Response.builder()

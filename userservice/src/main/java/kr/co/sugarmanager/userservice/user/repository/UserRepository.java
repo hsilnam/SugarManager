@@ -15,6 +15,10 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
 
     Optional<UserEntity> findByNickname(String nickname);
 
+    @Query("select u from UserEntity u " +
+            "where u.nickname = :nickname and u.nickname != :exclude")
+    Optional<UserEntity> findByNicknameExclude(@Param("nickname") String nickname,@Param("exclude") String exclude);
+
     @Query("select u,ui from " +
             "UserEntity u " +
             "left join fetch UserImageEntity ui on ui.user = u " +

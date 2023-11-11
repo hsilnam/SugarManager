@@ -149,10 +149,16 @@ public class UserEntity extends CUDBaseEntity {
     }
 
     private void setSugarMax(int sugarMax) {
+        if (!BLOODSUGARMAX.validate(sugarMax)) {
+            throw new ValidationException(BLOODSUGARMAX_NOT_VALID_EXCEPTION);
+        }
         this.sugarMax = sugarMax;
     }
 
     private void setSugarMin(int sugarMin) {
+        if (!BLOODSUGARMIN.validate(sugarMin)) {
+            throw new ValidationException(BLOODSUGARMIN_NOT_VALID_EXCEPTION);
+        }
         this.sugarMin = sugarMin;
     }
 
@@ -171,7 +177,7 @@ public class UserEntity extends CUDBaseEntity {
         if (!GENDER.validate(gender)) {
             throw new ValidationException(GENDER_NOT_VALID_EXCEPTION);
         }
-        this.gender = gender.equalsIgnoreCase("male") ? false : true;
+        this.gender = gender == null ? null : gender.equalsIgnoreCase("male") ? false : true;
     }
 
     private void setGender(Boolean gender) {

@@ -1,7 +1,6 @@
 package kr.co.sugarmanager.userservice.group.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 import java.util.ArrayList;
@@ -38,7 +37,6 @@ public class GroupMemberListDTO {
     public static class UserInfo {
         private long uid;
         private String nickname;
-        @JsonProperty("profile_url")
         private String profileUrl;
     }
 }

@@ -2,7 +2,6 @@ package kr.co.sugarmanager.userservice.user.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 import java.util.Date;
@@ -35,13 +34,9 @@ public class UserInfoDTO {
         private Date birthday;
         private Integer height;
         private Integer weight;
-        @JsonProperty("blood_sugar_min")
         private Integer bloodSugarMin;
-        @JsonProperty("blood_sugar_max")
         private Integer bloodSugarMax;
-        @JsonProperty("profile_image")
         private String profileImage;
-        @JsonProperty("group_code")
         private String groupCode;
     }
 }
