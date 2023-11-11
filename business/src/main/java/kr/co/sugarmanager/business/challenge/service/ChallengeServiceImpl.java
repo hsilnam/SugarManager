@@ -104,7 +104,7 @@ public class ChallengeServiceImpl implements ChallengeService {
                 .hour(dto.getHour())
                 .minute(dto.getMinute())
                 .days(days)
-                .userPk(userPk)
+                .userPk(dto.getUserPk())
                 .build();
 
         challengeTemplateRepository.save(challenge);
