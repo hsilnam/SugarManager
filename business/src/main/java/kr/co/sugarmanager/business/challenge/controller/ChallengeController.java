@@ -25,32 +25,32 @@ public class ChallengeController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<ChallengeAddDTO.Response> addChallenge(Long userPk, @RequestBody ChallengeAddDTO.Request dto){
-        ChallengeAddDTO.Response response = challengeService.addChallenge(userPk, dto);
+    public ResponseEntity<ChallengeAddDTO.Response> addChallenge(@RequestBody ChallengeAddDTO.Request dto){
+        ChallengeAddDTO.Response response = challengeService.addChallenge(dto);
         return new ResponseEntity<>(response,HttpStatus.CREATED);
     }
 
     @PostMapping("/delete")
-    public ResponseEntity<ChallengeDeleteDTO.Response> deleteChallenge(Long userPk, @RequestBody ChallengeDeleteDTO.Request dto){
-        ChallengeDeleteDTO.Response response = challengeService.deleteChallenge(userPk, dto);
+    public ResponseEntity<ChallengeDeleteDTO.Response> deleteChallenge(@RequestBody ChallengeDeleteDTO.Request dto){
+        ChallengeDeleteDTO.Response response = challengeService.deleteChallenge(dto);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @GetMapping("/{userPk}")
-    public ResponseEntity<UserChallengeAllDTO.Response> userChallengesAll(Long userPk){
+    @GetMapping("/user/{userPk}")
+    public ResponseEntity<UserChallengeAllDTO.Response> userChallengesAll(@PathVariable Long userPk){
         UserChallengeAllDTO.Response response = challengeService.userChallengesAll(userPk);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @GetMapping("/{userPk}/{challengePk}")
-    public ResponseEntity<UserChallengeInfoDTO.Response> userChallengeInfo(Long userPk, @PathVariable Long challengePk){
+    @GetMapping("/user/{userPk}/{challengePk}")
+    public ResponseEntity<UserChallengeInfoDTO.Response> userChallengeInfo(@PathVariable Long userPk, @PathVariable Long challengePk){
         UserChallengeInfoDTO.Response response = challengeService.userChallengeInfo(userPk, challengePk);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @GetMapping("/poke/info")
-    public ResponseEntity<ChallengePokeDTO.Response> infoForPoke(Long userPk, ChallengePokeDTO.Request dto){
-        ChallengePokeDTO.Response response = challengeService.infoForPoke(userPk, dto);
+    public ResponseEntity<ChallengePokeDTO.Response> infoForPoke(ChallengePokeDTO.Request dto){
+        ChallengePokeDTO.Response response = challengeService.infoForPoke(dto);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
