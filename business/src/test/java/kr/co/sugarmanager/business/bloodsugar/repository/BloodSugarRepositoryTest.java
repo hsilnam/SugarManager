@@ -2,12 +2,18 @@ package kr.co.sugarmanager.business.bloodsugar.repository;
 
 import jakarta.transaction.Transactional;
 import kr.co.sugarmanager.business.bloodsugar.dto.BLOODSUGARCATEGORY;
+import kr.co.sugarmanager.business.bloodsugar.dto.BloodSugarPeriodInterface;
 import kr.co.sugarmanager.business.bloodsugar.entity.BloodSugarEntity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 
@@ -106,5 +112,19 @@ public class BloodSugarRepositoryTest {
                 bloodSugarEntity.getCreatedAt().getDayOfMonth());
         //then
         assertTrue(result.size() > 0);
+    }
+
+    @Test
+    public void 혈당_범위_조회(){
+        //given
+        PageRequest pageRequest = PageRequest.of(0, 30);
+        LocalDateTime startDate = LocalDate.parse("2023-11-06", DateTimeFormatter.ISO_DATE).atStartOfDay();
+        LocalDateTime endDate = LocalDate.parse("2023-11-07", DateTimeFormatter.ISO_DATE).atStartOfDay().plusDays(1L);
+        System.out.println(startDate+":"+endDate);
+        Long userPk = 1L;
+        //when
+        Page<BloodSugarPeriodInterface> result = bloodSugarRepository.findByPeriod(userPk, startDate, endDate, pageRequest);
+        //then
+        assertTrue(result.getContent().size() > 0);
     }
 }
