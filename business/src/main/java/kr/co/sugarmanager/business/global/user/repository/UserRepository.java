@@ -1,6 +1,6 @@
-package kr.co.sugarmanager.business.challenge.repository;
+package kr.co.sugarmanager.business.global.user.repository;
 
-import kr.co.sugarmanager.business.challenge.entity.UserEntity;
+import kr.co.sugarmanager.business.global.user.entity.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
