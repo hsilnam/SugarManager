@@ -133,7 +133,7 @@ public class ChallengeServiceImpl implements ChallengeService {
         LocalDateTime start = LocalDate.now().atStartOfDay(ZoneId.of("Asia/Seoul")).toLocalDateTime();
         LocalDateTime end = start.plusDays(1);
 
-        List<ChallengeTemplateEntity> userChallenges = challengeTemplateRepository.findAllChallengesByUser(1l);
+        List<ChallengeTemplateEntity> userChallenges = challengeTemplateRepository.findAllChallengesByUser(userPk);
 
         List<UserChallengeAllDTO.Info> challenges = new ArrayList<>();
 
