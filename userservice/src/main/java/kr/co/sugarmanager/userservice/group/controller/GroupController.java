@@ -58,10 +58,11 @@ public class GroupController {
 
     @GetMapping
     public ResponseEntity<ApiResult<GroupMemberListDTO.Response>> getGroup(
-            @AuthenticationPrincipal JwtAuthentication auth,
-            @RequestBody GroupMemberListDTO.Request req
+            @AuthenticationPrincipal JwtAuthentication auth
     ) {
-        req.setUserPk(auth != null ? auth.getPk() : 0l);
+        GroupMemberListDTO.Request req = GroupMemberListDTO.Request.builder()
+                .userPk(auth != null ? auth.getPk() : 0l)
+                .build();
         GroupMemberListDTO.Response res = groupService.getGroupMembers(req);
         return result(res.isSuccess(), res, HttpStatus.OK);
     }

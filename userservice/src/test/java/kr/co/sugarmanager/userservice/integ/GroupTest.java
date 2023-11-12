@@ -2,22 +2,14 @@ package kr.co.sugarmanager.userservice.integ;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.persistence.EntityManager;
-import kr.co.sugarmanager.userservice.challenge.entity.ChallengeEntity;
-import kr.co.sugarmanager.userservice.challenge.repository.ChallengeRepository;
-import kr.co.sugarmanager.userservice.global.dto.MessageDTO;
 import kr.co.sugarmanager.userservice.global.exception.ErrorCode;
-import kr.co.sugarmanager.userservice.global.service.ProducerService;
 import kr.co.sugarmanager.userservice.global.util.APIUtils;
 import kr.co.sugarmanager.userservice.global.util.JwtProvider;
 import kr.co.sugarmanager.userservice.global.util.StringUtils;
 import kr.co.sugarmanager.userservice.group.dto.GroupJoinDTO;
+import kr.co.sugarmanager.userservice.group.dto.GroupMemberListDTO;
 import kr.co.sugarmanager.userservice.group.entity.GroupEntity;
 import kr.co.sugarmanager.userservice.group.repository.GroupRepository;
-import kr.co.sugarmanager.userservice.user.dto.AlarmDTO;
-import kr.co.sugarmanager.userservice.user.dto.AlarmUpdateDTO;
-import kr.co.sugarmanager.userservice.user.dto.PokeDTO;
-import kr.co.sugarmanager.userservice.user.dto.UserInfoUpdateDTO;
 import kr.co.sugarmanager.userservice.user.entity.UserEntity;
 import kr.co.sugarmanager.userservice.user.entity.UserImageEntity;
 import kr.co.sugarmanager.userservice.user.entity.UserRoleEntity;
@@ -28,11 +20,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -41,20 +31,15 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.mockito.Mockito.lenient;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.hamcrest.Matchers.*;
 
@@ -267,6 +252,59 @@ public class GroupTest {
             ResultActions action = mvc.perform(getBuilder("/api/v1/group/join", POST, header, req))
                     .andExpect(status().isNotFound());
             assertError(action, ErrorCode.GROUP_NOT_FOUND_EXCEPTION);
+        }
+    }
+
+    @Nested
+    @DisplayName("getGroupMember")
+    public class GetGroupMember {
+        @Test
+        public void 그룹원_조회_성공_가입된_그룹이_없는경우() throws Exception {
+            mvc.perform(getBuilder("/api/v1/group", GET, header, null))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.success", is(true)))
+                    .andExpect(jsonPath("$.error", nullValue()))
+                    .andExpect(jsonPath("$.response.users").isEmpty());
+        }
+
+        @Test
+        public void 그룹원_조회_성공_가입된_그룹이_있는경우() throws Exception {
+            GroupEntity group = GroupEntity.builder()
+                    .groupCode(StringUtils.generateRandomString(10))
+                    .build();
+            groupRepository.save(group);
+            List<UserEntity> sameGroup = new ArrayList<>();
+            sameGroup.add(owner);
+            //그룹에 가입시킴
+            owner.joinGroup(group);
+            for (int i = 0; i < 10; i++) {
+                if (userList.get(i).getPk() != owner.getPk()) {
+                    userList.get(i).joinGroup(group);
+                    sameGroup.add(userList.get(i));
+                }
+            }
+
+            ResultActions action = mvc.perform(getBuilder("/api/v1/group", GET, header, null))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.success", is(true)))
+                    .andExpect(jsonPath("$.error", nullValue()));
+
+            String content = action.andReturn().getResponse().getContentAsString();
+            APIUtils.ApiResult result = mapper.readValue(content, APIUtils.ApiResult.class);
+            GroupMemberListDTO.Response response = mapper.convertValue(result.getResponse(), GroupMemberListDTO.Response.class);
+            List<GroupMemberListDTO.UserInfo> responseUsers = response.getUsers();
+            List<GroupMemberListDTO.UserInfo> expected = sameGroup.stream()
+                    .map(u -> GroupMemberListDTO.UserInfo.builder()
+                            .uid(u.getPk())
+                            .nickname(u.getNickname())
+                            .profileUrl(u.getUserImage().getImageUrl())
+                            .build())
+                    .toList();
+            assertThat(responseUsers.size()).isEqualTo(expected.size());
+            for (int i = 0; i < responseUsers.size(); i++) {
+                GroupMemberListDTO.UserInfo actual = responseUsers.get(i);
+                assertThat(actual).isNotIn(expected);
+            }
         }
     }
 }
