@@ -318,6 +318,36 @@ public class UserTest {
             }
         }
 
+        @Nested
+        @DisplayName("Height")
+        public class Height {
+            @Test
+            public void 키_수정_성공() throws Exception {
+                req.setHeight(UserInfoValidation.HEIGHT.getMin() + 1);
+                mvc.perform(getBuilder("/api/v1/member/edit", POST, header, req))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.success", is(true)))
+                        .andExpect(jsonPath("$.response", nullValue()))
+                        .andExpect(jsonPath("$.error", nullValue()));
+            }
+
+            @Test
+            public void 키_수정_실패_최소() throws Exception {
+                req.setHeight(UserInfoValidation.HEIGHT.getMin() - 1);
+                ResultActions action = mvc.perform(getBuilder("/api/v1/member/edit", POST, header, req))
+                        .andExpect(status().isBadRequest());
+                assertError(action, ErrorCode.HEIGHT_NOT_VALID_EXCEPTION);
+            }
+
+            @Test
+            public void 키_수정_실패_최대() throws Exception {
+                req.setHeight(UserInfoValidation.HEIGHT.getMax() + 1);
+                ResultActions action = mvc.perform(getBuilder("/api/v1/member/edit", POST, header, req))
+                        .andExpect(status().isBadRequest());
+                assertError(action, ErrorCode.HEIGHT_NOT_VALID_EXCEPTION);
+            }
+        }
+
         private void assertUpdate(UserEntity updated, UserInfoUpdateDTO.Request req) {
             assertAll("update",
                     () -> assertThat(updated.getNickname()).isEqualTo(req.getNickname()),
