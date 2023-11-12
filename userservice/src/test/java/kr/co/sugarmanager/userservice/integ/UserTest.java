@@ -115,6 +115,8 @@ public class UserTest {
                     .nickname("nickname".concat(number))
                     .email("email".concat(number).concat("@gmail.com"))
                     .socialId("socialId".concat(number))
+                    .sugarMin(UserInfoValidation.BLOODSUGARMIN.getMin() + 1)
+                    .sugarMax(UserInfoValidation.BLOODSUGARMAX.getMax() - 1)
                     .socialType(SocialType.KAKAO)
                     .build();
             UserSettingEntity setting = UserSettingEntity.builder()
@@ -375,6 +377,66 @@ public class UserTest {
                 ResultActions action = mvc.perform(getBuilder("/api/v1/member/edit", POST, header, req))
                         .andExpect(status().isBadRequest());
                 assertError(action, ErrorCode.WEIGHT_NOT_VALID_EXCEPTION);
+            }
+        }
+
+        @Nested
+        @DisplayName("blood sugar min")
+        public class BloodSugarMin {
+            @Test
+            public void 혈당_최저_수정_성공() throws Exception {
+                req.setBloodSugarMin(UserInfoValidation.BLOODSUGARMIN.getMin() + 1);
+                mvc.perform(getBuilder("/api/v1/member/edit", POST, header, req))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.success", is(true)))
+                        .andExpect(jsonPath("$.response", nullValue()))
+                        .andExpect(jsonPath("$.error", nullValue()));
+            }
+
+            @Test
+            public void 혈당_최저_수정_실패_최소() throws Exception {
+                req.setBloodSugarMin(UserInfoValidation.BLOODSUGARMIN.getMin() - 1);
+                ResultActions action = mvc.perform(getBuilder("/api/v1/member/edit", POST, header, req))
+                        .andExpect(status().isBadRequest());
+                assertError(action, ErrorCode.BLOODSUGARMIN_NOT_VALID_EXCEPTION);
+            }
+
+            @Test
+            public void 혈당_최저_수정_실패_최대() throws Exception {
+                req.setBloodSugarMin(UserInfoValidation.BLOODSUGARMIN.getMax() + 1);
+                ResultActions action = mvc.perform(getBuilder("/api/v1/member/edit", POST, header, req))
+                        .andExpect(status().isBadRequest());
+                assertError(action, ErrorCode.BLOODSUGARMIN_NOT_VALID_EXCEPTION);
+            }
+        }
+
+        @Nested
+        @DisplayName("blood sugar max")
+        public class BloodSugarMax {
+            @Test
+            public void 혈당_최고_수정_성공() throws Exception {
+                req.setBloodSugarMax(UserInfoValidation.BLOODSUGARMAX.getMin() + 1);
+                mvc.perform(getBuilder("/api/v1/member/edit", POST, header, req))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.success", is(true)))
+                        .andExpect(jsonPath("$.response", nullValue()))
+                        .andExpect(jsonPath("$.error", nullValue()));
+            }
+
+            @Test
+            public void 혈당_최고_수정_실패_최소() throws Exception {
+                req.setBloodSugarMax(UserInfoValidation.BLOODSUGARMAX.getMin() - 1);
+                ResultActions action = mvc.perform(getBuilder("/api/v1/member/edit", POST, header, req))
+                        .andExpect(status().isBadRequest());
+                assertError(action, ErrorCode.BLOODSUGARMAX_NOT_VALID_EXCEPTION);
+            }
+
+            @Test
+            public void 혈당_최고_수정_실패_최대() throws Exception {
+                req.setBloodSugarMax(UserInfoValidation.BLOODSUGARMAX.getMax() + 1);
+                ResultActions action = mvc.perform(getBuilder("/api/v1/member/edit", POST, header, req))
+                        .andExpect(status().isBadRequest());
+                assertError(action, ErrorCode.BLOODSUGARMAX_NOT_VALID_EXCEPTION);
             }
         }
 
