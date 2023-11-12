@@ -30,7 +30,8 @@ public class GroupController {
                 .userPk(auth != null ? auth.getPk() : 0l)
                 .build();
         GroupCreateDTO.Response res = groupService.createGroup(req);
-        return result(res.isSuccess(), res, HttpStatus.CREATED);
+        return result(res.isSuccess(), res,
+                res.isSuccess() ? HttpStatus.CREATED : HttpStatus.OK);
     }
 
     @PostMapping("/leave")
@@ -42,7 +43,7 @@ public class GroupController {
                 .build();
 
         GroupLeaveDTO.Response res = groupService.leaveGroup(req);
-        return result(res.isSuccess(), res, HttpStatus.OK);
+        return result(res.isSuccess(), null, HttpStatus.OK);
     }
 
     @PostMapping("/join")

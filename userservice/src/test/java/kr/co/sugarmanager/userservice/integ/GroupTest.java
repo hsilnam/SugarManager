@@ -181,4 +181,50 @@ public class GroupTest {
                     .andExpect(jsonPath("$.error", nullValue()));
         }
     }
+
+    @Nested
+    @DisplayName("leave")
+    class Leave {
+        @Test
+        public void 그룹_탈퇴_성공_혼자_남은_그룹() throws Exception {
+            GroupEntity group = GroupEntity.builder()
+                    .groupCode(StringUtils.generateRandomString(8))
+                    .build();
+            groupRepository.save(group);
+            owner.joinGroup(group);
+            mvc.perform(getBuilder("/api/v1/group/leave", POST, header, null))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.success", is(true)))
+                    .andExpect(jsonPath("$.response", nullValue()))
+                    .andExpect(jsonPath("$.error", nullValue()));
+            assertThat(groupRepository.findAll().size()).isEqualTo(0);//마지막 남은 사람이 탈퇴하면 그룹또한 삭제
+        }
+
+        @Test
+        public void 그룹_탈퇴_성공_여러명_남은_그룹() throws Exception {
+            GroupEntity group = GroupEntity.builder()
+                    .groupCode(StringUtils.generateRandomString(8))
+                    .build();
+            groupRepository.save(group);
+            owner.joinGroup(group);
+            for (int i = 0; i < 10; i++) {
+                userList.get(i).joinGroup(group);
+            }
+            mvc.perform(getBuilder("/api/v1/group/leave", POST, header, null))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.success", is(true)))
+                    .andExpect(jsonPath("$.response", nullValue()))
+                    .andExpect(jsonPath("$.error", nullValue()));
+            assertThat(groupRepository.findAll().size()).isEqualTo(1);//남아있어야함
+        }
+
+        @Test
+        public void 그룹_탈퇴_실패_가입한_그룹_없음() throws Exception {
+            ResultActions action = mvc.perform(getBuilder("/api/v1/group/leave", POST, header, null))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.success", is(false)))
+                    .andExpect(jsonPath("$.response", nullValue()));
+            assertError(action, ErrorCode.GROUP_NOT_JOIN_EXCEPTION);
+        }
+    }
 }
