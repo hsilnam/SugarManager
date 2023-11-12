@@ -232,9 +232,13 @@ public class UserTest {
 
         @Test
         public void 다른_그룹_정보_조회() throws Exception {
-            UserEntity target = userList.stream().filter(u -> u.getGroup() != null)
-                    .filter(u -> !u.getGroup().getGroupCode().equals(owner.getGroup().getGroupCode()))
+            UserEntity target = userList.stream().filter(u -> u.getPk() != owner.getPk())
                     .findAny().get();
+            GroupEntity other = GroupEntity.builder()
+                            .groupCode(StringUtils.generateRandomString(10))
+                                    .build();
+            groupRepository.save(other);
+            target.joinGroup(other);
 
             ResultActions action = mvc.perform(getBuilder("/api/v1/member/".concat(target.getNickname()), GET, header, null))
                     .andExpect(status().isForbidden());
@@ -606,11 +610,9 @@ public class UserTest {
         public void 찌르기_성공_챌린지() throws Exception {
             //같은 그룹 사람
             UserEntity target = userList.stream()
-                    .filter(u -> u.getGroup() != null)
-                    .filter(u ->
-                            u.getPk() != owner.getPk() &&
-                                    u.getGroup().getGroupCode().equals(owner.getGroup().getGroupCode()))
+                    .filter(u -> u.getPk() != owner.getPk())
                     .findAny().get();
+            target.joinGroup(owner.getGroup());
 
             Field field = UserSettingEntity.class.getDeclaredField("pokeAlert");
             field.setAccessible(true);
@@ -649,11 +651,9 @@ public class UserTest {
         public void 찌르기_성공_혈당() throws Exception {
             //같은 그룹 사람
             UserEntity target = userList.stream()
-                    .filter(u -> u.getGroup() != null)
-                    .filter(u ->
-                            u.getPk() != owner.getPk() &&
-                                    u.getGroup().getGroupCode().equals(owner.getGroup().getGroupCode()))
+                    .filter(u -> u.getPk() != owner.getPk())
                     .findAny().get();
+            target.joinGroup(owner.getGroup());
 
             Field field = UserSettingEntity.class.getDeclaredField("pokeAlert");
             field.setAccessible(true);
@@ -683,11 +683,9 @@ public class UserTest {
         public void 찌르기_실패_상대방_알림_off() throws Exception {
             //같은 그룹 사람
             UserEntity target = userList.stream()
-                    .filter(u -> u.getGroup() != null)
-                    .filter(u ->
-                            u.getPk() != owner.getPk() &&
-                                    u.getGroup().getGroupCode().equals(owner.getGroup().getGroupCode()))
+                    .filter(u -> u.getPk() != owner.getPk())
                     .findAny().get();
+            target.joinGroup(owner.getGroup());
 
             Field field = UserSettingEntity.class.getDeclaredField("pokeAlert");
             field.setAccessible(true);
@@ -711,11 +709,14 @@ public class UserTest {
 
         @Test
         public void 찌르기_실패_다른_그룹() throws Exception {
-            //같은 그룹 사람
-            UserEntity target = userList.stream()
-                    .filter(u -> u.getGroup() != null)
-                    .filter(u -> !u.getGroup().getGroupCode().equals(owner.getGroup().getGroupCode()))
+            //다른 그룹 사람
+            UserEntity target = userList.stream().filter(u -> u.getPk() != owner.getPk())
                     .findAny().get();
+            GroupEntity other = GroupEntity.builder()
+                    .groupCode(StringUtils.generateRandomString(10))
+                    .build();
+            groupRepository.save(other);
+            target.joinGroup(other);
 
             Field field = UserSettingEntity.class.getDeclaredField("pokeAlert");
             field.setAccessible(true);
