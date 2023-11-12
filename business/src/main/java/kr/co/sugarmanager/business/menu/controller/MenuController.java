@@ -45,7 +45,7 @@ public class MenuController {
 
     @GetMapping("/{menuPk}")
     @ResponseBody
-    public ResponseEntity<MenuSelectDTO.Response> socialLogin(
+    public ResponseEntity<MenuSelectDTO.Response> select(
             @RequestHeader("X-Authorization-Id") Long userPk,
             @PathVariable("menuPk") Long menuPk
     ) {
