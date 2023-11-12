@@ -440,6 +440,56 @@ public class UserTest {
             }
         }
 
+        @Nested
+        @DisplayName("gender")
+        public class Gender {
+            @Test
+            public void 성별_설정_성공_Null() throws Exception {
+                req.setGender(null);
+                mvc.perform(getBuilder("/api/v1/member/edit", POST, header, req))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.success", is(true)))
+                        .andExpect(jsonPath("$.response", nullValue()))
+                        .andExpect(jsonPath("$.error", nullValue()));
+            }
+
+            @Test
+            public void 성별_설정_성공_MALE() throws Exception {
+                req.setGender("MALE");
+                mvc.perform(getBuilder("/api/v1/member/edit", POST, header, req))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.success", is(true)))
+                        .andExpect(jsonPath("$.response", nullValue()))
+                        .andExpect(jsonPath("$.error", nullValue()));
+            }
+
+            @Test
+            public void 성별_설정_성공_FEMALE() throws Exception {
+                req.setGender("FEMALE");
+                mvc.perform(getBuilder("/api/v1/member/edit", POST, header, req))
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.success", is(true)))
+                        .andExpect(jsonPath("$.response", nullValue()))
+                        .andExpect(jsonPath("$.error", nullValue()));
+            }
+
+            @Test
+            public void 성별_설정_실패_소문자() throws Exception {
+                req.setGender("female");
+                ResultActions action = mvc.perform(getBuilder("/api/v1/member/edit", POST, header, req))
+                        .andExpect(status().isBadRequest());
+                assertError(action, ErrorCode.GENDER_NOT_VALID_EXCEPTION);
+            }
+
+            @Test
+            public void 성별_설정_실패_오타() throws Exception {
+                req.setGender("femail");
+                ResultActions action = mvc.perform(getBuilder("/api/v1/member/edit", POST, header, req))
+                        .andExpect(status().isBadRequest());
+                assertError(action, ErrorCode.GENDER_NOT_VALID_EXCEPTION);
+            }
+        }
+
         private void assertUpdate(UserEntity updated, UserInfoUpdateDTO.Request req) {
             assertAll("update",
                     () -> assertThat(updated.getNickname()).isEqualTo(req.getNickname()),
