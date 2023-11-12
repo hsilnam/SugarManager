@@ -7,6 +7,15 @@ import org.springframework.data.repository.query.Param;
 
 public interface UserRepository extends JpaRepository<UserEntity, Long> {
 
+    @Query("select case when coalesce(count(u.nickname),0) > 1 then true else false end as check from UserEntity u where u.pk = :userPk")
+    Boolean isAuthorized(@Param("userPk") Long userPk);
+
     @Query("select u.nickname from UserEntity u where u.pk = :userPk")
     String findNicknameById(@Param("userPk") Long userPk);
+
+    @Query("select u.pk from UserEntity u where u.nickname = :nickname")
+    Long findIdByNickname(@Param("nickname") String nickname);
+
+    @Query("select case when coalesce(count(u1.nickname),0) > 1 then true else false end as check from UserEntity u1 where u1.groupPk = (select u.groupPk from UserEntity u where u.pk = :userPk) and u1.nickname = :nickname")
+    Boolean inSameGroup(@Param("userPk") Long userPk, @Param("nickname") String nickname);
 }

@@ -14,8 +14,13 @@ public enum ErrorCode {
     INVALID_PATH_VALUE(HttpStatus.BAD_REQUEST,"C006","요청이 잘못됐습니다."),
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "C007", "서버 에러"),
 
+    // 유저
+    UNAUTHORIZED_USER_ACCESS(HttpStatus.UNAUTHORIZED, "U001", "인증되지 않은 유저의 접근입니다"),
+    NO_SUCH_USER(HttpStatus.NOT_FOUND,"U002","없는 유저입니다."),
+
     // 식단 등록
     INVALID_IMAGE_TYPE_ERROR(HttpStatus.BAD_REQUEST, "M001", "이미지가 형식이 잘못되었습니다.");
+
 
     private final HttpStatus status;
     private final String code;

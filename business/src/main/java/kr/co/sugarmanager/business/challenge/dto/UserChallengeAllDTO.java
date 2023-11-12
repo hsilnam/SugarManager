@@ -16,11 +16,19 @@ public class UserChallengeAllDTO {
     @NoArgsConstructor
     public static class Response{
         private boolean success;
-        @Builder.Default
-        private List<Info> response = new ArrayList<>();
+        private InfoResponse response;
         private ErrorResponse error;
     }
 
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class InfoResponse{
+        private boolean pokeAbled;
+        @Builder.Default
+        private List<Info> list = new ArrayList<>();
+    }
     @Builder
     @Getter
     @NoArgsConstructor
