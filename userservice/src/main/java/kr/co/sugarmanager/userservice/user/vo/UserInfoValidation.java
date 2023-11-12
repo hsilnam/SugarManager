@@ -5,7 +5,7 @@ import java.util.regex.Pattern;
 
 public enum UserInfoValidation {
     NAME(2, 20, false, null, "이름은 2~20자로 입력해주세요."),
-    NICKNAME(6, 20, false, "^[a-zA-Z0-9]{6,20}$", "닉네임은 한글, 영문, 숫자로 이루어진 6~20자 입니다."),
+    NICKNAME(6, 20, false, "^[a-zA-Z0-9가-힣]{6,20}$", "닉네임은 한글, 영문, 숫자로 이루어진 6~20자 입니다."),
     HEIGHT(0, 250, true, null, "신장은 0.0 ~ 250.0 사이로 입력해주세요."),
     WEIGHT(0, 300, true, null, "체중은 0.0 ~ 300.0 사이로 입력해주세요."),
     GENDER(0, 100, true, "^(MALE|FEMALE)$", "성별은 MALE 혹은 FEMALE로 입력해주세요."),

@@ -235,8 +235,8 @@ public class UserTest {
             UserEntity target = userList.stream().filter(u -> u.getPk() != owner.getPk())
                     .findAny().get();
             GroupEntity other = GroupEntity.builder()
-                            .groupCode(StringUtils.generateRandomString(10))
-                                    .build();
+                    .groupCode(StringUtils.generateRandomString(10))
+                    .build();
             groupRepository.save(other);
             target.joinGroup(other);
 
@@ -313,6 +313,14 @@ public class UserTest {
             @Test
             public void 닉네임_변경_성공() throws Exception {
                 req.setNickname(StringUtils.generateRandomString(UserInfoValidation.NICKNAME.getMin() + 1));
+                mvc.perform(getBuilder("/api/v1/member/edit", POST, header, req))
+                        .andExpect(status().isOk());
+                assertUpdate(owner, req);
+            }
+
+            @Test
+            public void 닉네임_변경_성공_한글() throws Exception {
+                req.setNickname("김현욱이올시다");
                 mvc.perform(getBuilder("/api/v1/member/edit", POST, header, req))
                         .andExpect(status().isOk());
                 assertUpdate(owner, req);
