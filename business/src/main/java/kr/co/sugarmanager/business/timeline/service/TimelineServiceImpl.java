@@ -33,6 +33,7 @@ public class TimelineServiceImpl implements TimelineService{
     public TimelineMonthDTO.Response timelineMonth(String nickname, Integer year, Integer month){
 //Long id, String nickname, Integer year, Integer month){
         // [1] 유효성 검사
+//        Long loggedInUserPk = id;
         // [1-1] 접근 권한이 있는 유저인지 검사
 //        if (!Objects.equals(userRepository.findNicknameById(id), nickname) || !userRepository.inSameGroup(id, nickname)){
 //            throw new ValidationException(ErrorCode.HANDLE_ACCESS_DENIED);
@@ -45,6 +46,10 @@ public class TimelineServiceImpl implements TimelineService{
         if(userRepository.findIdByNickname(nickname) == null){
             throw new ValidationException(ErrorCode.NO_SUCH_USER);
         }
+        // [1-4] 인증된 유저 검사
+//        if(!userRepository.isAuthorized(loggedInUserPk)){
+//            throw new ValidationException(ErrorCode.UNAUTHORIZED_USER_ACCESS);
+//        }
 
         Long searchUserPk = userRepository.findIdByNickname(nickname);
         log.info("nickname : {} year : {} month : {}", nickname, year, month);
