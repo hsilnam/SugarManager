@@ -200,10 +200,9 @@ public class UserTest {
 
         @Test
         public void 다른_그룹_정보_조회() throws Exception {
-            UserEntity target = groupToUser.get(
-                    groupList.stream().filter(g -> !g.getGroupCode().equals(owner.getGroup().getGroupCode()))
-                            .findAny().get().getGroupCode()
-            ).get(0);
+            UserEntity target = userList.stream().filter(u -> u.getGroup() != null)
+                    .filter(u -> !u.getGroup().getGroupCode().equals(owner.getGroup().getGroupCode()))
+                    .findAny().get();
 
             ResultActions action = mvc.perform(getBuilder("/api/v1/member/".concat(target.getNickname()), GET, header, null))
                     .andExpect(status().isForbidden());
@@ -250,8 +249,7 @@ public class UserTest {
                         .andExpect(jsonPath("$.success", is(true)))
                         .andExpect(jsonPath("$.error", nullValue()));
 
-                UserEntity updated = userRepository.findById(owner.getPk()).get();
-                assertUpdate(updated, req);
+                assertUpdate(owner, req);
             }
 
             @Test
@@ -281,6 +279,7 @@ public class UserTest {
                 req.setNickname(StringUtils.generateRandomString(UserInfoValidation.NICKNAME.getMin() + 1));
                 mvc.perform(getBuilder("/api/v1/member/edit", POST, header, req))
                         .andExpect(status().isOk());
+                assertUpdate(owner, req);
             }
 
             @Test
@@ -331,6 +330,7 @@ public class UserTest {
                         .andExpect(jsonPath("$.success", is(true)))
                         .andExpect(jsonPath("$.response", nullValue()))
                         .andExpect(jsonPath("$.error", nullValue()));
+                assertUpdate(owner, req);
             }
 
             @Test
@@ -361,6 +361,7 @@ public class UserTest {
                         .andExpect(jsonPath("$.success", is(true)))
                         .andExpect(jsonPath("$.response", nullValue()))
                         .andExpect(jsonPath("$.error", nullValue()));
+                assertUpdate(owner, req);
             }
 
             @Test
@@ -391,6 +392,7 @@ public class UserTest {
                         .andExpect(jsonPath("$.success", is(true)))
                         .andExpect(jsonPath("$.response", nullValue()))
                         .andExpect(jsonPath("$.error", nullValue()));
+                assertUpdate(owner, req);
             }
 
             @Test
@@ -421,6 +423,7 @@ public class UserTest {
                         .andExpect(jsonPath("$.success", is(true)))
                         .andExpect(jsonPath("$.response", nullValue()))
                         .andExpect(jsonPath("$.error", nullValue()));
+                assertUpdate(owner, req);
             }
 
             @Test
@@ -451,6 +454,7 @@ public class UserTest {
                         .andExpect(jsonPath("$.success", is(true)))
                         .andExpect(jsonPath("$.response", nullValue()))
                         .andExpect(jsonPath("$.error", nullValue()));
+                assertUpdate(owner, req);
             }
 
             @Test
@@ -461,6 +465,7 @@ public class UserTest {
                         .andExpect(jsonPath("$.success", is(true)))
                         .andExpect(jsonPath("$.response", nullValue()))
                         .andExpect(jsonPath("$.error", nullValue()));
+                assertUpdate(owner, req);
             }
 
             @Test
@@ -471,6 +476,7 @@ public class UserTest {
                         .andExpect(jsonPath("$.success", is(true)))
                         .andExpect(jsonPath("$.response", nullValue()))
                         .andExpect(jsonPath("$.error", nullValue()));
+                assertUpdate(owner, req);
             }
 
             @Test
@@ -494,7 +500,7 @@ public class UserTest {
             assertAll("update",
                     () -> assertThat(updated.getNickname()).isEqualTo(req.getNickname()),
                     () -> assertThat(updated.getName()).isEqualTo(req.getName()),
-                    () -> assertThat(updated.getGender()).isEqualTo(req.getGender()),
+                    () -> assertThat(updated.getGender()).isEqualTo(req.getGender() == null ? null : req.getGender().equals("MALE") ? false : true),
                     () -> assertThat(updated.getHeight()).isEqualTo(req.getHeight()),
                     () -> assertThat(updated.getWeight()).isEqualTo(req.getWeight()),
                     () -> assertThat(updated.getSugarMax()).isEqualTo(req.getBloodSugarMax()),
