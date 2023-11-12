@@ -2,6 +2,7 @@ package kr.co.sugarmanager.userservice.integ;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.persistence.EntityManager;
 import kr.co.sugarmanager.userservice.global.exception.ErrorCode;
 import kr.co.sugarmanager.userservice.global.util.APIUtils;
 import kr.co.sugarmanager.userservice.global.util.JwtProvider;
@@ -9,6 +10,7 @@ import kr.co.sugarmanager.userservice.global.util.StringUtils;
 import kr.co.sugarmanager.userservice.group.entity.GroupEntity;
 import kr.co.sugarmanager.userservice.group.repository.GroupRepository;
 import kr.co.sugarmanager.userservice.user.dto.AlarmDTO;
+import kr.co.sugarmanager.userservice.user.dto.AlarmUpdateDTO;
 import kr.co.sugarmanager.userservice.user.dto.UserInfoUpdateDTO;
 import kr.co.sugarmanager.userservice.user.entity.UserEntity;
 import kr.co.sugarmanager.userservice.user.entity.UserImageEntity;
@@ -63,6 +65,8 @@ public class UserTest {
     private JwtProvider jwtProvider;
     @Autowired
     private ObjectMapper mapper;
+    @Autowired
+    private EntityManager em;
 
     private String accessToken;
     private Map<String, Object> payload;
@@ -549,6 +553,30 @@ public class UserTest {
                     .andDo(print())
                     .andExpect(status().isOk());
             assertAlarmStatus(action, owner);
+        }
+    }
+
+    @Nested
+    @DisplayName("alarm save")
+    public class AlarmSave {
+        AlarmUpdateDTO.Request req;
+
+        @Test
+        public void 알람_수정_성공() throws Exception {
+            for (AlertType category : AlertType.values()) {
+                //해당 카테고리의 상태에 반대되는 상태로 변경
+                req = AlarmUpdateDTO.Request.builder()
+                        .category(category)
+                        .status(
+                                !owner.getSetting().getAlarmInfos()
+                                        .stream()
+                                        .filter(a -> a.getCategory().equals(category))
+                                        .findAny().get().isStatus()
+                        )
+                        .build();
+                mvc.perform(getBuilder("/api/v1/member/alarm/save", POST, header, req))
+                        .andExpect(status().isOk());
+            }
         }
     }
 }

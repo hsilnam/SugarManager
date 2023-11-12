@@ -62,7 +62,7 @@ public class UserController {
     ) {
         request.setUserPk(auth != null ? auth.getPk() : 0l);
         AlarmUpdateDTO.Response response = userService.setAlarm(request);
-        return result(response.isSuccess(), response, HttpStatus.OK);
+        return result(response.isSuccess(), null, HttpStatus.OK);
     }
 
     @PostMapping("/poke")
