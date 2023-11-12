@@ -1,6 +1,5 @@
 package kr.co.sugarmanager.business.menu.service;
 
-import jakarta.transaction.Transactional;
 import kr.co.sugarmanager.business.bloodsugar.dto.BLOODSUGARCATEGORY;
 import kr.co.sugarmanager.business.bloodsugar.entity.BloodSugarEntity;
 import kr.co.sugarmanager.business.bloodsugar.repository.BloodSugarRepository;
@@ -16,6 +15,7 @@ import kr.co.sugarmanager.business.menu.repository.MenuRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
@@ -76,7 +76,7 @@ public class MenuServiceImpl implements MenuService {
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public MenuSelectDTO.Response select(MenuSelectDTO.Request request) {
         Long userPk = request.getUserPk();
         Long menuPk = request.getMenuPk();
