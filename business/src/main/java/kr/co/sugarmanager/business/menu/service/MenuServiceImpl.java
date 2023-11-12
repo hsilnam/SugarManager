@@ -81,8 +81,9 @@ public class MenuServiceImpl implements MenuService {
         Long userPk = request.getUserPk();
         Long menuPk = request.getMenuPk();
 
+        // TODO: 내 그룹원이 아닌 다른 사람의 메뉴 조회 할 경우(403 Forbidden) 체크 및 처리 필요
         Optional<MenuEntity> menuOptional = menuRepository.findByMenuPkAndUserPk(menuPk, userPk);
-        if (!menuOptional.isPresent()) throw new MenuException(ErrorCode.HANDLE_ACCESS_DENIED);
+        if (!menuOptional.isPresent()) throw new MenuException(ErrorCode.MENU_NOT_FOUND_ERROR);
 
         MenuEntity menu = menuOptional.get();
         List<FoodImageEntity> foodImages = menu.getFoodImageList();
