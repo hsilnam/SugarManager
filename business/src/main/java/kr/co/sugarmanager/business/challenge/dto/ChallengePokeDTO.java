@@ -5,33 +5,35 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
-public class ChallengeDeleteDTO {
+public class ChallengePokeDTO {
     @Builder
     @Getter
-    @NoArgsConstructor
     @AllArgsConstructor
+    @NoArgsConstructor
     public static class Request{
-        private List<DeleteInfo> deleteList;
+        private long challengePk;
+    }
+    @Builder
+    @Getter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class Response{
+        private boolean success;
+        private Info response;
+        private ErrorResponse error;
+
     }
 
     @Builder
     @Getter
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class Response{
-        private boolean success;
-        private String response;
-        private ErrorResponse error;
-    }
-    @Builder
-    @Getter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class DeleteInfo{
-        private String nickname;
-        private Long challengePk;
+    public static class Info{
+        private String challengeTitle;
+        private long userPk;
     }
 }

@@ -27,6 +27,11 @@ public class UserSettingEntity {
     @Column(name = "FCM_TOKEN", nullable = false)
     private String fcmToken;
 
+    @Column(name = "SETTING_POKE_ALERT", nullable = false)
+    @ColumnDefault("false")
+    @Builder.Default
+    private boolean pokeAlert = false;
+
     @Column(name = "SETTING_CHALLENGE_ALERT", nullable = false)
     @ColumnDefault("false")
     @Builder.Default

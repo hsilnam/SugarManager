@@ -1,9 +1,6 @@
 package kr.co.sugarmanager.business.bloodsugar.service;
 
-import kr.co.sugarmanager.business.bloodsugar.dto.BloodSugarDeleteDTO;
-import kr.co.sugarmanager.business.bloodsugar.dto.BloodSugarSaveDTO;
-import kr.co.sugarmanager.business.bloodsugar.dto.BloodSugarSelectDTO;
-import kr.co.sugarmanager.business.bloodsugar.dto.BloodSugarUpdateDTO;
+import kr.co.sugarmanager.business.bloodsugar.dto.*;
 import kr.co.sugarmanager.business.bloodsugar.entity.BloodSugarEntity;
 import kr.co.sugarmanager.business.bloodsugar.exception.BloodSugarException;
 import kr.co.sugarmanager.business.bloodsugar.repository.BloodSugarRepository;
@@ -11,8 +8,12 @@ import kr.co.sugarmanager.business.global.exception.ErrorCode;
 import kr.co.sugarmanager.business.global.exception.ValidationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -109,5 +110,30 @@ public class BloodSugarServiceImpl implements BloodSugarService{
         returnDTO.getResponse().setBloodSugarMin(minBloodSugar == 501 ? 0: minBloodSugar);
 
         return returnDTO;
+    }
+
+    @Override
+    public BloodSugarPeriodDTO.Response selectPeriod(Long userPk, String startDate, String endDate, int page) {
+        PageRequest pageRequest = PageRequest.of(page, 30);
+        LocalDateTime startLocalDate = convertStringToLocalDateTime(startDate);
+        LocalDateTime endLocalDate = convertStringToLocalDateTime(endDate).plusDays(1L);
+
+        if (startLocalDate.isAfter(endLocalDate)) {
+            throw new BloodSugarException(ErrorCode.INVALID_INPUT_VALUE);
+        }
+
+        return BloodSugarPeriodDTO.Response.builder()
+                .success(true)
+                .response(bloodSugarRepository.findByPeriod(userPk, startLocalDate, endLocalDate, pageRequest).getContent())
+                .error(null)
+                .build();
+    }
+
+    private LocalDateTime convertStringToLocalDateTime(String date) {
+        try {
+            return LocalDate.parse(date, DateTimeFormatter.ISO_DATE).atStartOfDay();
+        } catch (RuntimeException e) {
+            throw new BloodSugarException(ErrorCode.INVALID_INPUT_VALUE);
+        }
     }
 }

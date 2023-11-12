@@ -16,5 +16,8 @@ public interface ChallengeTemplateRepository extends JpaRepository<ChallengeTemp
 
     @Query("select t from ChallengeTemplateEntity t where t.userPk = :userPk")
     List<ChallengeTemplateEntity> findAllChallengesByUser(@Param("userPk") Long userPk);
+
+    @Query("select t from ChallengeTemplateEntity t where t.pk = :challengePk")
+    ChallengeTemplateEntity findChallengeByPk(@Param("challengePk") Long challengePk);
 }
 

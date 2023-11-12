@@ -1,13 +1,12 @@
 package kr.co.sugarmanager.business.challenge.service;
 
-import kr.co.sugarmanager.business.challenge.dto.ChallengeAddDTO;
-import kr.co.sugarmanager.business.challenge.dto.ChallengeDeleteDTO;
-import kr.co.sugarmanager.business.challenge.dto.TodayChallengesDTO;
-import kr.co.sugarmanager.business.challenge.dto.UserChallengeAllDTO;
+import kr.co.sugarmanager.business.challenge.dto.*;
 
 public interface ChallengeService {
     TodayChallengesDTO.Response todaysChallenges();
-    ChallengeAddDTO.Response addChallenge(Long userPk, ChallengeAddDTO.Request dto);
-    ChallengeDeleteDTO.Response deleteChallenge(Long userPk, ChallengeDeleteDTO.Request dto);
-    UserChallengeAllDTO.Response userChallengesAll(Long userPk);
+    ChallengeAddDTO.Response addChallenge(ChallengeAddDTO.Request dto);
+    ChallengeDeleteDTO.Response deleteChallenge(ChallengeDeleteDTO.Request dto);
+    UserChallengeAllDTO.Response userChallengesAll(String nickname);
+    UserChallengeInfoDTO.Response userChallengeInfo(String nickname, Long challengePk);
+    ChallengePokeDTO.Response infoForPoke(ChallengePokeDTO.Request dto);
 }
