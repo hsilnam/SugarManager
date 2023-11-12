@@ -53,7 +53,7 @@ public class GroupController {
     ) {
         req.setUserPk(auth != null ? auth.getPk() : 0l);
         GroupJoinDTO.Response res = groupService.joinGroup(req);
-        return result(res.isSuccess(), res, HttpStatus.OK);
+        return result(res.isSuccess(), null, HttpStatus.OK);
     }
 
     @GetMapping

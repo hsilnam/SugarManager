@@ -11,6 +11,7 @@ import kr.co.sugarmanager.userservice.global.service.ProducerService;
 import kr.co.sugarmanager.userservice.global.util.APIUtils;
 import kr.co.sugarmanager.userservice.global.util.JwtProvider;
 import kr.co.sugarmanager.userservice.global.util.StringUtils;
+import kr.co.sugarmanager.userservice.group.dto.GroupJoinDTO;
 import kr.co.sugarmanager.userservice.group.entity.GroupEntity;
 import kr.co.sugarmanager.userservice.group.repository.GroupRepository;
 import kr.co.sugarmanager.userservice.user.dto.AlarmDTO;
@@ -225,6 +226,47 @@ public class GroupTest {
                     .andExpect(jsonPath("$.success", is(false)))
                     .andExpect(jsonPath("$.response", nullValue()));
             assertError(action, ErrorCode.GROUP_NOT_JOIN_EXCEPTION);
+        }
+    }
+
+    @Nested
+    @DisplayName("join")
+    class Join {
+        GroupEntity group = GroupEntity.builder()
+                .groupCode(StringUtils.generateRandomString(10))
+                .build();
+        GroupJoinDTO.Request req = GroupJoinDTO.Request.builder()
+                .groupCode(group.getGroupCode())
+                .build();
+
+        @Test
+        public void 그룹_가입_성공() throws Exception {
+            groupRepository.save(group);
+            mvc.perform(getBuilder("/api/v1/group/join", POST, header, req))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.success", is(true)))
+                    .andExpect(jsonPath("$.error", nullValue()))
+                    .andExpect(jsonPath("$.response", nullValue()));
+            assertThat(groupRepository.getGroupMember(group.getGroupCode())).isEqualTo(1);
+        }
+
+        @Test
+        public void 그룹_가입_실패_이미_가입한_그룹_존재() throws Exception {
+            groupRepository.save(group);
+            owner.joinGroup(group);
+            mvc.perform(getBuilder("/api/v1/group/join", POST, header, req))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.success", is(false)))
+                    .andExpect(jsonPath("$.error", nullValue()))
+                    .andExpect(jsonPath("$.response", nullValue()));
+        }
+
+        @Test
+        public void 그룹_가입_실패_존재하지_않는_그룹() throws Exception {
+            req.setGroupCode(StringUtils.generateRandomString(10));//다른 랜덤한 그룹 코드로 설정
+            ResultActions action = mvc.perform(getBuilder("/api/v1/group/join", POST, header, req))
+                    .andExpect(status().isNotFound());
+            assertError(action, ErrorCode.GROUP_NOT_FOUND_EXCEPTION);
         }
     }
 }
