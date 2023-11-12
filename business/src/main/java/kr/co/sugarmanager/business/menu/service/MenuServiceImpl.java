@@ -93,11 +93,13 @@ public class MenuServiceImpl implements MenuService {
         LocalDateTime createdAt = menu.getCreatedAt();
         LocalDateTime threeHoursBefore = createdAt.minusHours(3);
         LocalDateTime threeHoursAfter = createdAt.plusHours(3);
-        BloodSugarEntity beforeBloodSuger = bloodSugarRepository.findOneByUserPkAndCreatedAt(userPk, threeHoursBefore, createdAt).orElse(null);
-        BloodSugarEntity afterBloodSuger = bloodSugarRepository.findOneByUserPkAndCreatedAt(userPk, createdAt, threeHoursAfter).orElse(null);
-        MenuSelectDTO.BloodSugar bloodSugar = MenuSelectDTO.BloodSugar.builder()
-                .beforeLevel(beforeBloodSuger.getLevel())
-                .afterLevel(afterBloodSuger.getLevel())
+
+        BloodSugarEntity beforeBloodSuger = bloodSugarRepository.findOneByUserPkAndCategoryAndCreatedAt(userPk, BLOODSUGARCATEGORY.BEFORE.name(), threeHoursBefore, createdAt).orElse(null);
+        System.out.println(beforeBloodSuger);
+        BloodSugarEntity afterBloodSuger = bloodSugarRepository.findOneByUserPkAndCategoryAndCreatedAt(userPk, BLOODSUGARCATEGORY.AFTER.name(), createdAt, threeHoursAfter).orElse(null);
+        MenuSelectDTO.BloodSugar repBloodSugar = MenuSelectDTO.BloodSugar.builder()
+                .beforeLevel((beforeBloodSuger != null) ? beforeBloodSuger.getLevel() : null)
+                .afterLevel((afterBloodSuger != null) ? afterBloodSuger.getLevel() : null)
                 .build();
 
         ArrayList<MenuSelectDTO.Food> foods = (ArrayList<MenuSelectDTO.Food>) menu.getFoodList().stream().map(food -> MenuSelectDTO.Food.builder()
