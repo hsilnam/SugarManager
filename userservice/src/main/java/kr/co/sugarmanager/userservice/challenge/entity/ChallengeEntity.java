@@ -12,7 +12,7 @@ import org.hibernate.annotations.Where;
 
 @Entity
 @Table(name = "CHALLENGE_TEMPLATE")
-@SQLDelete(sql = "UPDATE SET DELETED_AT = NOW() ON CHALLENGE_TEMPLATE WHERE CHALLENGE_TEMPLATE_PK = ?")
+@SQLDelete(sql = "UPDATE CHALLENGE_TEMPLATE SET DELETED_AT = NOW() WHERE CHALLENGE_TEMPLATE_PK = ?")
 @Where(clause = "DELETED_AT IS NOT NULL")
 @Getter
 @Builder

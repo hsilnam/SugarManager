@@ -3,7 +3,11 @@ package kr.co.sugarmanager.userservice.integ;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManager;
+import kr.co.sugarmanager.userservice.challenge.entity.ChallengeEntity;
+import kr.co.sugarmanager.userservice.challenge.repository.ChallengeRepository;
+import kr.co.sugarmanager.userservice.global.dto.MessageDTO;
 import kr.co.sugarmanager.userservice.global.exception.ErrorCode;
+import kr.co.sugarmanager.userservice.global.service.ProducerService;
 import kr.co.sugarmanager.userservice.global.util.APIUtils;
 import kr.co.sugarmanager.userservice.global.util.JwtProvider;
 import kr.co.sugarmanager.userservice.global.util.StringUtils;
@@ -11,23 +15,23 @@ import kr.co.sugarmanager.userservice.group.entity.GroupEntity;
 import kr.co.sugarmanager.userservice.group.repository.GroupRepository;
 import kr.co.sugarmanager.userservice.user.dto.AlarmDTO;
 import kr.co.sugarmanager.userservice.user.dto.AlarmUpdateDTO;
+import kr.co.sugarmanager.userservice.user.dto.PokeDTO;
 import kr.co.sugarmanager.userservice.user.dto.UserInfoUpdateDTO;
 import kr.co.sugarmanager.userservice.user.entity.UserEntity;
 import kr.co.sugarmanager.userservice.user.entity.UserImageEntity;
 import kr.co.sugarmanager.userservice.user.entity.UserRoleEntity;
 import kr.co.sugarmanager.userservice.user.entity.UserSettingEntity;
 import kr.co.sugarmanager.userservice.user.repository.UserRepository;
-import kr.co.sugarmanager.userservice.user.vo.AlertType;
-import kr.co.sugarmanager.userservice.user.vo.RoleType;
-import kr.co.sugarmanager.userservice.user.vo.SocialType;
-import kr.co.sugarmanager.userservice.user.vo.UserInfoValidation;
+import kr.co.sugarmanager.userservice.user.vo.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -37,6 +41,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -44,6 +49,7 @@ import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.Mockito.lenient;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -66,7 +72,9 @@ public class UserTest {
     @Autowired
     private ObjectMapper mapper;
     @Autowired
-    private EntityManager em;
+    private ChallengeRepository challengeRepository;
+    @MockBean
+    private ProducerService producerService;
 
     private String accessToken;
     private Map<String, Object> payload;
@@ -78,6 +86,7 @@ public class UserTest {
     private List<UserEntity> userList = new ArrayList<>();
     private List<GroupEntity> groupList = new ArrayList<>();
     private Map<String, List<UserEntity>> groupToUser = new HashMap<>();
+    private List<MessageDTO> messageList = new ArrayList<>();
 
     private MockHttpServletRequestBuilder getBuilder(String url, HttpMethod method, Map<String, Object> header,
                                                      Object body) throws JsonProcessingException {
@@ -109,10 +118,20 @@ public class UserTest {
     }
 
     @BeforeEach
+    public void producerServiceMocking() {
+        lenient().doAnswer(invocation -> {
+            MessageDTO message = invocation.getArgument(0, MessageDTO.class);
+            messageList.add(message);
+            return null;
+        }).when(producerService).sendMessage(ArgumentMatchers.any(MessageDTO.class));
+    }
+
+    @BeforeEach
     public void initUsers() {
         Random random = new Random();
         for (int i = 0; i < 10; i++) {
             GroupEntity group = GroupEntity.builder()
+                    .groupCode(StringUtils.generateRandomString(8))
                     .build();
             groupList.add(group);
             groupToUser.put(group.getGroupCode(), new ArrayList<>());
@@ -577,6 +596,143 @@ public class UserTest {
                 mvc.perform(getBuilder("/api/v1/member/alarm/save", POST, header, req))
                         .andExpect(status().isOk());
             }
+        }
+    }
+
+    @Nested
+    @DisplayName("poke")
+    public class Poke {
+        @Test
+        public void 찌르기_성공_챌린지() throws Exception {
+            //같은 그룹 사람
+            UserEntity target = userList.stream()
+                    .filter(u -> u.getGroup() != null)
+                    .filter(u ->
+                            u.getPk() != owner.getPk() &&
+                                    u.getGroup().getGroupCode().equals(owner.getGroup().getGroupCode()))
+                    .findAny().get();
+
+            Field field = UserSettingEntity.class.getDeclaredField("pokeAlert");
+            field.setAccessible(true);
+            field.set(target.getSetting(), true);
+            field.setAccessible(false);
+
+            ChallengeEntity targetChallenge = ChallengeEntity.builder()
+                    .title("target title")
+                    .goal("0")
+                    .alert(true)
+                    .build();
+
+            challengeRepository.save(targetChallenge);
+
+            PokeDTO.Request req = PokeDTO.Request.builder()
+                    .nickname(target.getNickname())
+                    .type(PokeType.CHALLENGE)
+                    .challengeId(targetChallenge.getPk())
+                    .build();
+
+            mvc.perform(getBuilder("/api/v1/member/poke", POST, header, req))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.success", is(true)))
+                    .andExpect(jsonPath("$.error", nullValue()))
+                    .andExpect(jsonPath("$.response.nickname", is(req.getNickname())))
+                    .andExpect(jsonPath("$.response.type", is(req.getType().name())))
+                    .andExpect(jsonPath("$.response.challengeId", is(req.getChallengeId()), Long.class));
+            assertThat(messageList.size()).isEqualTo(1);
+            MessageDTO messageDTO = messageList.get(0);
+            assertThat(messageDTO.getBody()).isEqualTo(targetChallenge.getTitle());
+            assertThat(messageDTO.getTitle()).isEqualTo(owner.getNickname().concat(" 님의 찌르기입니다."));
+            assertThat(messageDTO.getFcmToken()).isEqualTo(target.getSetting().getFcmToken());
+        }
+
+        @Test
+        public void 찌르기_성공_혈당() throws Exception {
+            //같은 그룹 사람
+            UserEntity target = userList.stream()
+                    .filter(u -> u.getGroup() != null)
+                    .filter(u ->
+                            u.getPk() != owner.getPk() &&
+                                    u.getGroup().getGroupCode().equals(owner.getGroup().getGroupCode()))
+                    .findAny().get();
+
+            Field field = UserSettingEntity.class.getDeclaredField("pokeAlert");
+            field.setAccessible(true);
+            field.set(target.getSetting(), true);
+            field.setAccessible(false);
+
+            PokeDTO.Request req = PokeDTO.Request.builder()
+                    .nickname(target.getNickname())
+                    .type(PokeType.BLOODSUGAR)
+                    .build();
+
+            mvc.perform(getBuilder("/api/v1/member/poke", POST, header, req))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.success", is(true)))
+                    .andExpect(jsonPath("$.error", nullValue()))
+                    .andExpect(jsonPath("$.response.nickname", is(req.getNickname())))
+                    .andExpect(jsonPath("$.response.type", is(req.getType().name())))
+                    .andExpect(jsonPath("$.response.challengeId", is(req.getChallengeId())));
+            assertThat(messageList.size()).isEqualTo(1);
+            MessageDTO messageDTO = messageList.get(0);
+            assertThat(messageDTO.getBody()).isEqualTo("혈당을 체크하세요!");
+            assertThat(messageDTO.getTitle()).isEqualTo(owner.getNickname().concat(" 님의 찌르기입니다."));
+            assertThat(messageDTO.getFcmToken()).isEqualTo(target.getSetting().getFcmToken());
+        }
+
+        @Test
+        public void 찌르기_실패_상대방_알림_off() throws Exception {
+            //같은 그룹 사람
+            UserEntity target = userList.stream()
+                    .filter(u -> u.getGroup() != null)
+                    .filter(u ->
+                            u.getPk() != owner.getPk() &&
+                                    u.getGroup().getGroupCode().equals(owner.getGroup().getGroupCode()))
+                    .findAny().get();
+
+            Field field = UserSettingEntity.class.getDeclaredField("pokeAlert");
+            field.setAccessible(true);
+            field.set(target.getSetting(), false);
+            field.setAccessible(false);
+
+            PokeDTO.Request req = PokeDTO.Request.builder()
+                    .nickname(target.getNickname())
+                    .type(PokeType.BLOODSUGAR)
+                    .build();
+
+            mvc.perform(getBuilder("/api/v1/member/poke", POST, header, req))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.success", is(false)))
+                    .andExpect(jsonPath("$.error", nullValue()))
+                    .andExpect(jsonPath("$.response.nickname", nullValue()))
+                    .andExpect(jsonPath("$.response.type", nullValue()))
+                    .andExpect(jsonPath("$.response.challengeId", nullValue()));
+            assertThat(messageList.size()).isEqualTo(0);
+        }
+
+        @Test
+        public void 찌르기_실패_다른_그룹() throws Exception {
+            //같은 그룹 사람
+            UserEntity target = userList.stream()
+                    .filter(u -> u.getGroup() != null)
+                    .filter(u -> !u.getGroup().getGroupCode().equals(owner.getGroup().getGroupCode()))
+                    .findAny().get();
+
+            Field field = UserSettingEntity.class.getDeclaredField("pokeAlert");
+            field.setAccessible(true);
+            field.set(target.getSetting(), true);
+            field.setAccessible(false);
+
+            PokeDTO.Request req = PokeDTO.Request.builder()
+                    .nickname(target.getNickname())
+                    .type(PokeType.BLOODSUGAR)
+                    .build();
+
+            ResultActions action = mvc.perform(getBuilder("/api/v1/member/poke", POST, header, req))
+                    .andExpect(status().isForbidden())
+                    .andExpect(jsonPath("$.success", is(false)))
+                    .andExpect(jsonPath("$.response", nullValue()));
+            assertThat(messageList.size()).isEqualTo(0);
+            assertError(action, ErrorCode.FORBIDDEN_EXCEPTION);
         }
     }
 }
