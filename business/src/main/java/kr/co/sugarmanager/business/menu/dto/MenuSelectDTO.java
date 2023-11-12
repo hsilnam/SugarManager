@@ -55,8 +55,8 @@ public class MenuSelectDTO {
     @Getter
     @Setter
     public static class BloodSugar {
-        private int beforeLevel;
-        private int afterLevel;
+        private Integer beforeLevel;
+        private Integer afterLevel;
     }
 
     @Builder
@@ -67,14 +67,14 @@ public class MenuSelectDTO {
     public static class Food {
         private Long foodPk;
         private String foodName;
-        private float foodCal;
-        private float foodGrams;
-        private float foodCarbohydrate;
-        private float foodProtein;
-        private float foodDietaryFiber;
-        private float foodVitamin;
-        private float foodMineral;
-        private float foodSalt;
-        private float foodSugars;
+        private Float foodCal;
+        private Float foodGrams;
+        private Float foodCarbohydrate;
+        private Float foodProtein;
+        private Float foodDietaryFiber;
+        private Float foodVitamin;
+        private Float foodMineral;
+        private Float foodSalt;
+        private Float foodSugars;
     }
 }

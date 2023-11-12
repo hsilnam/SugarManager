@@ -1,6 +1,7 @@
 package kr.co.sugarmanager.business.menu.service;
 
 import jakarta.transaction.Transactional;
+import kr.co.sugarmanager.business.bloodsugar.dto.BLOODSUGARCATEGORY;
 import kr.co.sugarmanager.business.bloodsugar.entity.BloodSugarEntity;
 import kr.co.sugarmanager.business.bloodsugar.repository.BloodSugarRepository;
 import kr.co.sugarmanager.business.global.exception.ErrorCode;
@@ -84,11 +85,12 @@ public class MenuServiceImpl implements MenuService {
         if (!menuOptional.isPresent()) throw new MenuException(ErrorCode.HANDLE_ACCESS_DENIED);
 
         MenuEntity menu = menuOptional.get();
-        ArrayList<MenuSelectDTO.MenuImage> foodImages = (ArrayList<MenuSelectDTO.MenuImage>) menu.getFoodImageList().stream().map(foodImage -> MenuSelectDTO.MenuImage.builder()
+        List<FoodImageEntity> foodImages = menu.getFoodImageList();
+        ArrayList<MenuSelectDTO.MenuImage> repFoodImages = (foodImages == null) ? new ArrayList<>() : new ArrayList<>(foodImages.stream().map(foodImage -> MenuSelectDTO.MenuImage.builder()
                 .menuImagePk(foodImage.getFoodImagePk())
                 .menuImageUrl(foodImage.getImage().getImageUrl())
                 .build()
-        ).toList();
+        ).toList());
 
         LocalDateTime createdAt = menu.getCreatedAt();
         LocalDateTime threeHoursBefore = createdAt.minusHours(3);
@@ -102,7 +104,8 @@ public class MenuServiceImpl implements MenuService {
                 .afterLevel((afterBloodSuger != null) ? afterBloodSuger.getLevel() : null)
                 .build();
 
-        ArrayList<MenuSelectDTO.Food> foods = (ArrayList<MenuSelectDTO.Food>) menu.getFoodList().stream().map(food -> MenuSelectDTO.Food.builder()
+        List<FoodEntity> foods = menu.getFoodList();
+        ArrayList<MenuSelectDTO.Food> repFoods = (foods == null) ? new ArrayList<>() : new ArrayList<>(foods.stream().map(food -> MenuSelectDTO.Food.builder()
                 .foodPk(food.getFoodPk())
                 .foodName(food.getFoodName())
                 .foodCal(food.getFoodCal())
@@ -115,13 +118,13 @@ public class MenuServiceImpl implements MenuService {
                 .foodSalt(food.getFoodSalt())
                 .foodSugars(food.getFoodSugars())
                 .build()
-        ).toList();
+        ).toList());
 
         MenuSelectDTO.ReturnResponse returnResponse = MenuSelectDTO.ReturnResponse.builder()
                 .menuPk(menuPk)
-                .menuImages(foodImages)
-                .bloodSugar(bloodSugar)
-                .foods(foods)
+                .menuImages(repFoodImages)
+                .bloodSugar(repBloodSugar)
+                .foods(repFoods)
                 .build();
 
         return MenuSelectDTO.Response
