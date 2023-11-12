@@ -14,7 +14,7 @@ public class ChallengeDeleteDTO {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class Request{
-        private List<Long> deleteList;
+        private List<DeleteInfo> deleteList;
     }
 
     @Builder
@@ -25,5 +25,13 @@ public class ChallengeDeleteDTO {
         private boolean success;
         private String response;
         private ErrorResponse error;
+    }
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class DeleteInfo{
+        private String nickname;
+        private Long challengePk;
     }
 }

@@ -4,7 +4,6 @@ import kr.co.sugarmanager.business.challenge.dto.*;
 import kr.co.sugarmanager.business.challenge.service.ChallengeService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -36,19 +35,19 @@ public class ChallengeController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @GetMapping("/user/{userPk}")
-    public ResponseEntity<UserChallengeAllDTO.Response> userChallengesAll(@PathVariable Long userPk){
-        UserChallengeAllDTO.Response response = challengeService.userChallengesAll(userPk);
+    @GetMapping("/user/{nickname}")
+    public ResponseEntity<UserChallengeAllDTO.Response> userChallengesAll(@PathVariable String nickname){
+        UserChallengeAllDTO.Response response = challengeService.userChallengesAll(nickname);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @GetMapping("/user/{userPk}/{challengePk}")
-    public ResponseEntity<UserChallengeInfoDTO.Response> userChallengeInfo(@PathVariable Long userPk, @PathVariable Long challengePk){
-        UserChallengeInfoDTO.Response response = challengeService.userChallengeInfo(userPk, challengePk);
+    @GetMapping("/user/{nickname}/{challengePk}")
+    public ResponseEntity<UserChallengeInfoDTO.Response> userChallengeInfo(@PathVariable String nickname, @PathVariable Long challengePk){
+        UserChallengeInfoDTO.Response response = challengeService.userChallengeInfo(nickname, challengePk);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @GetMapping("/poke/info")
+    @GetMapping("/poke")
     public ResponseEntity<ChallengePokeDTO.Response> infoForPoke(ChallengePokeDTO.Request dto){
         ChallengePokeDTO.Response response = challengeService.infoForPoke(dto);
         return new ResponseEntity<>(response, HttpStatus.OK);
