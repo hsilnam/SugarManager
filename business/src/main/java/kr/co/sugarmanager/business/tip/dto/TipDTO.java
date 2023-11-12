@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 public class TipDTO {
     @Builder
     @Getter
@@ -13,9 +15,16 @@ public class TipDTO {
     @AllArgsConstructor
     public static class Response{
         private boolean success;
+        private Tip response;
+        private ErrorResponse error;
+    }
+
+    @Builder
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Tip{
         private String title;
         private String content;
-        private String response;
-        private ErrorResponse error;
     }
 }
