@@ -3,16 +3,19 @@ package kr.co.sugarmanager.userservice.integ;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.co.sugarmanager.userservice.global.exception.ErrorCode;
+import kr.co.sugarmanager.userservice.global.util.APIUtils;
 import kr.co.sugarmanager.userservice.global.util.JwtProvider;
 import kr.co.sugarmanager.userservice.global.util.StringUtils;
 import kr.co.sugarmanager.userservice.group.entity.GroupEntity;
 import kr.co.sugarmanager.userservice.group.repository.GroupRepository;
+import kr.co.sugarmanager.userservice.user.dto.AlarmDTO;
 import kr.co.sugarmanager.userservice.user.dto.UserInfoUpdateDTO;
 import kr.co.sugarmanager.userservice.user.entity.UserEntity;
 import kr.co.sugarmanager.userservice.user.entity.UserImageEntity;
 import kr.co.sugarmanager.userservice.user.entity.UserRoleEntity;
 import kr.co.sugarmanager.userservice.user.entity.UserSettingEntity;
 import kr.co.sugarmanager.userservice.user.repository.UserRepository;
+import kr.co.sugarmanager.userservice.user.vo.AlertType;
 import kr.co.sugarmanager.userservice.user.vo.RoleType;
 import kr.co.sugarmanager.userservice.user.vo.SocialType;
 import kr.co.sugarmanager.userservice.user.vo.UserInfoValidation;
@@ -31,6 +34,7 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -41,6 +45,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.POST;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.hamcrest.Matchers.*;
 
@@ -101,6 +106,7 @@ public class UserTest {
 
     @BeforeEach
     public void initUsers() {
+        Random random = new Random();
         for (int i = 0; i < 10; i++) {
             GroupEntity group = GroupEntity.builder()
                     .build();
@@ -121,6 +127,9 @@ public class UserTest {
                     .build();
             UserSettingEntity setting = UserSettingEntity.builder()
                     .fcmToken("fcmToken")
+                    .challengeAlert(random.nextBoolean())
+                    .pokeAlert(random.nextBoolean())
+                    .sugarAlert(random.nextBoolean())
                     .build();
             UserImageEntity image = UserImageEntity.builder()
                     .imageUrl("image".concat(number))
@@ -518,6 +527,28 @@ public class UserTest {
                     () -> assertThat(user.getSugarMax()).isEqualTo(origin.getBloodSugarMax()),
                     () -> assertThat(user.getSugarMin()).isEqualTo(origin.getBloodSugarMin())
             );
+        }
+    }
+
+    @Nested
+    @DisplayName("alarm")
+    public class Alarm {
+        void assertAlarmStatus(ResultActions action, UserEntity user) throws UnsupportedEncodingException, JsonProcessingException {
+            String content = action.andReturn().getResponse().getContentAsString();
+            APIUtils.ApiResult apiResult = mapper.readValue(content, APIUtils.ApiResult.class);
+            AlarmDTO.Response response = mapper.convertValue(apiResult.getResponse(), AlarmDTO.Response.class);
+            response.getAlarms().stream().forEach(a -> {
+                AlarmDTO.AlarmInfo owners = owner.getSetting().getAlarmInfos().stream().filter(info -> info.getCategory().equals(a.getCategory())).findAny().get();
+                assertThat(a.isStatus()).isEqualTo(owners.isStatus());
+            });
+        }
+
+        @Test
+        public void 알람_조회_성공() throws Exception {
+            ResultActions action = mvc.perform(getBuilder("/api/v1/member/alarm", GET, header, null))
+                    .andDo(print())
+                    .andExpect(status().isOk());
+            assertAlarmStatus(action, owner);
         }
     }
 }
