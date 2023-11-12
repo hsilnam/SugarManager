@@ -1,4 +1,4 @@
-package kr.co.sugarmanager.business.challenge.entity;
+package kr.co.sugarmanager.business.global.user.entity;
 
 import jakarta.persistence.*;
 import jakarta.persistence.Table;

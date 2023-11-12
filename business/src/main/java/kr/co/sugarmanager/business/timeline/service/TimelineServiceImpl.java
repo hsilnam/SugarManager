@@ -6,7 +6,7 @@ import kr.co.sugarmanager.business.challenge.dto.LogsAndLatestInterface;
 import kr.co.sugarmanager.business.challenge.entity.ChallengeTemplateEntity;
 import kr.co.sugarmanager.business.challenge.repository.ChallengeLogRepository;
 import kr.co.sugarmanager.business.challenge.repository.ChallengeTemplateRepository;
-import kr.co.sugarmanager.business.challenge.repository.UserRepository;
+import kr.co.sugarmanager.business.global.user.repository.UserRepository;
 import kr.co.sugarmanager.business.global.exception.ErrorCode;
 import kr.co.sugarmanager.business.global.exception.ValidationException;
 import kr.co.sugarmanager.business.menu.entity.MenuEntity;
