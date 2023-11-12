@@ -41,13 +41,13 @@ public class ChallengeController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @GetMapping("/user/{userPk}/{challengePk}")
-    public ResponseEntity<UserChallengeInfoDTO.Response> userChallengeInfo(@PathVariable Long userPk, @PathVariable Long challengePk){
-        UserChallengeInfoDTO.Response response = challengeService.userChallengeInfo(userPk, challengePk);
+    @GetMapping("/user/{nickname}/{challengePk}")
+    public ResponseEntity<UserChallengeInfoDTO.Response> userChallengeInfo(@PathVariable String nickname, @PathVariable Long challengePk){
+        UserChallengeInfoDTO.Response response = challengeService.userChallengeInfo(nickname, challengePk);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @GetMapping("/poke/info")
+    @GetMapping("/poke")
     public ResponseEntity<ChallengePokeDTO.Response> infoForPoke(ChallengePokeDTO.Request dto){
         ChallengePokeDTO.Response response = challengeService.infoForPoke(dto);
         return new ResponseEntity<>(response, HttpStatus.OK);
