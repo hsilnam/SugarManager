@@ -19,4 +19,7 @@ public interface BloodSugarRepository extends JpaRepository<BloodSugarEntity, Lo
     @Query("select distinct(cast (b.createdAt as localdate)) from BloodSugarEntity b where year(b.createdAt) = :year and month(b.createdAt) = :month and b.userPk = :searchUserPk")
     List<LocalDate> findBloodSugarRecordsForMonth(@Param("searchUserPk") Long searchUserPk, @Param("year") Integer year, @Param("month") Integer month);
 
+    @Query("select b from BloodSugarEntity b where b.userPk = :searchUserPk and b.createdAt between :start and :end" )
+    List<BloodSugarEntity> findBloodSugarRecordsForDay(@Param("searchUserPk") Long searchUserPk, @Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
+
 }

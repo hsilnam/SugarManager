@@ -1,10 +1,16 @@
 package kr.co.sugarmanager.business.timeline.service;
 
+import kr.co.sugarmanager.business.bloodsugar.entity.BloodSugarEntity;
 import kr.co.sugarmanager.business.bloodsugar.repository.BloodSugarRepository;
+import kr.co.sugarmanager.business.challenge.dto.LogsAndLatestInterface;
+import kr.co.sugarmanager.business.challenge.entity.ChallengeTemplateEntity;
+import kr.co.sugarmanager.business.challenge.repository.ChallengeLogRepository;
+import kr.co.sugarmanager.business.challenge.repository.ChallengeTemplateRepository;
 import kr.co.sugarmanager.business.challenge.repository.UserRepository;
 import kr.co.sugarmanager.business.global.exception.ErrorCode;
 import kr.co.sugarmanager.business.global.exception.ValidationException;
 import kr.co.sugarmanager.business.menu.entity.MenuEntity;
+import kr.co.sugarmanager.business.menu.repository.FoodRepository;
 import kr.co.sugarmanager.business.menu.repository.MenuRepository;
 import kr.co.sugarmanager.business.timeline.dto.InfoTypeEnum;
 import kr.co.sugarmanager.business.timeline.dto.TimelineDateDTO;
@@ -27,6 +33,9 @@ public class TimelineServiceImpl implements TimelineService{
     private final UserRepository userRepository;
     private final BloodSugarRepository bloodSugarRepository;
     private final MenuRepository menuRepository;
+    private final FoodRepository foodRepository;
+    private final ChallengeTemplateRepository challengeTemplateRepository;
+    private final ChallengeLogRepository challengeLogRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -97,8 +106,8 @@ public class TimelineServiceImpl implements TimelineService{
         }
 
         List<TimelineDateDTO.Info> infos = new ArrayList<>();
-
         Long searchUserPk = userRepository.findIdByNickname(nickname);
+
         LocalDateTime start = LocalDateTime.of(year, month, date, 0, 0, 0);
         LocalDateTime end = start.plusDays(1);
 
@@ -108,16 +117,45 @@ public class TimelineServiceImpl implements TimelineService{
                             .hour(m.getCreatedAt().getHour())
                             .minute(m.getCreatedAt().getMinute())
                             .second(m.getCreatedAt().getSecond())
-                            .category(InfoTypeEnum.valueOf("MENU"))
-//                            .content(m.get)
+                            .category(InfoTypeEnum.MENU)
+                            .content(String.valueOf(foodRepository.caloriesPerMenu(m.getMenuPk())))
                             .build());
         }
 
+        List<BloodSugarEntity> bloodSugar = bloodSugarRepository.findBloodSugarRecordsForDay(searchUserPk,start,end);
+        for (BloodSugarEntity b : bloodSugar){
+            infos.add(TimelineDateDTO.Info.builder()
+                            .hour(b.getCreatedAt().getHour())
+                            .minute(b.getCreatedAt().getMinute())
+                            .second(b.getCreatedAt().getSecond())
+                            .category(InfoTypeEnum.BLOODSUGAR)
+                            .content(String.valueOf(b.getLevel()))
+                            .build());
+        }
 
+        List<ChallengeTemplateEntity> challenge = challengeTemplateRepository.findAllChallengesByUser(searchUserPk);
+        for (ChallengeTemplateEntity c : challenge){
+            try {
+                LogsAndLatestInterface logs = challengeLogRepository.findChallengeLogsAndLatestUpdatedTime(start, end, c.getPk());
+                if (logs.getCount() >= c.getGoal()) {
+                    infos.add(TimelineDateDTO.Info.builder()
+                            .hour(logs.getLatest().getHour())
+                            .minute(logs.getLatest().getMinute())
+                            .second(logs.getLatest().getSecond())
+                            .category(InfoTypeEnum.CHALLENGE)
+                            .content(c.getTitle())
+                            .complete(true)
+                            .build());
+                }
+            } catch(Exception ignored){
+            }
+        }
+
+        Collections.sort(infos);
 
         return TimelineDateDTO.Response.builder()
                 .success(true)
-                .response(null)
+                .response(infos)
                 .build();
     }
 

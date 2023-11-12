@@ -1,6 +1,5 @@
 package kr.co.sugarmanager.business.challenge.repository;
 
-import kr.co.sugarmanager.business.challenge.dto.UserChallengeAllDTO;
 import kr.co.sugarmanager.business.challenge.entity.ChallengeTemplateEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
