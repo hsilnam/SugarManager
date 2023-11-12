@@ -4,6 +4,8 @@ import kr.co.sugarmanager.business.challenge.dto.*;
 import kr.co.sugarmanager.business.challenge.entity.ChallengeTemplateEntity;
 import kr.co.sugarmanager.business.challenge.repository.ChallengeLogRepository;
 import kr.co.sugarmanager.business.challenge.repository.ChallengeTemplateRepository;
+import kr.co.sugarmanager.business.challenge.repository.SettingsRepository;
+import kr.co.sugarmanager.business.challenge.repository.UserRepository;
 import kr.co.sugarmanager.business.global.exception.ErrorCode;
 import kr.co.sugarmanager.business.global.exception.ValidationException;
 import lombok.RequiredArgsConstructor;
@@ -26,8 +28,8 @@ public class ChallengeServiceImpl implements ChallengeService {
     private final ChallengeLogRepository challengeLogRepository;
 
     // 현욱이가 만들어주면 삭제
-//    private final UserRepository userRepository;
-//    private final SettingsRepository settingsRepository;
+    private final UserRepository userRepository;
+    private final SettingsRepository settingsRepository;
 
     // 오늘의 챌린지 모두 가져오기
     @Transactional(readOnly = true)
@@ -71,7 +73,7 @@ public class ChallengeServiceImpl implements ChallengeService {
         // [1] 유효성 검사
 
         // [1-1] 필수 조건들이 누락되어 있을 때 (제목, 목표 횟수, 종류, 반복 요일)
-        if (dto.getTitle() == null || dto.getGoal() == 0 || dto.getType() == null || dto.getDays().size() == 0) {
+        if (dto.getTitle() == null || dto.getGoal() == 0 || dto.getType() == null || dto.getDays().isEmpty()) {
             throw new ValidationException(ErrorCode.MISSING_INPUT_VALUE);
         }
         // [1-2] 알람은 설정했으나 시간, 분 정보가 들어오지 않았을 때
@@ -128,8 +130,23 @@ public class ChallengeServiceImpl implements ChallengeService {
 
     @Transactional(readOnly = true)
     @Override
-    public UserChallengeAllDTO.Response userChallengesAll(Long userPk){
+    public UserChallengeAllDTO.Response userChallengesAll(String nickname){
 
+        // [1] 유효성 검사
+//        long loggedInUserPk = id;
+        // [1-1] 권한 관련
+//        if (userRepository.isAuthorized(loggedInUserPk)){
+//            throw new ValidationException(ErrorCode.UNAUTHORIZED_USER_ACCESS);
+//        }
+
+        // [1-2] 내 그룹이 아닐 때
+//        if(userRepository.findIdByNickname(nickname) == null || userRepository.inSameGroup(loggedInUserPk,nickname)){
+//            throw new ValidationException(ErrorCode.HANDLE_ACCESS_DENIED);
+//        }
+
+        long userPk = userRepository.findIdByNickname(nickname);
+
+        // [2] 조회
         LocalDateTime start = LocalDate.now().atStartOfDay(ZoneId.of("Asia/Seoul")).toLocalDateTime();
         LocalDateTime end = start.plusDays(1);
 
