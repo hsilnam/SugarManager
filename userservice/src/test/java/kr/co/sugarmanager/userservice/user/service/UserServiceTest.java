@@ -93,6 +93,13 @@ public class UserServiceTest {
             return userList.stream().filter(u -> u.getNickname().equals(nickname))
                     .findAny();
         });
+        lenient().when(userRepository.findByNicknameExclude(anyString(), anyString())).thenAnswer(invocation -> {
+            String nickname = invocation.getArgument(0, String.class);
+            String exclude = invocation.getArgument(1, String.class);
+
+            return userList.stream().filter(u -> u.getNickname().equals(nickname) && !u.getNickname().equals(exclude))
+                    .findAny();
+        });
 
         int n = 100;
         int groupCount = 10;
@@ -261,7 +268,7 @@ public class UserServiceTest {
         public void 유저_정보_업데이트_성공() {
             UserInfoUpdateDTO.Response response = userService.updateMemberInfo(req);
             assertThat(response.isSuccess()).isTrue();
-            verify(userRepository, times(1)).findByNickname(anyString());
+            verify(userRepository, times(1)).findByNicknameExclude(anyString(), anyString());
             verify(userRepository, times(1)).findById(anyLong());
             assertAfterUpdate(user.getPk(), true);
         }
