@@ -18,8 +18,8 @@ import org.hibernate.annotations.Where;
 @DynamicInsert
 @DynamicUpdate
 @Table(name = "USER_IMAGE")
-@SQLDelete(sql = "UPDATE SET DELETED_AT ON USER_IMAGE WHERE IMAGE_PK = ?")
-@Where(clause = "DELETED_AT IS NOT NULL")
+@SQLDelete(sql = "UPDATE USER_IMAGE SET DELETED_AT WHERE IMAGE_PK = ?")
+@Where(clause = "DELETED_AT IS NULL")
 public class UserImageEntity extends CDBaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

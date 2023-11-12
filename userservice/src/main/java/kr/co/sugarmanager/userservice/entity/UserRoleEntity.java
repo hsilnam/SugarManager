@@ -15,8 +15,8 @@ import org.hibernate.annotations.Where;
 @DynamicInsert
 @DynamicUpdate
 @Table(name = "USER_ROLES")
-@SQLDelete(sql = "UPDATE SET DELETED_AT ON USER_ROLES WHERE USER_ROLES_PK = ?")
-@Where(clause = "DELETED_AT IS NOT NULL")
+@SQLDelete(sql = "UPDATE USER_ROLES SET DELETED_AT WHERE USER_ROLES_PK = ?")
+@Where(clause = "DELETED_AT IS NULL")
 public class UserRoleEntity extends CUDBaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -25,8 +25,8 @@ import java.util.stream.Collectors;
 @Table(name = "SETTING")
 @DynamicInsert
 @DynamicUpdate
-@SQLDelete(sql = "UPDATE SET DELETED_AT = NOW() ON SETTING WHERE SETTING_PK = ?")
-@Where(clause = "DELETED_AT IS NOT NULL")
+@SQLDelete(sql = "UPDATE SETTING SET DELETED_AT = NOW() WHERE SETTING_PK = ?")
+@Where(clause = "DELETED_AT IS NULL")
 @Slf4j
 public class UserSettingEntity extends CUDBaseEntity {
     @Id

@@ -6,11 +6,13 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
 @Entity
 @Table(name = "CHALLENGE_TEMPLATE")
-@Where(clause = "DELETED_AT IS NOT NULL")
+@SQLDelete(sql = "UPDATE CHALLENGE_TEMPLATE SET DELETED_AT = NOW() WHERE CHALLENGE_TEMPLATE_PK = ?")
+@Where(clause = "DELETED_AT IS NULL")
 @Getter
 @Builder
 @AllArgsConstructor

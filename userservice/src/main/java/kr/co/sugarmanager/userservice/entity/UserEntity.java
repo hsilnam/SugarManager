@@ -21,8 +21,8 @@ import static kr.co.sugarmanager.userservice.entity.UserInfoValidation.*;
 @DynamicInsert
 @DynamicUpdate
 @Table(name = "USERS")
-@SQLDelete(sql = "UPDATE SET DELETED_AT ON USER WHERE USER_PK = ?")
-@Where(clause = "DELETED_AT IS NOT NULL")
+@SQLDelete(sql = "UPDATE USERS SET DELETED_AT WHERE USER_PK = ?")
+@Where(clause = "DELETED_AT IS NULL")
 @ToString
 public class UserEntity extends CUDBaseEntity {
     @Id

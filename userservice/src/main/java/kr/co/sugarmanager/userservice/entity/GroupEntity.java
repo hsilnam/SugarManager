@@ -20,8 +20,8 @@ import org.hibernate.annotations.Where;
 @DynamicInsert
 @DynamicUpdate
 @Table(name = "USER_GROUP")
-@SQLDelete(sql = "UPDATE SET DELETED_AT = NOW() ON USER_GROUP WHERE GROUP_PK = ?")
-@Where(clause = "DELETED_AT IS NOT NULL")
+@SQLDelete(sql = "UPDATE USER_GROUP SET DELETED_AT = NOW() WHERE GROUP_PK = ?")
+@Where(clause = "DELETED_AT IS NULL")
 public class GroupEntity extends CUDBaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
