@@ -25,6 +25,7 @@ public class MenuImageServiceImpl implements MenuImageService {
     private final ObjectMapper objectMapper;
 
     @Override
+    @Async
     public void saveImage(Long pk, ImageTypeEnum imageTypeEnum, List<MultipartFile> multipartFile) {
         if (multipartFile == null) return;
         try {
