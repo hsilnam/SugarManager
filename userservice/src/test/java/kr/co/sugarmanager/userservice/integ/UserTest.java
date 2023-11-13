@@ -75,6 +75,8 @@ public class UserTest {
     private ChallengeRepository challengeRepository;
     @MockBean
     private ProducerService producerService;
+    @Autowired
+    private EntityManager em;
 
     private String accessToken;
     private Map<String, Object> payload;
@@ -598,17 +600,29 @@ public class UserTest {
         public void 알람_수정_성공() throws Exception {
             for (AlertType category : AlertType.values()) {
                 //해당 카테고리의 상태에 반대되는 상태로 변경
-                req = AlarmUpdateDTO.Request.builder()
+                AlarmUpdateDTO.Request.RequestBuilder builder = AlarmUpdateDTO.Request.builder()
                         .category(category)
                         .status(
                                 !owner.getSetting().getAlarmInfos()
                                         .stream()
                                         .filter(a -> a.getCategory().equals(category))
                                         .findAny().get().isStatus()
-                        )
-                        .build();
+                        );
+                if (category.equals(AlertType.BLOOD)) {
+                    builder.hour(3);
+                }
+                req = builder.build();
                 mvc.perform(getBuilder("/api/v1/member/alarm/save", POST, header, req))
-                        .andExpect(status().isOk());
+                        .andExpect(status().isOk())
+                        .andExpect(jsonPath("$.success", is(true)))
+                        .andExpect(jsonPath("$.error", nullValue()))
+                        .andExpect(jsonPath("$.response.category", is(category.name())))
+                        .andExpect(jsonPath("$.response.status", is(req.isStatus())))
+                        .andExpect(jsonPath("$.response.hour", req.getCategory().equals(AlertType.BLOOD) ? is(req.getHour()) : nullValue()));
+                em.clear();
+                owner = userRepository.findById(owner.getPk()).get();
+                assertThat(owner.getSetting().getAlarmInfos().stream().filter(a -> a.getCategory().equals(category)).findAny().get().isStatus())
+                        .isEqualTo(req.isStatus());
             }
         }
     }
