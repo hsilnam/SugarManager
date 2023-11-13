@@ -23,6 +23,7 @@ public class TimelineController {
             @PathVariable String nickname,
             @PathVariable Integer year,
             @PathVariable Integer month){
+        log.info("컨트롤러 호출");
         TimelineMonthDTO.Response response = timelineService.timelineMonth(pk,nickname,year,month);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
