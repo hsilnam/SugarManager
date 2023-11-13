@@ -56,10 +56,11 @@ public class ChallengeController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @GetMapping("/poke")
-    public ResponseEntity<ChallengePokeDTO.Response> infoForPoke(ChallengePokeDTO.Request dto){
-        ChallengePokeDTO.Response response = challengeService.infoForPoke(dto);
-        return new ResponseEntity<>(response, HttpStatus.OK);
+    @PostMapping("/{challengePk}")
+    public void claim(
+            @RequestHeader("X-Authorization-Id") Long pk,
+            @PathVariable Long challengePk){
+        challengeService.claim(pk,challengePk);
     }
 
 
