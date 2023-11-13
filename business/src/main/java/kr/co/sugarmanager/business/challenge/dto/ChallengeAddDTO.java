@@ -11,6 +11,7 @@ public class ChallengeAddDTO {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class Request{
+        private String nickname;
         private String title;
         private int goal;
         private ChallengeTypeEnum type; // enum type

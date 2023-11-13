@@ -1,14 +1,12 @@
-package kr.co.sugarmanager.business.challenge.entity;
+package kr.co.sugarmanager.business.global.user.entity;
 
 import jakarta.persistence.*;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.DynamicInsert;
-import org.hibernate.annotations.DynamicUpdate;
-import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.*;
 
 @Getter
 @Builder
@@ -19,7 +17,7 @@ import org.hibernate.annotations.SQLDelete;
 @DynamicInsert
 @DynamicUpdate
 @SQLDelete(sql = "UPDATE SETTING SET DELETED_AT = now() WHERE SETTING_PK = ?")
-
+@Where(clause = "DELETED_AT is null")
 public class UserSettingEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,6 +26,11 @@ public class UserSettingEntity {
 
     @Column(name = "FCM_TOKEN", nullable = false)
     private String fcmToken;
+
+    @Column(name = "SETTING_POKE_ALERT", nullable = false)
+    @ColumnDefault("false")
+    @Builder.Default
+    private boolean pokeAlert = false;
 
     @Column(name = "SETTING_CHALLENGE_ALERT", nullable = false)
     @ColumnDefault("false")

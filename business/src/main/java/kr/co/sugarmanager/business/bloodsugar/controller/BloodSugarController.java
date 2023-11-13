@@ -1,9 +1,6 @@
 package kr.co.sugarmanager.business.bloodsugar.controller;
 
-import kr.co.sugarmanager.business.bloodsugar.dto.BloodSugarDeleteDTO;
-import kr.co.sugarmanager.business.bloodsugar.dto.BloodSugarSaveDTO;
-import kr.co.sugarmanager.business.bloodsugar.dto.BloodSugarSelectDTO;
-import kr.co.sugarmanager.business.bloodsugar.dto.BloodSugarUpdateDTO;
+import kr.co.sugarmanager.business.bloodsugar.dto.*;
 import kr.co.sugarmanager.business.bloodsugar.service.BloodSugarService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -60,5 +57,18 @@ public class BloodSugarController {
         log.info("BloodSugar select - Authorization: {}, nickname: {}, date: {}-{}-{}", auth, nickname, year, month, day);
         Long userPkByNickname = 1L;       // TODO: 서버간 통신 필요 (auth와 같은 그룹인지, 같은 그룹이라면 PK가져오기)
         return new ResponseEntity<>(bloodSugarService.select(userPkByNickname, year, month, day), HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/period/{nickname}/{startDate}/{endDate}/{page}")
+    public ResponseEntity<BloodSugarPeriodDTO.Response> selet(
+            @RequestHeader("Authorization") String auth,
+            @PathVariable("nickname") String nickname,
+            @PathVariable("startDate") String startDate,
+            @PathVariable("endDate") String endDate,
+            @PathVariable("page") Integer page) {
+        Long userPkByNickname = 1L;       // TODO: 서버간 통신 필요 (auth와 같은 그룹인지, 같은 그룹이라면 PK가져오기)
+
+
+        return new ResponseEntity<>(bloodSugarService.selectPeriod(userPkByNickname, startDate, endDate, page), HttpStatus.OK);
     }
 }
