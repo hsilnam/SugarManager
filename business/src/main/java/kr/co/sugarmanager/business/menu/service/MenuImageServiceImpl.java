@@ -39,7 +39,7 @@ public class MenuImageServiceImpl implements MenuImageService {
     }
 
     @Override
-    public void deleteImage(List<Long> pkList) {
+    public void deleteImage(List<String> imagePaths) {
 
     }
 
