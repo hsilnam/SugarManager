@@ -39,14 +39,12 @@ public class TimelineServiceImpl implements TimelineService{
 
     @Override
     @Transactional(readOnly = true)
-    public TimelineMonthDTO.Response timelineMonth(String nickname, Integer year, Integer month){
-//Long id, String nickname, Integer year, Integer month){
+    public TimelineMonthDTO.Response timelineMonth(Long pk, String nickname, Integer year, Integer month){
         // [1] 유효성 검사
-//        Long loggedInUserPk = id;
         // [1-1] 접근 권한이 있는 유저인지 검사
-//        if (!Objects.equals(userRepository.findNicknameById(id), nickname) || !userRepository.inSameGroup(id, nickname)){
-//            throw new ValidationException(ErrorCode.HANDLE_ACCESS_DENIED);
-//        }
+        if (!Objects.equals(userRepository.findNicknameById(pk), nickname) && !userRepository.inSameGroup(pk, nickname)){
+            throw new ValidationException(ErrorCode.HANDLE_ACCESS_DENIED);
+        }
         // [1-2] 요청하는 날짜 포맷을 벗어난 경우
         if(0 >= month || month > 12 || 1970 > year || year > 2099 ){
             throw new ValidationException(ErrorCode.INVALID_INPUT_VALUE);
@@ -56,12 +54,10 @@ public class TimelineServiceImpl implements TimelineService{
             throw new ValidationException(ErrorCode.NO_SUCH_USER);
         }
         // [1-4] 인증된 유저 검사
-//        if(!userRepository.isAuthorized(loggedInUserPk)){
-//            throw new ValidationException(ErrorCode.UNAUTHORIZED_USER_ACCESS);
-//        }
-
+        if(!userRepository.isAuthorized(pk)){
+            throw new ValidationException(ErrorCode.UNAUTHORIZED_USER_ACCESS);
+        }
         Long searchUserPk = userRepository.findIdByNickname(nickname);
-        log.info("nickname : {} year : {} month : {}", nickname, year, month);
 
         // [2] 해당 월의 기록들 불러오기
         List<LocalDate> total = new ArrayList<>();
@@ -88,14 +84,12 @@ public class TimelineServiceImpl implements TimelineService{
 
     @Override
     @Transactional(readOnly = true)
-    public TimelineDateDTO.Response timelineDate(String nickname, Integer year, Integer month, Integer date) {
-        //Long id, String nickname, Integer year, Integer month, Integer date){
-
+    public TimelineDateDTO.Response timelineDate(Long pk, String nickname, Integer year, Integer month, Integer date) {
         // [1] 유효성 검사
         // [1-1] 접근 권한이 있는 유저인지 검사
-//        if (!Objects.equals(userRepository.findNicknameById(id), nickname) || !userRepository.inSameGroup(id, nickname)){
-//            throw new ValidationException(ErrorCode.HANDLE_ACCESS_DENIED);
-//        }
+        if (!Objects.equals(userRepository.findNicknameById(pk), nickname) && !userRepository.inSameGroup(pk, nickname)){
+            throw new ValidationException(ErrorCode.HANDLE_ACCESS_DENIED);
+        }
         // [1-2] 요청하는 날짜 포맷을 벗어난 경우
         if(0 >= month || month > 12 || 1970 > year || year > 2099 || date <= 0 || date > 31){
             throw new ValidationException(ErrorCode.INVALID_INPUT_VALUE);
@@ -103,6 +97,10 @@ public class TimelineServiceImpl implements TimelineService{
         // [1-3] 해당 닉네임이 없을 때
         if(userRepository.findIdByNickname(nickname) == null){
             throw new ValidationException(ErrorCode.NO_SUCH_USER);
+        }
+        // [1-4] 인증된 유저 검사
+        if(!userRepository.isAuthorized(pk)){
+            throw new ValidationException(ErrorCode.UNAUTHORIZED_USER_ACCESS);
         }
 
         List<TimelineDateDTO.Info> infos = new ArrayList<>();
