@@ -63,7 +63,6 @@ public class BloodSugarController {
             @PathVariable("startDate") String startDate,
             @PathVariable("endDate") String endDate,
             @PathVariable("page") Integer page) {
-        Long userPkByNickname = 1L;
         log.info("BloodSugar Period Select - userPk: {}, nickname: {}, startDate: {}, endDate: {}, page: {},", userPk, nickname, startDate, endDate, page);
 
         return new ResponseEntity<>(bloodSugarService.selectPeriod(userPk, nickname, startDate, endDate, page), HttpStatus.OK);

@@ -5,6 +5,7 @@ import kr.co.sugarmanager.business.bloodsugar.dto.*;
 import kr.co.sugarmanager.business.bloodsugar.entity.BloodSugarEntity;
 import kr.co.sugarmanager.business.bloodsugar.exception.BloodSugarException;
 import kr.co.sugarmanager.business.bloodsugar.repository.BloodSugarRepository;
+import kr.co.sugarmanager.business.global.user.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,8 @@ public class BloodSugarServiceTest {
 
     @Autowired
     private BloodSugarRepository bloodSugarRepository;
+    @Autowired
+    private UserRepository userRepository;
 
     private BloodSugarEntity bloodSugarEntity;
 
@@ -116,7 +119,7 @@ public class BloodSugarServiceTest {
     @Test
     void 조회_성공() throws Exception {
         //given
-        String userNickName = "GUEST_wRvMPa63Km";
+        String userNickName = userRepository.findNicknameById(1L);
         //when
         BloodSugarSelectDTO.Response response = bloodSugarService.select(1L, userNickName, LocalDateTime.now().getYear(), LocalDateTime.now().getMonthValue(), LocalDateTime.now().getDayOfMonth());
 
@@ -127,10 +130,7 @@ public class BloodSugarServiceTest {
     @Test
     void 조회_실패() throws Exception {
         //given
-        String userNickName = "GUEST_wRvMPa63Km";
-        BloodSugarDeleteDTO.Request request = BloodSugarDeleteDTO.Request.builder()
-                .bloodSugarPk(bloodSugarEntity.getBloodSugarPk())
-                .build();
+        String userNickName = userRepository.findNicknameById(1L);
 
         //when
         BloodSugarSelectDTO.Response response = bloodSugarService.select(1L, userNickName, LocalDateTime.now().getYear()+1, LocalDateTime.now().getMonthValue(), LocalDateTime.now().getDayOfMonth());
