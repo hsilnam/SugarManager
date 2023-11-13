@@ -153,6 +153,7 @@ public class UserTest {
                     .challengeAlert(random.nextBoolean())
                     .pokeAlert(random.nextBoolean())
                     .sugarAlert(random.nextBoolean())
+                    .sugarAlertHour(random.nextInt() % 5 + 1)
                     .build();
             UserImageEntity image = UserImageEntity.builder()
                     .imageUrl("image".concat(number))
@@ -573,9 +574,10 @@ public class UserTest {
             APIUtils.ApiResult apiResult = mapper.readValue(content, APIUtils.ApiResult.class);
             AlarmDTO.Response response = mapper.convertValue(apiResult.getResponse(), AlarmDTO.Response.class);
             response.getAlarms().stream().forEach(a -> {
-                AlarmDTO.AlarmInfo owners = owner.getSetting().getAlarmInfos().stream().filter(info -> info.getCategory().equals(a.getCategory())).findAny().get();
-                assertThat(a.isStatus()).isEqualTo(owners.isStatus());
+                AlarmDTO.AlarmInfo users = user.getSetting().getAlarmInfos().stream().filter(info -> info.getCategory().equals(a.getCategory())).findAny().get();
+                assertThat(a.isStatus()).isEqualTo(users.isStatus());
             });
+            assertThat(response.getBloodSugarHour()).isEqualTo(user.getSetting().getSugarAlertHour());
         }
 
         @Test
