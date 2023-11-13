@@ -112,6 +112,9 @@ public class UserServiceImpl implements UserService {
 
         return AlarmUpdateDTO.Response.builder()
                 .success(true)
+                .hour(req.getHour())
+                .status(req.isStatus())
+                .category(req.getCategory())
                 .build();
     }
 
