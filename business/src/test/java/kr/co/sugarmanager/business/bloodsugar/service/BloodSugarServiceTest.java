@@ -116,9 +116,9 @@ public class BloodSugarServiceTest {
     @Test
     void 조회_성공() throws Exception {
         //given
-
+        String userNickName = "GUEST_wRvMPa63Km";
         //when
-        BloodSugarSelectDTO.Response response = bloodSugarService.select(1L, LocalDateTime.now().getYear(), LocalDateTime.now().getMonthValue(), LocalDateTime.now().getDayOfMonth());
+        BloodSugarSelectDTO.Response response = bloodSugarService.select(1L, userNickName, LocalDateTime.now().getYear(), LocalDateTime.now().getMonthValue(), LocalDateTime.now().getDayOfMonth());
 
         System.out.println(response);
         assertTrue(response.isSuccess());
@@ -127,12 +127,13 @@ public class BloodSugarServiceTest {
     @Test
     void 조회_실패() throws Exception {
         //given
+        String userNickName = "GUEST_wRvMPa63Km";
         BloodSugarDeleteDTO.Request request = BloodSugarDeleteDTO.Request.builder()
                 .bloodSugarPk(bloodSugarEntity.getBloodSugarPk())
                 .build();
 
         //when
-        BloodSugarSelectDTO.Response response = bloodSugarService.select(1L, LocalDateTime.now().getYear()+1, LocalDateTime.now().getMonthValue(), LocalDateTime.now().getDayOfMonth());
+        BloodSugarSelectDTO.Response response = bloodSugarService.select(1L, userNickName, LocalDateTime.now().getYear()+1, LocalDateTime.now().getMonthValue(), LocalDateTime.now().getDayOfMonth());
         assertTrue(response.isSuccess());
         assertEquals(response.getResponse().getBloodSugarMax(), 0);
     }
