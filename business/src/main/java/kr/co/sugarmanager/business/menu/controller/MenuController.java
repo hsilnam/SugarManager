@@ -1,6 +1,7 @@
 package kr.co.sugarmanager.business.menu.controller;
 
 import kr.co.sugarmanager.business.menu.dto.MenuDeleteDTO;
+import kr.co.sugarmanager.business.menu.dto.MenuEditDTO;
 import kr.co.sugarmanager.business.menu.dto.MenuSaveDTO;
 import kr.co.sugarmanager.business.menu.dto.MenuSelectDTO;
 import kr.co.sugarmanager.business.menu.service.MenuService;
@@ -55,5 +56,18 @@ public class MenuController {
                 .menuPk(menuPk)
                 .build();
         return new ResponseEntity<>(menuService.select(request), HttpStatus.OK);
+    }
+
+    @PostMapping(value = "/edit", produces = APPLICATION_JSON_VALUE, consumes = {APPLICATION_JSON_VALUE, MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<MenuEditDTO.Response> edit(
+            @RequestHeader("X-Authorization-Id") Long userPk,
+            @RequestPart(value = "createdMenuImages", required = false) List<MultipartFile> imageFile,
+            @Validated @RequestPart MenuEditDTO.Request request
+    ) {
+        request.setUserPk(userPk);
+        request.setCreatedMenuImages(imageFile);
+        log.info("MenuEdit - userPk: {}, request: {}", userPk, request);
+
+        return new ResponseEntity<>(menuService.edit(request), HttpStatus.OK);
     }
 }
