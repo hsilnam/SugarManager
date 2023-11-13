@@ -73,7 +73,7 @@ public class UserServiceImpl implements UserService {
         UserEntity user = userRepository.findById(userPk)
                 .orElseThrow(() -> new AccessDenyException(ErrorCode.UNAUTHORIZATION_EXCEPTION));
         //중복 닉네임 검사
-        if (userRepository.findByNicknameExclude(req.getNickname(),user.getNickname()).isPresent()) {
+        if (userRepository.findByNicknameExclude(req.getNickname(), user.getNickname()).isPresent()) {
             return UserInfoUpdateDTO.Response.builder()
                     .success(false)
                     .build();
@@ -102,7 +102,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public AlarmUpdateDTO.Response setAlarm(AlarmUpdateDTO.Request req) {
-        long count = userSettingRepository.setAlarm(req.getUserPk(), req.getCategory(), req.isStatus());
+        long count = userSettingRepository.setAlarm(req.getUserPk(), req);
         if (count == 0) {//업데이트 한 칼럼이 존재하지 않음
             throw new UserNotFoundException(ErrorCode.USER_NOT_FOUND_EXCEPTION);
         } else if (count > 1) {//혹시모르게 2개이상의 칼럼이 업데이트되었다면, 정합성 오류기때문에 error throw하며 rollback
