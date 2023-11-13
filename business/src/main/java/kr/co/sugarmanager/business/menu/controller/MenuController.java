@@ -61,12 +61,12 @@ public class MenuController {
     @PostMapping(value = "/edit", produces = APPLICATION_JSON_VALUE, consumes = {APPLICATION_JSON_VALUE, MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<MenuEditDTO.Response> edit(
             @RequestHeader("X-Authorization-Id") Long userPk,
-            @RequestPart(value = "file", required = false) List<MultipartFile> imageFile,
+            @RequestPart(value = "createdMenuImages", required = false) List<MultipartFile> imageFile,
             @Validated @RequestPart MenuEditDTO.Request request
     ) {
-        log.info("MenuEdit - userPk: {}, request: {}", userPk, request);
         request.setUserPk(userPk);
         request.setCreatedMenuImages(imageFile);
+        log.info("MenuEdit - userPk: {}, request: {}", userPk, request);
 
         return new ResponseEntity<>(menuService.edit(request), HttpStatus.OK);
     }
