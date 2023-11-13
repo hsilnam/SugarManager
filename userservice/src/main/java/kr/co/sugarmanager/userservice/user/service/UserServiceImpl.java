@@ -96,6 +96,7 @@ public class UserServiceImpl implements UserService {
         return AlarmDTO.Response.builder()
                 .success(true)
                 .alarms(userSettingEntity.getAlarmInfos())
+                .bloodSugarHour(userSettingEntity.getSugarAlertHour())
                 .build();
     }
 
