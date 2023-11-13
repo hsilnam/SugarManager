@@ -11,6 +11,7 @@ import kr.co.sugarmanager.business.menu.dto.OperationTypeEnum;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -53,7 +54,7 @@ public class MenuImageServiceImpl implements MenuImageService {
 
     @Override
     public ImageDTO createImageDTO(Long pk, ImageTypeEnum imageTypeEnum, MultipartFile multipartFile) {
-        String originalFilename = multipartFile.getName();
+        String originalFilename = multipartFile.getOriginalFilename();
         String extension = originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
         checkImageFileExtension(extension);
         try {
