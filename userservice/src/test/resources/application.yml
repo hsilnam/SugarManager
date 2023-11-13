@@ -2,7 +2,7 @@ spring:
   application:
     name: USER-SERVICE
   profiles:
-    include: db,jwt,eureka,oauth,redis
+    include: db,jwt,eureka,oauth,redis,kafka
 server:
   port: 0
 eureka:
