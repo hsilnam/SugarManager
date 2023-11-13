@@ -1,18 +1,20 @@
 package kr.co.sugarmanager.business.bloodsugar.service;
 
-import kr.co.sugarmanager.business.bloodsugar.dto.BloodSugarDeleteDTO;
-import kr.co.sugarmanager.business.bloodsugar.dto.BloodSugarSaveDTO;
-import kr.co.sugarmanager.business.bloodsugar.dto.BloodSugarSelectDTO;
-import kr.co.sugarmanager.business.bloodsugar.dto.BloodSugarUpdateDTO;
+import kr.co.sugarmanager.business.bloodsugar.dto.*;
 import kr.co.sugarmanager.business.bloodsugar.entity.BloodSugarEntity;
 import kr.co.sugarmanager.business.bloodsugar.exception.BloodSugarException;
 import kr.co.sugarmanager.business.bloodsugar.repository.BloodSugarRepository;
 import kr.co.sugarmanager.business.global.exception.ErrorCode;
 import kr.co.sugarmanager.business.global.exception.ValidationException;
+import kr.co.sugarmanager.business.global.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -22,7 +24,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class BloodSugarServiceImpl implements BloodSugarService{
     private final BloodSugarRepository bloodSugarRepository;
-
+    private final UserRepository userRepository;
     @Override
     public BloodSugarSaveDTO.Response save(Long userPk, BloodSugarSaveDTO.Request request) {
         try {
@@ -82,8 +84,10 @@ public class BloodSugarServiceImpl implements BloodSugarService{
     }
 
     @Override
-    public BloodSugarSelectDTO.Response select(Long userPk, int year, int month, int day) {
-        List<BloodSugarEntity> selectResult = bloodSugarRepository.findByUserPkAndUpdatedAt(userPk, year, month, day);
+    public BloodSugarSelectDTO.Response select(Long userPk, String targetUserNickname, int year, int month, int day) {
+        Long targetUserPk = isSameGroup(userPk, targetUserNickname);
+
+        List<BloodSugarEntity> selectResult = bloodSugarRepository.findByUserPkAndUpdatedAt(targetUserPk, year, month, day);
         int minBloodSugar = 501;
         int maxBloodSugar = -1;
         BloodSugarSelectDTO.Response returnDTO = BloodSugarSelectDTO.Response.builder()
@@ -109,5 +113,40 @@ public class BloodSugarServiceImpl implements BloodSugarService{
         returnDTO.getResponse().setBloodSugarMin(minBloodSugar == 501 ? 0: minBloodSugar);
 
         return returnDTO;
+    }
+
+    @Override
+    public BloodSugarPeriodDTO.Response selectPeriod(Long userPk, String targetUserNickname, String startDate, String endDate, int page) {
+        Long targetUserPk = isSameGroup(userPk, targetUserNickname);
+
+        PageRequest pageRequest = PageRequest.of(page, 30);
+        LocalDateTime startLocalDate = convertStringToLocalDateTime(startDate);
+        LocalDateTime endLocalDate = convertStringToLocalDateTime(endDate).plusDays(1L);
+
+        if (startLocalDate.isAfter(endLocalDate)) {
+            throw new BloodSugarException(ErrorCode.INVALID_INPUT_VALUE);
+        }
+
+        return BloodSugarPeriodDTO.Response.builder()
+                .success(true)
+                .response(bloodSugarRepository.findByPeriod(targetUserPk, startLocalDate, endLocalDate, pageRequest).getContent())
+                .error(null)
+                .build();
+    }
+
+    private LocalDateTime convertStringToLocalDateTime(String date) {
+        try {
+            return LocalDate.parse(date, DateTimeFormatter.ISO_DATE).atStartOfDay();
+        } catch (RuntimeException e) {
+            throw new BloodSugarException(ErrorCode.INVALID_INPUT_VALUE);
+        }
+    }
+
+    private Long isSameGroup(Long userPk, String targetUserNickname) {
+        if (!userRepository.inSameGroup(userPk, targetUserNickname)) {
+            throw new BloodSugarException(ErrorCode.HANDLE_ACCESS_DENIED);
+        }
+
+        return userRepository.findIdByNickname(targetUserNickname);
     }
 }

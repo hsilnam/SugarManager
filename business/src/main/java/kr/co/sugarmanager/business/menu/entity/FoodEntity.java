@@ -4,8 +4,12 @@ import jakarta.persistence.*;
 import kr.co.sugarmanager.business.global.entity.CUDEntity;
 import kr.co.sugarmanager.business.menu.dto.FoodDTO;
 import lombok.*;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 @Entity
+@SQLDelete(sql = "UPDATE FOOD SET DELETED_AT = now() WHERE FOOD_PK = ?")
+@Where(clause = "DELETED_AT is null")
 @Builder
 @Getter
 @Setter

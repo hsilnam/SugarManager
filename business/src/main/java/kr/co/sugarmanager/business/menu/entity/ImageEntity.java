@@ -2,14 +2,14 @@ package kr.co.sugarmanager.business.menu.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.hibernate.annotations.Where;
 
 @Builder
 @Embeddable
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
 public class ImageEntity {
 
     @Column(name = "IMAGE_URL")

@@ -4,8 +4,8 @@ import kr.co.sugarmanager.business.challenge.dto.*;
 import kr.co.sugarmanager.business.challenge.entity.ChallengeTemplateEntity;
 import kr.co.sugarmanager.business.challenge.repository.ChallengeLogRepository;
 import kr.co.sugarmanager.business.challenge.repository.ChallengeTemplateRepository;
-import kr.co.sugarmanager.business.challenge.repository.SettingsRepository;
-import kr.co.sugarmanager.business.challenge.repository.UserRepository;
+import kr.co.sugarmanager.business.global.user.repository.SettingsRepository;
+import kr.co.sugarmanager.business.global.user.repository.UserRepository;
 import kr.co.sugarmanager.business.global.exception.ErrorCode;
 import kr.co.sugarmanager.business.global.exception.ValidationException;
 import lombok.RequiredArgsConstructor;
@@ -24,10 +24,9 @@ import java.util.List;
 @RequiredArgsConstructor
 @Transactional
 public class ChallengeServiceImpl implements ChallengeService {
+
     private final ChallengeTemplateRepository challengeTemplateRepository;
     private final ChallengeLogRepository challengeLogRepository;
-
-    // 현욱이가 만들어주면 삭제
     private final UserRepository userRepository;
     private final SettingsRepository settingsRepository;
 
@@ -38,15 +37,12 @@ public class ChallengeServiceImpl implements ChallengeService {
 
         int day = 1 << (LocalDateTime.now().getDayOfWeek().getValue() - 1);
         List<ChallengeTemplateEntity> challenges = challengeTemplateRepository.findTodaysChallenges(day);
-//        log.info("size : {} , challenges : {}", challenges.size(), challenges);
 
         List<ChallengeInfoDTO> userInfos = new ArrayList<>();
 
         for (ChallengeTemplateEntity challenge : challenges) {
-
             int challengeDays = challenge.getDays();
             List<String> days = convertToList(challengeDays);
-
             ChallengeInfoDTO userInfo = ChallengeInfoDTO.builder()
                     .challengePk(challenge.getPk())
                     .challengeTitle(challenge.getTitle())
@@ -59,7 +55,6 @@ public class ChallengeServiceImpl implements ChallengeService {
                     .build();
             userInfos.add(userInfo);
         }
-
         return TodayChallengesDTO.Response.builder()
                 .success(true)
                 .userInfos(userInfos)
@@ -68,17 +63,16 @@ public class ChallengeServiceImpl implements ChallengeService {
 
     @Transactional
     @Override
-    public ChallengeAddDTO.Response addChallenge(ChallengeAddDTO.Request dto){
+    public ChallengeAddDTO.Response addChallenge(Long pk, ChallengeAddDTO.Request dto){
         // [1] 유효성 검사
         // [1-1] 인증되지 않은 유저
-//        Long loggedInUserPk = id;
-//        if (!userRepository.isAuthorized(loggedInUserPk)){
-//            throw new ValidationException(ErrorCode.UNAUTHORIZED_USER_ACCESS);
-//        }
+        if (!userRepository.isAuthorized(pk)){
+            throw new ValidationException(ErrorCode.UNAUTHORIZED_USER_ACCESS);
+        }
         // [1-2] 그룹 멤버 아님
-//        if (!userRepository.inSameGroup(loggedInUserPk,dto.getNickname())){
-//            throw new ValidationException(ErrorCode.HANDLE_ACCESS_DENIED);
-//        }
+        if (!userRepository.inSameGroup(pk,dto.getNickname())){
+            throw new ValidationException(ErrorCode.HANDLE_ACCESS_DENIED);
+        }
         // [1-3] 등록할 사람이 없는 유저
         if (userRepository.findIdByNickname(dto.getNickname()) == null){
             throw new ValidationException(ErrorCode.NO_SUCH_USER);
@@ -111,7 +105,6 @@ public class ChallengeServiceImpl implements ChallengeService {
         // [2] 저장
         // [2-1] 요일 변환
         int days = convertToInteger(dto.getDays());
-
         // [2-2] db 저장
         ChallengeTemplateEntity challenge = ChallengeTemplateEntity.builder()
                 .title(dto.getTitle())
@@ -123,9 +116,7 @@ public class ChallengeServiceImpl implements ChallengeService {
                 .days(days)
                 .userPk(userRepository.findIdByNickname(dto.getNickname()))
                 .build();
-
         challengeTemplateRepository.save(challenge);
-
         return ChallengeAddDTO.Response.builder()
                 .success(true)
                 .build();
@@ -133,26 +124,23 @@ public class ChallengeServiceImpl implements ChallengeService {
 
     @Transactional
     @Override
-    public ChallengeDeleteDTO.Response deleteChallenge(ChallengeDeleteDTO.Request dto){
+    public ChallengeDeleteDTO.Response deleteChallenge(Long pk, ChallengeDeleteDTO.Request dto){
 
         // [1] 유효성 검사
-//        Long loggedInUserPk = id;
         // [1-1] 인증되지 않은 유저
-//        if (!userRepository.isAuthorized(id)){
-//            throw new ValidationException(ErrorCode.UNAUTHORIZED_USER_ACCESS);
-//        }
-
+        if (!userRepository.isAuthorized(pk)){
+            throw new ValidationException(ErrorCode.UNAUTHORIZED_USER_ACCESS);
+        }
         // [2] 삭제
         List<ChallengeDeleteDTO.DeleteInfo> deleteList = dto.getDeleteList();
         for(ChallengeDeleteDTO.DeleteInfo challenge : deleteList){
             // [1-2] 같은 그룹이 아닌 유저의 챌린지 삭제 시 403 에러
-//            if (!userRepository.inSameGroup(loggedInUserPk,challenge.getNickname())){
-//                throw new ValidationException(ErrorCode.HANDLE_ACCESS_DENIED);
-//            }
-//            else {
-//                challengeTemplateRepository.deleteById(challenge.getChallengePk());
-//            }
-            challengeTemplateRepository.deleteById(challenge.getChallengePk());
+            if (!userRepository.inSameGroup(pk,challenge.getNickname())){
+                throw new ValidationException(ErrorCode.HANDLE_ACCESS_DENIED);
+            }
+            else {
+                challengeTemplateRepository.deleteById(challenge.getChallengePk());
+            }
         }
         return ChallengeDeleteDTO.Response.builder()
                 .success(true)
@@ -161,22 +149,19 @@ public class ChallengeServiceImpl implements ChallengeService {
 
     @Transactional(readOnly = true)
     @Override
-    public UserChallengeAllDTO.Response userChallengesAll(String nickname){
+    public UserChallengeAllDTO.Response userChallengesAll(Long pk, String nickname){
 
         // [1] 유효성 검사
-//        Long loggedInUserPk = id;
         // [1-1] 권한 관련
-//        if (userRepository.isAuthorized(loggedInUserPk)){
-//            throw new ValidationException(ErrorCode.UNAUTHORIZED_USER_ACCESS);
-//        }
-
+        if (!userRepository.isAuthorized(pk)){
+            throw new ValidationException(ErrorCode.UNAUTHORIZED_USER_ACCESS);
+        }
         // [1-2] 내 그룹이 아닐 때
-//        if(userRepository.findIdByNickname(nickname) == null || userRepository.inSameGroup(loggedInUserPk,nickname)){
-//            throw new ValidationException(ErrorCode.HANDLE_ACCESS_DENIED);
-//        }
+        if(userRepository.findIdByNickname(nickname) == null || !userRepository.inSameGroup(pk,nickname)){
+            throw new ValidationException(ErrorCode.HANDLE_ACCESS_DENIED);
+        }
 
         Long userPk = userRepository.findIdByNickname(nickname);
-
 
         // [2] 조회
         LocalDateTime start = LocalDate.now().atStartOfDay(ZoneId.of("Asia/Seoul")).toLocalDateTime();
@@ -240,19 +225,18 @@ public class ChallengeServiceImpl implements ChallengeService {
     }
 
     // 단일 챌린지 조회
-    public UserChallengeInfoDTO.Response userChallengeInfo(String nickname, Long challengePk) {
+    public UserChallengeInfoDTO.Response userChallengeInfo(Long pk, String nickname, Long challengePk) {
 
         // [1] 유효성 검사
-//        Long loggedInUserPk = id;
         // [1-1] 권한 관련
-//        if (userRepository.isAuthorized(loggedInUserPk)){
-//            throw new ValidationException(ErrorCode.UNAUTHORIZED_USER_ACCESS);
-//        }
+        if (userRepository.isAuthorized(pk)){
+            throw new ValidationException(ErrorCode.UNAUTHORIZED_USER_ACCESS);
+        }
 
         // [1-2] 내 그룹이 아닐 때
-//        if(userRepository.findIdByNickname(nickname) == null || userRepository.inSameGroup(loggedInUserPk,nickname)){
-//            throw new ValidationException(ErrorCode.HANDLE_ACCESS_DENIED);
-//        }
+        if(userRepository.findIdByNickname(nickname) == null || !userRepository.inSameGroup(pk,nickname)){
+            throw new ValidationException(ErrorCode.HANDLE_ACCESS_DENIED);
+        }
 
         LocalDateTime start = LocalDate.now().atStartOfDay(ZoneId.of("Asia/Seoul")).toLocalDateTime();
         LocalDateTime end = start.plusDays(1);
