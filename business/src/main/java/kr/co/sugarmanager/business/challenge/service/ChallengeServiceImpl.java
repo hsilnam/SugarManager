@@ -19,6 +19,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @Slf4j
@@ -156,9 +157,20 @@ public class ChallengeServiceImpl implements ChallengeService {
         if (!userRepository.isAuthorized(pk)) {
             throw new ValidationException(ErrorCode.UNAUTHORIZED_USER_ACCESS);
         }
-        // [1-2] 내 그룹이 아닐 때
-        if (userRepository.findIdByNickname(nickname) == null || !userRepository.inSameGroup(pk, nickname)) {
+        // [1-2] 없는 유저일 때
+        if (userRepository.findIdByNickname(nickname) == null) {
             throw new ValidationException(ErrorCode.HANDLE_ACCESS_DENIED);
+        }
+        // [1-3] 내 그룹이 아니거나 내 것이 아닐 때
+        if (userRepository.findGroupIdByNickname(nickname) != null){
+            if (!userRepository.inSameGroup(pk, nickname)){
+                throw new ValidationException(ErrorCode.HANDLE_ACCESS_DENIED);
+            }
+        }
+        else {
+            if (!Objects.equals(userRepository.findIdByNickname(nickname), pk)){
+                throw new ValidationException(ErrorCode.HANDLE_ACCESS_DENIED);
+            }
         }
 
         Long userPk = userRepository.findIdByNickname(nickname);
@@ -211,9 +223,20 @@ public class ChallengeServiceImpl implements ChallengeService {
         if (userRepository.isAuthorized(pk)) {
             throw new ValidationException(ErrorCode.UNAUTHORIZED_USER_ACCESS);
         }
-        // [1-2] 내 그룹이 아닐 때
-        if (userRepository.findIdByNickname(nickname) == null || !userRepository.inSameGroup(pk, nickname)) {
+        // [1-2] 없는 유저일 때
+        if (userRepository.findIdByNickname(nickname) == null) {
             throw new ValidationException(ErrorCode.HANDLE_ACCESS_DENIED);
+        }
+        // [1-3] 내 그룹이 아니거나 내 것이 아닐 때
+        if (userRepository.findGroupIdByNickname(nickname) != null){
+            if (!userRepository.inSameGroup(pk, nickname)){
+                throw new ValidationException(ErrorCode.HANDLE_ACCESS_DENIED);
+            }
+        }
+        else {
+            if (!Objects.equals(userRepository.findIdByNickname(nickname), pk)){
+                throw new ValidationException(ErrorCode.HANDLE_ACCESS_DENIED);
+            }
         }
         LocalDateTime start = LocalDate.now().atStartOfDay(ZoneId.of("Asia/Seoul")).toLocalDateTime();
         LocalDateTime end = start.plusDays(1);

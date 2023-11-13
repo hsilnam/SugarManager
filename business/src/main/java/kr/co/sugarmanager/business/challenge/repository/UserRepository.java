@@ -19,6 +19,9 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
     @Query("select " +
             "case when coalesce(count(u1.nickname),0) > 0 then true else false end as checkgroup " +
             "from UserEntity u1 " +
-            "where u1.groupPk = (select u.groupPk from UserEntity u where u.pk = :userPk and u1.nickname = :nickname)")
+            "where u1.groupPk = (select u.groupPk from UserEntity u where u.pk = :userPk) and u1.nickname = :nickname")
     Boolean inSameGroup(@Param("userPk") Long userPk, @Param("nickname") String nickname);
+
+    @Query("select u.groupPk from UserEntity u where u.nickname = :nickname")
+    Integer findGroupIdByNickname(@Param("nickname") String nickname);
 }
