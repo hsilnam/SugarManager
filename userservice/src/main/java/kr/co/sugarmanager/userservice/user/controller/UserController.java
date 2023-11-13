@@ -56,13 +56,13 @@ public class UserController {
     }
 
     @PostMapping(value = "/alarm/save", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ApiResult<Object>> updateAlarm(
+    public ResponseEntity<ApiResult<AlarmUpdateDTO.Response>> updateAlarm(
             @AuthenticationPrincipal JwtAuthentication auth,
             @RequestBody AlarmUpdateDTO.Request request
     ) {
         request.setUserPk(auth != null ? auth.getPk() : 0l);
         AlarmUpdateDTO.Response response = userService.setAlarm(request);
-        return result(response.isSuccess(), null, HttpStatus.OK);
+        return result(response.isSuccess(), response, HttpStatus.OK);
     }
 
     @PostMapping("/poke")

@@ -29,6 +29,7 @@ public class AlarmDTO {
 
         @Builder.Default
         private List<AlarmInfo> alarms = new ArrayList<>();
+        private Integer bloodSugarHour;//식후 혈당 알람을 몇시간후로 지정할지에 대한 변수
     }
 
     @Builder

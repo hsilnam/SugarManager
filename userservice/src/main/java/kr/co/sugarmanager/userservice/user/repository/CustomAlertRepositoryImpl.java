@@ -4,6 +4,7 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.BooleanPath;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.querydsl.jpa.impl.JPAUpdateClause;
+import kr.co.sugarmanager.userservice.user.dto.AlarmUpdateDTO;
 import kr.co.sugarmanager.userservice.user.entity.QUserSettingEntity;
 import kr.co.sugarmanager.userservice.user.vo.AlertType;
 import lombok.RequiredArgsConstructor;
@@ -27,13 +28,21 @@ public class CustomAlertRepositoryImpl implements CustomAlertRepository {
     }
 
     @Override
-    public long setAlarm(long pk, AlertType alertType, boolean status) {
+    public long setAlarm(long pk, AlarmUpdateDTO.Request req) {
+        AlertType alertType = req.getCategory();
+        boolean status = req.isStatus();
+        Integer bloodSugarHour = req.getHour();
+
         QUserSettingEntity setting = QUserSettingEntity.userSettingEntity;
 
         JPAUpdateClause query = jpaQueryFactory.update(setting);
 
         BooleanPath field = getField(setting, alertType);
         query.set(field, status);
+
+        if (alertType.equals(AlertType.BLOOD)) {
+            query.set(setting.sugarAlertHour, bloodSugarHour == null ? 1 : bloodSugarHour.intValue());
+        }
 
         BooleanExpression eq = setting.user.pk.eq(pk).and(setting.deletedAt.isNull());
         query.where(eq);
