@@ -2,7 +2,6 @@ package kr.co.sugarmanager.image.repository;
 
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import kr.co.sugarmanager.image.dto.ImageDTO;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +12,7 @@ import org.springframework.stereotype.Repository;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.UUID;
 
 @Slf4j
@@ -43,7 +43,7 @@ public class ImageS3Repository implements ImageRepository{
     // 파일 URL
     @Override
     public String getFileURL(String path) {
-        return amazonS3.generatePresignedUrl(new GeneratePresignedUrlRequest(bucket, path)).toString();
+        return amazonS3.getUrl(bucket, path).toString();
     }
 
     // 파일 이름 생성

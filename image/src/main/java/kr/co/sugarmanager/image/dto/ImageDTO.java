@@ -4,7 +4,11 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import lombok.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.support.StringMultipartFileEditor;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.Map;
 
 @Data
@@ -37,10 +41,10 @@ public class ImageDTO {
     }
 
     public void setFile(String file) {
-        this.file = file.getBytes();
+        this.file = Base64.getDecoder().decode(file);
     }
 
-    public ImageDTO(Map<String,Object> map) {
+    public ImageDTO(Map<String, Object> map) {
         this(map.get("pk"),
                 map.get("imageType"),
                 map.get("extension"),
@@ -59,5 +63,6 @@ public class ImageDTO {
     }
 
     @JsonPOJOBuilder(withPrefix = "")
-    public static class ImageDtoBuilder {}
+    public static class ImageDtoBuilder {
+    }
 }
