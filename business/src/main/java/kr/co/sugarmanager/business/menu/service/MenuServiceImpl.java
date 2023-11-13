@@ -89,10 +89,9 @@ public class MenuServiceImpl implements MenuService {
         Long menuPk = request.getMenuPk();
 
         // TODO: 내 그룹원이 아닌 다른 사람의 메뉴 조회 할 경우(403 Forbidden) 체크 및 처리 필요
-        Optional<MenuEntity> menuOptional = menuRepository.findByMenuPkAndUserPk(menuPk, userPk);
-        if (!menuOptional.isPresent()) throw new MenuException(ErrorCode.MENU_NOT_FOUND_ERROR);
+        MenuEntity menu = menuRepository.findByMenuPkAndUserPk(menuPk, userPk)
+                .orElseThrow(()-> new MenuException(ErrorCode.MENU_NOT_FOUND_ERROR));
 
-        MenuEntity menu = menuOptional.get();
         List<FoodImageEntity> foodImages = menu.getFoodImageList();
         ArrayList<MenuSelectDTO.MenuImage> repFoodImages = (foodImages == null) ? new ArrayList<>() : new ArrayList<>(foodImages.stream().map(foodImage -> MenuSelectDTO.MenuImage.builder()
                 .menuImagePk(foodImage.getFoodImagePk())
@@ -152,11 +151,11 @@ public class MenuServiceImpl implements MenuService {
         if (!menuOptional.isPresent()) throw new MenuException(ErrorCode.MENU_NOT_FOUND_ERROR);
         MenuEntity menu = menuOptional.get();
 
-        if(request.getCreatedMenuImages() != null) {
+        if(request.getCreatedMenuImages() != null && !request.getCreatedMenuImages().isEmpty()) {
             menuImageService.saveImage(menuPk, ImageTypeEnum.FOOD, request.getCreatedMenuImages());
         }
 
-        if(request.getDeletedMenuImagePks() != null) {
+        if(request.getDeletedMenuImagePks() != null && !request.getDeletedMenuImagePks().isEmpty()) {
             List<String> deletedImagePaths = new ArrayList<>();
             for (Long deletedMenuImagePk : request.getDeletedMenuImagePks()) {
                 Optional<FoodImageEntity> optionalFoodImage = foodImageRepository.findByMenuPkAndFoodImagePk(menuPk, deletedMenuImagePk);
@@ -171,7 +170,7 @@ public class MenuServiceImpl implements MenuService {
             foodImageRepository.deleteByFoodImagePkInAndMenuPK(request.getDeletedMenuImagePks(), menuPk);
         }
 
-        if(request.getCreatedFoods() != null) {
+        if(request.getCreatedFoods() != null && !request.getCreatedFoods().isEmpty()) {
             List<FoodEntity> createdFoodEntities = request.getCreatedFoods().stream()
                     .map(food -> FoodEntity.builder()
                             .menuEntity(menu)
@@ -190,7 +189,7 @@ public class MenuServiceImpl implements MenuService {
             foodRepository.saveAll(createdFoodEntities);
         }
 
-        if(request.getUpdatedFoods() != null) {
+        if(request.getUpdatedFoods() != null && !request.getUpdatedFoods().isEmpty()) {
             for (MenuEditDTO.UpdatedFood food : request.getUpdatedFoods()) {
                 Optional<FoodEntity> optionalFood = foodRepository.findByMenuPkAndFoodPk(menuPk, food.getFoodPk());
                 if (!optionalFood.isPresent()) {
@@ -211,7 +210,7 @@ public class MenuServiceImpl implements MenuService {
             }
         }
 
-        if(request.getDeletedFoodPks() != null) {
+        if(request.getDeletedFoodPks() != null && !request.getDeletedFoodPks().isEmpty()) {
             foodRepository.deleteByFoodPkInAndMenuPK(request.getDeletedFoodPks(), menuPk);
         }
 
