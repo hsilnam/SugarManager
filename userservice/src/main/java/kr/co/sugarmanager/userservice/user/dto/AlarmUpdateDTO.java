@@ -15,6 +15,7 @@ public class AlarmUpdateDTO {
         private long userPk;
         private AlertType category;
         private boolean status;
+        private Integer hour;//category가 BLOODSUGAR인 경우, 식후 몇시간후 알림을 보내줄지 셋팅하는 변수
     }
 
     @Builder
@@ -25,5 +26,8 @@ public class AlarmUpdateDTO {
     public static class Response {
         @JsonIgnore
         private boolean success;
+        private AlertType category;
+        private boolean status;
+        private Integer hour;//category가 BLOODSUGAR인 경우, 식후 몇시간후 알림을 보내줄지 셋팅하는 변수
     }
 }
