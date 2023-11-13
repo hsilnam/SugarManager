@@ -10,7 +10,6 @@ import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,4 +28,12 @@ public interface BloodSugarRepository extends JpaRepository<BloodSugarEntity, Lo
     @Query("select b from BloodSugarEntity b where b.userPk = :searchUserPk and b.createdAt between :start and :end" )
     List<BloodSugarEntity> findBloodSugarRecordsForDay(@Param("searchUserPk") Long searchUserPk, @Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
 
+
+    @Query("SELECT e FROM BloodSugarEntity e WHERE e.userPk = :userPk AND e.category = :category AND e.createdAt BETWEEN :startDate AND :endDate ORDER BY e.createdAt DESC LIMIT 1")
+    Optional<BloodSugarEntity> findOneByUserPkAndCategoryAndCreatedAt(
+            @Param("userPk") Long userPk,
+            @Param("category") String category,
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate
+            );
 }

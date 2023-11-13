@@ -19,7 +19,8 @@ public enum ErrorCode {
     NO_SUCH_USER(HttpStatus.NOT_FOUND,"U002","없는 사용자입니다."),
 
     // 식단 등록
-    INVALID_IMAGE_TYPE_ERROR(HttpStatus.BAD_REQUEST, "M001", "이미지가 형식이 잘못되었습니다.");
+    INVALID_IMAGE_TYPE_ERROR(HttpStatus.BAD_REQUEST, "M001", "이미지가 형식이 잘못되었습니다."),
+    MENU_NOT_FOUND_ERROR(HttpStatus.NOT_FOUND, "M002", "해당 메뉴가 없습니다.");
 
     private final HttpStatus status;
     private final String code;
