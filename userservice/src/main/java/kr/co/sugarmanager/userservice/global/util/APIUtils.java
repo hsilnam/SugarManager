@@ -3,6 +3,7 @@ package kr.co.sugarmanager.userservice.global.util;
 import kr.co.sugarmanager.userservice.global.exception.CustomException;
 import kr.co.sugarmanager.userservice.global.exception.ErrorCode;
 import lombok.Getter;
+import lombok.Setter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -19,26 +20,34 @@ public class APIUtils {
     }
 
     @Getter
+    @Setter
     public static class ApiResult<T> {
-        private final boolean success;
-        private final T response;
-        private final ApiError error;
+        private boolean success;
+        private T response;
+        private ApiError error;
 
         public ApiResult(boolean success, T response, ApiError error) {
             this.success = success;
             this.response = response;
             this.error = error;
         }
+
+        public ApiResult() {
+        }
     }
 
     @Getter
+    @Setter
     public static class ApiError {
-        private final String code;
-        private final String message;
+        private String code;
+        private String message;
 
         public ApiError(String code, String message) {
             this.code = code;
             this.message = message;
+        }
+
+        public ApiError() {
         }
 
         public ApiError(ErrorCode code) {
