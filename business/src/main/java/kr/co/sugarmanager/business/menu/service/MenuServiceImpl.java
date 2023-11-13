@@ -98,9 +98,16 @@ public class MenuServiceImpl implements MenuService {
         LocalDateTime threeHoursBefore = createdAt.minusHours(3);
         LocalDateTime threeHoursAfter = createdAt.plusHours(3);
 
-        BloodSugarEntity beforeBloodSuger = bloodSugarRepository.findOneByUserPkAndCategoryAndCreatedAt(userPk, BLOODSUGARCATEGORY.BEFORE.name(), threeHoursBefore, createdAt).orElse(null);
-        System.out.println(beforeBloodSuger);
-        BloodSugarEntity afterBloodSuger = bloodSugarRepository.findOneByUserPkAndCategoryAndCreatedAt(userPk, BLOODSUGARCATEGORY.AFTER.name(), createdAt, threeHoursAfter).orElse(null);
+        BloodSugarEntity beforeBloodSuger = bloodSugarRepository.findOneByUserPkAndCategoryAndCreatedAt(userPk,
+                        BLOODSUGARCATEGORY.BEFORE.name(),
+                        threeHoursBefore,
+                        createdAt)
+                .orElse(null);
+        BloodSugarEntity afterBloodSuger = bloodSugarRepository.findOneByUserPkAndCategoryAndCreatedAt(userPk,
+                        BLOODSUGARCATEGORY.AFTER.name(),
+                        createdAt,
+                        threeHoursAfter)
+                .orElse(null);
         MenuSelectDTO.BloodSugar repBloodSugar = MenuSelectDTO.BloodSugar.builder()
                 .beforeLevel((beforeBloodSuger != null) ? beforeBloodSuger.getLevel() : null)
                 .afterLevel((afterBloodSuger != null) ? afterBloodSuger.getLevel() : null)
