@@ -18,4 +18,7 @@ public interface FoodRepository extends JpaRepository<FoodEntity, Long> {
     @Modifying
     @Query(value = "DELETE FROM FOOD WHERE FOOD_PK IN :foodPks AND MENU_PK = :menuPk", nativeQuery = true)
     void deleteByFoodPkInAndMenuPK(@Param("foodPks") List<Long> foodPks, @Param("menuPk") Long menuPk);
+
+    @Query("select sum(f.foodCal) from FoodEntity f where f.menuEntity.menuPk = :menuPk ")
+    Integer caloriesPerMenu(@Param("menuPk") Long menuPk);
 }

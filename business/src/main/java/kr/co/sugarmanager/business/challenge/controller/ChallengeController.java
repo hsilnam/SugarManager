@@ -1,9 +1,6 @@
 package kr.co.sugarmanager.business.challenge.controller;
 
-import kr.co.sugarmanager.business.challenge.dto.ChallengeAddDTO;
-import kr.co.sugarmanager.business.challenge.dto.ChallengeDeleteDTO;
-import kr.co.sugarmanager.business.challenge.dto.TodayChallengesDTO;
-import kr.co.sugarmanager.business.challenge.dto.UserChallengeAllDTO;
+import kr.co.sugarmanager.business.challenge.dto.*;
 import kr.co.sugarmanager.business.challenge.service.ChallengeService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,21 +24,33 @@ public class ChallengeController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<ChallengeAddDTO.Response> addChallenge(Long userPk, @RequestBody ChallengeAddDTO.Request dto){
-        ChallengeAddDTO.Response response = challengeService.addChallenge(userPk, dto);
+    public ResponseEntity<ChallengeAddDTO.Response> addChallenge(@RequestBody ChallengeAddDTO.Request dto){
+        ChallengeAddDTO.Response response = challengeService.addChallenge(dto);
         return new ResponseEntity<>(response,HttpStatus.CREATED);
     }
 
     @PostMapping("/delete")
-    public ResponseEntity<ChallengeDeleteDTO.Response> deleteChallenge(Long userPk, @RequestBody ChallengeDeleteDTO.Request dto){
-        ChallengeDeleteDTO.Response response = challengeService.deleteChallenge(userPk, dto);
+    public ResponseEntity<ChallengeDeleteDTO.Response> deleteChallenge(@RequestBody ChallengeDeleteDTO.Request dto){
+        ChallengeDeleteDTO.Response response = challengeService.deleteChallenge(dto);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @GetMapping("/{userPk}")
-    public ResponseEntity<UserChallengeAllDTO.Response> userChallengesAll(Long userPk){
-        UserChallengeAllDTO.Response resopnse = challengeService.userChallengesAll(userPk);
-        return new ResponseEntity<>(resopnse, HttpStatus.OK);
+    @GetMapping("/user/{nickname}")
+    public ResponseEntity<UserChallengeAllDTO.Response> userChallengesAll(@PathVariable String nickname){
+        UserChallengeAllDTO.Response response = challengeService.userChallengesAll(nickname);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping("/user/{nickname}/{challengePk}")
+    public ResponseEntity<UserChallengeInfoDTO.Response> userChallengeInfo(@PathVariable String nickname, @PathVariable Long challengePk){
+        UserChallengeInfoDTO.Response response = challengeService.userChallengeInfo(nickname, challengePk);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @GetMapping("/poke")
+    public ResponseEntity<ChallengePokeDTO.Response> infoForPoke(ChallengePokeDTO.Request dto){
+        ChallengePokeDTO.Response response = challengeService.infoForPoke(dto);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 

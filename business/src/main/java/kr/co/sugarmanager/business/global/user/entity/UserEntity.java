@@ -1,4 +1,4 @@
-package kr.co.sugarmanager.business.challenge.entity;
+package kr.co.sugarmanager.business.global.user.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import java.sql.Date;
 
@@ -20,6 +21,7 @@ import java.sql.Date;
 @DynamicUpdate
 @Table(name = "USERS")
 @SQLDelete(sql = "UPDATE USERS SET DELETED_AT = now() WHERE USER_PK = ?")
+@Where(clause = "DELETED_AT is null")
 public class UserEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

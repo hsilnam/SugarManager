@@ -51,9 +51,6 @@ public class MenuController {
             @PathVariable("menuPk") Long menuPk
     ) {
         log.info("MenuSelect - userPk: {}, menuPk: {}", userPk, menuPk);
-        if (userPk == null) { // TODO: 서버간 통신 필요
-            userPk = 1L;
-        }
         MenuSelectDTO.Request request = MenuSelectDTO.Request.builder()
                 .userPk(userPk)
                 .menuPk(menuPk)

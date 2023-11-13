@@ -16,7 +16,7 @@ public class TodayChallengesDTO {
     public static class Response{
         private boolean success;
         @Builder.Default
-        private List<UserChallengeInfoDTO> userInfos = new ArrayList<>();
+        private List<ChallengeInfoDTO> userInfos = new ArrayList<>();
         private String response;
         private ErrorResponse error;
     }

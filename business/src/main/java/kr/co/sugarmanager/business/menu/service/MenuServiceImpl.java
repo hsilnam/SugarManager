@@ -93,26 +93,34 @@ public class MenuServiceImpl implements MenuService {
                 .orElseThrow(()-> new MenuException(ErrorCode.MENU_NOT_FOUND_ERROR));
 
         List<FoodImageEntity> foodImages = menu.getFoodImageList();
-        ArrayList<MenuSelectDTO.MenuImage> repFoodImages = (foodImages == null) ? new ArrayList<>() : new ArrayList<>(foodImages.stream().map(foodImage -> MenuSelectDTO.MenuImage.builder()
-                .menuImagePk(foodImage.getFoodImagePk())
-                .menuImageUrl(foodImage.getImage().getImageUrl())
-                .build()
-        ).toList());
+        List<MenuSelectDTO.MenuImage> repFoodImages = (foodImages == null) ? new ArrayList<>() : foodImages.stream()
+                .map(foodImage -> MenuSelectDTO.MenuImage.builder()
+                        .menuImagePk(foodImage.getFoodImagePk())
+                        .menuImageUrl(foodImage.getImage().getImageUrl())
+                        .build()
+                ).toList();
 
         LocalDateTime createdAt = menu.getCreatedAt();
         LocalDateTime threeHoursBefore = createdAt.minusHours(3);
         LocalDateTime threeHoursAfter = createdAt.plusHours(3);
 
-        BloodSugarEntity beforeBloodSuger = bloodSugarRepository.findOneByUserPkAndCategoryAndCreatedAt(userPk, BLOODSUGARCATEGORY.BEFORE.name(), threeHoursBefore, createdAt).orElse(null);
-        System.out.println(beforeBloodSuger);
-        BloodSugarEntity afterBloodSuger = bloodSugarRepository.findOneByUserPkAndCategoryAndCreatedAt(userPk, BLOODSUGARCATEGORY.AFTER.name(), createdAt, threeHoursAfter).orElse(null);
+        BloodSugarEntity beforeBloodSuger = bloodSugarRepository.findOneByUserPkAndCategoryAndCreatedAt(userPk,
+                        BLOODSUGARCATEGORY.BEFORE.name(),
+                        threeHoursBefore,
+                        createdAt)
+                .orElse(null);
+        BloodSugarEntity afterBloodSuger = bloodSugarRepository.findOneByUserPkAndCategoryAndCreatedAt(userPk,
+                        BLOODSUGARCATEGORY.AFTER.name(),
+                        createdAt,
+                        threeHoursAfter)
+                .orElse(null);
         MenuSelectDTO.BloodSugar repBloodSugar = MenuSelectDTO.BloodSugar.builder()
                 .beforeLevel((beforeBloodSuger != null) ? beforeBloodSuger.getLevel() : null)
                 .afterLevel((afterBloodSuger != null) ? afterBloodSuger.getLevel() : null)
                 .build();
 
         List<FoodEntity> foods = menu.getFoodList();
-        ArrayList<MenuSelectDTO.Food> repFoods = (foods == null) ? new ArrayList<>() : new ArrayList<>(foods.stream().map(food -> MenuSelectDTO.Food.builder()
+        List<MenuSelectDTO.Food> repFoods = (foods == null) ? new ArrayList<>() : foods.stream().map(food -> MenuSelectDTO.Food.builder()
                 .foodPk(food.getFoodPk())
                 .foodName(food.getFoodName())
                 .foodCal(food.getFoodCal())
@@ -125,7 +133,7 @@ public class MenuServiceImpl implements MenuService {
                 .foodSalt(food.getFoodSalt())
                 .foodSugars(food.getFoodSugars())
                 .build()
-        ).toList());
+        ).toList();
 
         MenuSelectDTO.ReturnResponse returnResponse = MenuSelectDTO.ReturnResponse.builder()
                 .menuPk(menuPk)

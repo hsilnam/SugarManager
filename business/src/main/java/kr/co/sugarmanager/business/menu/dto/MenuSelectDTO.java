@@ -4,6 +4,7 @@ import kr.co.sugarmanager.business.global.dto.ErrorResponse;
 import lombok.*;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class MenuSelectDTO {
     @Builder
@@ -34,9 +35,9 @@ public class MenuSelectDTO {
     @Setter
     public static class ReturnResponse {
         private Long menuPk;
-        private ArrayList<MenuImage> menuImages;
+        private List<MenuImage> menuImages;
         private BloodSugar bloodSugar;
-        private ArrayList<Food> foods;
+        private List<Food> foods;
     }
 
     @Builder
