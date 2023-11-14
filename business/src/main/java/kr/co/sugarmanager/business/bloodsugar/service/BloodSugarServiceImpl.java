@@ -121,7 +121,7 @@ public class BloodSugarServiceImpl implements BloodSugarService{
     public BloodSugarPeriodDTO.Response selectPeriod(Long userPk, String targetUserNickname, String startDate, String endDate, int page) {
         Long targetUserPk = isSameGroup(userPk, targetUserNickname);
 
-        PageRequest pageRequest = PageRequest.of(page, 5);
+        PageRequest pageRequest = PageRequest.of(page, 30);
         LocalDateTime startLocalDate = convertStringToLocalDateTime(startDate);
         LocalDateTime endLocalDate = convertStringToLocalDateTime(endDate).plusDays(1L);
 
