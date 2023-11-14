@@ -16,10 +16,30 @@ import java.util.Optional;
 public interface BloodSugarRepository extends JpaRepository<BloodSugarEntity, Long> {
     Optional<BloodSugarEntity> findByBloodSugarPkAndUserPk(Long bloodSugarPk, Long userPk);
 
-    @Query("SELECT e FROM BloodSugarEntity e WHERE e.userPk = :userPk AND YEAR(e.updatedAt) = :year AND MONTH(e.updatedAt) = :month AND DAY(e.updatedAt) = :day")
+    @Query("SELECT e FROM BloodSugarEntity e WHERE e.userPk = :userPk AND YEAR(e.createdAt) = :year AND MONTH(e.createdAt) = :month AND DAY(e.createdAt) = :day")
     List<BloodSugarEntity> findByUserPkAndUpdatedAt(@Param("userPk") Long userPk, @Param("year") int year, @Param("month") int month, @Param("day") int day);
 
-    @Query("SELECT DATE(e.createdAt) AS time, ROUND(AVG(CASE WHEN e.category = 'BEFORE' THEN e.level END), 1) AS bloodSugarBefore, ROUND(AVG(CASE WHEN e.category = 'AFTER' THEN e.level END), 1) AS bloodSugarAfter, COUNT(*) AS count FROM BloodSugarEntity e WHERE e.userPk = :userPk AND e.createdAt BETWEEN :startDate AND :endDate GROUP BY DATE(e.createdAt) order by DATE(e.createdAt) desc")
+    @Query("SELECT " +
+            "  DATE(e.createdAt) AS time, " +
+            "  ROUND(AVG(CASE WHEN e.category = 'BEFORE' THEN e.level END), 1) AS bloodSugarBefore, " +
+            "  ROUND(AVG(CASE WHEN e.category = 'AFTER' THEN e.level END), 1) AS bloodSugarAfter, " +
+            "  COUNT(*) AS count, " +
+            "  COALESCE(" +
+            "    CASE " +
+            "      WHEN ROUND(AVG(CASE WHEN e.category = 'BEFORE' THEN e.level END), 1) BETWEEN 70 AND 130 THEN 'SAFETY' " +
+            "      WHEN ROUND(AVG(CASE WHEN e.category = 'BEFORE' THEN e.level END), 1) BETWEEN 63 AND 143 THEN 'WARNING' " +
+            "      WHEN ROUND(AVG(CASE WHEN e.category = 'BEFORE' THEN e.level END), 1) BETWEEN 0 AND 1000 THEN 'DANGER' " +
+            "    END, NULL) AS bloodSugarBeforeStatus, " +
+            "  COALESCE(" +
+            "    CASE " +
+            "      WHEN ROUND(AVG(CASE WHEN e.category = 'AFTER' THEN e.level END), 1) BETWEEN 90 AND 180 THEN 'SAFETY' " +
+            "      WHEN ROUND(AVG(CASE WHEN e.category = 'AFTER' THEN e.level END), 1) BETWEEN 81 AND 198 THEN 'WARNING' " +
+            "      WHEN ROUND(AVG(CASE WHEN e.category = 'AFTER' THEN e.level END), 1) BETWEEN 0 AND 1000 THEN 'DANGER' " +
+            "    END, NULL) AS bloodSugarAfterStatus " +
+            "FROM BloodSugarEntity e " +
+            "WHERE e.userPk = :userPk AND e.createdAt BETWEEN :startDate AND :endDate " +
+            "GROUP BY DATE(e.createdAt) " +
+            "ORDER BY DATE(e.createdAt) DESC")
     Page<BloodSugarPeriodInterface> findByPeriod(@Param("userPk") Long userPk, @Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate, PageRequest pageRequest);
 
     @Query("select distinct(cast (b.createdAt as localdate)) from BloodSugarEntity b where year(b.createdAt) = :year and month(b.createdAt) = :month and b.userPk = :searchUserPk")
