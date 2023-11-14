@@ -96,7 +96,6 @@ public class BloodSugarServiceImpl implements BloodSugarService{
                 .error(null)
                 .build();
         returnDTO.getResponse().setList(new ArrayList<>());
-        returnDTO.getResponse().setList(new ArrayList<>());
         for (BloodSugarEntity bloodSugarEntity: selectResult) {
             minBloodSugar = Math.min(minBloodSugar, bloodSugarEntity.getLevel());
             maxBloodSugar = Math.max(maxBloodSugar, bloodSugarEntity.getLevel());
