@@ -1,6 +1,8 @@
 package kr.co.sugarmanager.userservice.user.service;
 
 import kr.co.sugarmanager.userservice.global.service.KakaoOAuthService;
+import kr.co.sugarmanager.userservice.user.dto.JoinDTO;
+import kr.co.sugarmanager.userservice.user.dto.LoginDTO;
 import kr.co.sugarmanager.userservice.user.entity.*;
 import kr.co.sugarmanager.userservice.user.dto.RefreshDTO;
 import kr.co.sugarmanager.userservice.user.dto.SocialLoginDTO;
@@ -13,14 +15,19 @@ import kr.co.sugarmanager.userservice.global.util.StringUtils;
 import kr.co.sugarmanager.userservice.global.vo.KakaoProfile;
 import kr.co.sugarmanager.userservice.user.vo.RoleType;
 import kr.co.sugarmanager.userservice.user.vo.SocialType;
+import kr.co.sugarmanager.userservice.user.vo.UserInfoValidation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.mapping.Join;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static kr.co.sugarmanager.userservice.user.vo.UserInfoValidation.*;
 
 @Service
 @Slf4j
@@ -30,6 +37,7 @@ public class UserAuthServiceImpl implements UserAuthService {
     private final UserRepository userRepository;
     private final JwtProvider jwtProvider;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
@@ -40,7 +48,7 @@ public class UserAuthServiceImpl implements UserAuthService {
 
     @Transactional
     public SocialLoginDTO.Response getResponse(KakaoProfile userInfo, String fcmToken) {
-        if(userInfo == null){
+        if (userInfo == null) {
             return null;
         }
         Optional<UserEntity> userEntity = userRepository.findBySocialTypeAndSocialId(SocialType.KAKAO, String.valueOf(userInfo.getId()));
@@ -130,5 +138,83 @@ public class UserAuthServiceImpl implements UserAuthService {
         return RefreshDTO.Response.builder()
                 .accessToken(jwtProvider.refreshToken(refreshToken))
                 .build();
+    }
+
+    @Override
+    public LoginDTO.Response login(LoginDTO.Request req) {
+        String id = req.getId();
+        String pw = req.getPw();
+
+        UserEntity user = userRepository.findById(id).orElseThrow(() -> new AccessDenyException(ErrorCode.LOGIN_INFO_NOT_VALIDATE));
+        if (!passwordEncoder.matches(pw, user.getPw()))
+            throw new AccessDenyException(ErrorCode.LOGIN_INFO_NOT_VALIDATE);
+
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("id", user.getPk());
+        payload.put("roles", user.getRoles().stream().map(role -> role.getRole().getValue()).collect(Collectors.toList()));
+
+        return LoginDTO.Response.builder()
+                .accessToken(jwtProvider.createToken(payload))
+                .refreshToken(jwtProvider.createRefreshToken(payload))
+                .success(true)
+                .build();
+    }
+
+    @Override
+    @Transactional
+    public JoinDTO.Response join(JoinDTO.Request req) {
+        String name = req.getName();
+        String pw = req.getPw();
+        String id = req.getId();
+        String email = req.getEmail();
+        String nickname = req.getNickname();
+        String fcmToken = req.getFcmToken();
+
+        if (NAME.validate(name) && NICKNAME.validate(nickname) && EMAIL.validate(email) && ID.validate(id) && PASSWORD.validate(pw)) {
+            UserEntity user = UserEntity.builder()
+                    .id(id)
+                    .pw(pw)
+                    .email(email)
+                    .name(name)
+                    .nickname(nickname)
+                    .socialId(StringUtils.generateRandomString(250))
+                    .socialType(SocialType.HOME)
+                    .build();
+
+            //setting 만들기
+            UserSettingEntity setting = UserSettingEntity.builder()
+                    .sugarAlert(false)
+                    .pokeAlert(false)
+                    .challengeAlert(false)
+                    .sugarAlertHour(1)
+                    .fcmToken(fcmToken)
+                    .build();
+
+            //user image만들기
+            UserImageEntity profile = UserImageEntity.builder()
+                    .build();
+
+            //권한
+            Set<UserRoleEntity> roles = Set.of(
+                    UserRoleEntity.builder()
+                            .role(RoleType.MEMBER)
+                            .build()
+            );
+
+            user.addProfileImage(profile);
+            user.addSetting(setting);
+            user.addRoles(roles);
+
+            userRepository.save(user);
+
+            return JoinDTO.Response.builder()
+                    .success(true)
+                    .id(id)
+                    .build();
+        } else {
+            return JoinDTO.Response.builder()
+                    .success(false)
+                    .build();
+        }
     }
 }

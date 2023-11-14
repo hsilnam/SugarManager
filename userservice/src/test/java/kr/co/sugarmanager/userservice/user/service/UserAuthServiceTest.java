@@ -23,6 +23,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.annotation.DirtiesContext;
 
 import java.lang.reflect.Field;
@@ -51,6 +52,8 @@ public class UserAuthServiceTest {
 
     @Mock
     private RefreshTokenRepository refreshTokenRepository;
+    @Mock
+    private PasswordEncoder passwordEncoder;
 
     private final String accessToken = "accessToken";
     private final String fcmToken = "fcmToken";
@@ -62,7 +65,7 @@ public class UserAuthServiceTest {
 
     @BeforeEach
     public void initKakaoOAuthService() {
-        userAuthService = new UserAuthServiceImpl(kakaoOAuthService, userRepository, jwtProvider, refreshTokenRepository);
+        userAuthService = new UserAuthServiceImpl(kakaoOAuthService, userRepository, jwtProvider, refreshTokenRepository, passwordEncoder);
         lenient().when(kakaoOAuthService.getUserInfo(anyString())).thenAnswer(invocation ->
                 KakaoProfile.builder()
                         .id(SOCIAL_PK)
@@ -123,6 +126,15 @@ public class UserAuthServiceTest {
         lenient().when(refreshTokenRepository.findById(anyString())).thenAnswer(invocation -> {
             String id = invocation.getArgument(0, String.class);
             return refreshTokenList.stream().filter(ref -> ref.getRefreshToken().equals(id)).findAny();
+        });
+        lenient().when(passwordEncoder.encode(anyString())).thenAnswer(invocation -> {
+            String input = invocation.getArgument(0, String.class);
+            return input;
+        });
+        lenient().when(passwordEncoder.matches(anyString(), anyString())).thenAnswer(invocation -> {
+            String raw = invocation.getArgument(0, String.class);
+            String encoded = invocation.getArgument(1, String.class);
+            return raw.equals(encoded);
         });
     }
 
