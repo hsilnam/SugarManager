@@ -96,18 +96,21 @@ public class BloodSugarServiceImpl implements BloodSugarService{
                 .error(null)
                 .build();
         returnDTO.getResponse().setList(new ArrayList<>());
+        returnDTO.getResponse().setList(new ArrayList<>());
         for (BloodSugarEntity bloodSugarEntity: selectResult) {
             minBloodSugar = Math.min(minBloodSugar, bloodSugarEntity.getLevel());
             maxBloodSugar = Math.max(maxBloodSugar, bloodSugarEntity.getLevel());
 
             returnDTO.getResponse().addList(BloodSugarSelectDTO.EntityResponse.builder()
-                            .bloodSugarPk(bloodSugarEntity.getBloodSugarPk())
-                            .category(bloodSugarEntity.getCategory())
-                            .content(bloodSugarEntity.getContent())
-                            .updatedAt(bloodSugarEntity.getUpdatedAt())
-                            .level(bloodSugarEntity.getLevel())
+                    .bloodSugarPk(bloodSugarEntity.getBloodSugarPk())
+                    .category(bloodSugarEntity.getCategory())
+                    .content(bloodSugarEntity.getContent())
+                    .createdAt(bloodSugarEntity.getCreatedAt())
+                    .level(bloodSugarEntity.getLevel())
+                    .status(getSugarBloodStatus(BLOODSUGARCATEGORY.valueOf(bloodSugarEntity.getCategory()), bloodSugarEntity.getLevel()))
                     .build());
         }
+
 
         returnDTO.getResponse().setBloodSugarMax(maxBloodSugar == -1 ? 0 : maxBloodSugar);
         returnDTO.getResponse().setBloodSugarMin(minBloodSugar == 501 ? 0: minBloodSugar);
@@ -119,7 +122,7 @@ public class BloodSugarServiceImpl implements BloodSugarService{
     public BloodSugarPeriodDTO.Response selectPeriod(Long userPk, String targetUserNickname, String startDate, String endDate, int page) {
         Long targetUserPk = isSameGroup(userPk, targetUserNickname);
 
-        PageRequest pageRequest = PageRequest.of(page, 30);
+        PageRequest pageRequest = PageRequest.of(page, 5);
         LocalDateTime startLocalDate = convertStringToLocalDateTime(startDate);
         LocalDateTime endLocalDate = convertStringToLocalDateTime(endDate).plusDays(1L);
 
@@ -149,5 +152,21 @@ public class BloodSugarServiceImpl implements BloodSugarService{
         }
 
         return userRepository.findIdByNickname(targetUserNickname);
+    }
+
+    private SUGARBLOODSTATUS getSugarBloodStatus(BLOODSUGARCATEGORY category, int level) {
+        switch (category) {
+            case BEFORE -> {
+                if (level >= 70 && level <= 130) return SUGARBLOODSTATUS.SAFETY;
+                else if (level >= 63 && level < 143) return SUGARBLOODSTATUS.WARNING;
+                else if (level >= 0 && level < 1000) return SUGARBLOODSTATUS.DANGER;
+            }
+            case AFTER -> {
+                if (level >= 90 && level <= 180) return SUGARBLOODSTATUS.SAFETY;
+                else if (level >= 81 && level < 198) return SUGARBLOODSTATUS.WARNING;
+                else if (level >= 0 && level < 1000) return SUGARBLOODSTATUS.DANGER;
+            }
+        }
+        return null;
     }
 }
