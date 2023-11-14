@@ -143,7 +143,8 @@ public class BloodSugarServiceImpl implements BloodSugarService{
     }
 
     private Long isSameGroup(Long userPk, String targetUserNickname) {
-        if (!userRepository.inSameGroup(userPk, targetUserNickname)) {
+        if (!userRepository.findIdByNickname(targetUserNickname).equals(userPk)
+                && !userRepository.inSameGroup(userPk, targetUserNickname)) {
             throw new BloodSugarException(ErrorCode.HANDLE_ACCESS_DENIED);
         }
 
