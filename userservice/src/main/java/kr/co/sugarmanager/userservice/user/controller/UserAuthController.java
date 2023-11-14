@@ -1,6 +1,8 @@
 package kr.co.sugarmanager.userservice.user.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import kr.co.sugarmanager.userservice.user.dto.JoinDTO;
+import kr.co.sugarmanager.userservice.user.dto.LoginDTO;
 import kr.co.sugarmanager.userservice.user.dto.RefreshDTO;
 import kr.co.sugarmanager.userservice.user.dto.SocialLoginDTO;
 import kr.co.sugarmanager.userservice.user.service.UserAuthService;
@@ -24,6 +26,24 @@ public class UserAuthController {
 
     private final UserAuthService userAuthService;
 
+    @PostMapping("/signin")
+    @ResponseBody
+    public ResponseEntity<ApiResult<LoginDTO.Response>> nomalLogin(
+            @RequestBody LoginDTO.Request req
+    ) {
+        LoginDTO.Response res = userAuthService.login(req);
+        return result(res.isSuccess(), res, HttpStatus.OK);
+    }
+
+    @PostMapping("/signup")
+    @ResponseBody
+    public ResponseEntity<ApiResult<JoinDTO.Response>> nomalJoin(
+            @RequestBody JoinDTO.Request req
+    ) {
+        userAuthService.join(req);
+        return null;
+    }
+
     @PostMapping("/{socialType}")
     @ResponseBody
     public ResponseEntity<ApiResult<SocialLoginDTO.Response>> socialLogin(
@@ -38,7 +58,7 @@ public class UserAuthController {
     public ResponseEntity<ApiResult<RefreshDTO.Response>> refreshToken(
             @RequestBody RefreshDTO.Request dto
     ) {
-        return result(true,userAuthService.refreshToken(dto),HttpStatus.OK);
+        return result(true, userAuthService.refreshToken(dto), HttpStatus.OK);
     }
 
     //아래는 클라이언트에서 테스트용으로 만든 컨트롤러

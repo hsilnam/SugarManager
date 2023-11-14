@@ -4,6 +4,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public enum UserInfoValidation {
+    ID(6, 320, false, "^[a-zA-Z0-9]{6,320}$", "ID는 6~320자의 영문과 숫자조합입니다."),
+    PASSWORD(8, 20, false, "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&*()-_=+[\\]{};:'\",.<>/?]).{8,20}$\n", "비밀번호는 8~20자로, 소문자, 대문자, 숫자, 특수문자가 각각 한번씩 들어가야 합니다."),
+    EMAIL(0, 320, false, "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$\n", "이메일 형식으로 작성해주세요."),
     NAME(2, 20, false, null, "이름은 2~20자로 입력해주세요."),
     NICKNAME(6, 20, false, "^[a-zA-Z0-9가-힣]{6,20}$", "닉네임은 한글, 영문, 숫자로 이루어진 6~20자 입니다."),
     HEIGHT(0, 250, true, null, "신장은 0.0 ~ 250.0 사이로 입력해주세요."),

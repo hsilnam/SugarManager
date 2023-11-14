@@ -14,6 +14,7 @@ public enum ErrorCode {
     JWT_EXPIRED_EXCEPTION(HttpStatus.UNAUTHORIZED, "U003", "토큰 시간이 만료되었습니다."),
     JWT_BADREQUEST_EXCEPTION(HttpStatus.BAD_REQUEST, "U004", "토큰 정보가 잘못되었습니다."),
     USER_NOT_FOUND_EXCEPTION(HttpStatus.NOT_FOUND, "U005", "유저가 존재하지 않습니다."),
+    LOGIN_INFO_NOT_VALIDATE(HttpStatus.UNAUTHORIZED, "U006", "인증정보가 일치하지 않습니다."),
 
     //그룹
     GROUP_NOT_JOIN_EXCEPTION(HttpStatus.BAD_REQUEST, "G001", "그룹에 가입한 상태가 아닙니다."),
