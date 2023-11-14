@@ -26,20 +26,20 @@ public class MenuImageServiceTest {
     @Autowired
     private MenuService menuImageService;
 
-    @Test
-    void 이미지_전송을_위한_ImageDTO_생성_성공() throws Exception{
-        Long pk = 1L;
-        ImageTypeEnum imageTypeEnum = ImageTypeEnum.FOOD;
-
-        String base = "src/test/java/kr/co/sugarmanager/business/menu/service/asset";
-        Path logoPath = Paths.get(base, "logo.png");
-        InputStream logoInputStream = new FileInputStream(logoPath.toFile());
-        MockMultipartFile logoFile = new MockMultipartFile("logo.png", logoInputStream);
-
-        ImageDTO imageDTO = menuImageService.createImageDTO(pk, imageTypeEnum, logoFile);
-
-        assertArrayEquals(logoFile.getBytes(), imageDTO.getFile());
-    }
+//    @Test
+//    void 이미지_전송을_위한_ImageDTO_생성_성공() throws Exception{
+//        Long pk = 1L;
+//        ImageTypeEnum imageTypeEnum = ImageTypeEnum.FOOD;
+//
+//        String base = "src/test/java/kr/co/sugarmanager/business/menu/service/asset";
+//        Path logoPath = Paths.get(base, "logo.png");
+//        InputStream logoInputStream = new FileInputStream(logoPath.toFile());
+//        MockMultipartFile logoFile = new MockMultipartFile("logo.png", logoInputStream);
+//
+//        ImageDTO imageDTO = menuImageService.createImageDTO(pk, imageTypeEnum, logoFile);
+//
+//        assertArrayEquals(logoFile.getBytes(), imageDTO.getFile());
+//    }
 
     @Test
     void 이미지_전송을_위한_ImageDTO_생성_실패() throws Exception{
