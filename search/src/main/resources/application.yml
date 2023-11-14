@@ -1,9 +1,7 @@
 spring:
+  application:
+    name: SEARCH-SERVICE
   profiles:
-    active: db
-
-eureka:
-  client:
-    register-with-eureka: false
-    fetch-registry: false
-
+    active: db, eureka
+server:
+  port: 8080
