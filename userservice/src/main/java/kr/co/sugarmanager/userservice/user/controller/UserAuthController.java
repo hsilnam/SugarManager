@@ -40,8 +40,8 @@ public class UserAuthController {
     public ResponseEntity<ApiResult<JoinDTO.Response>> nomalJoin(
             @RequestBody JoinDTO.Request req
     ) {
-        userAuthService.join(req);
-        return null;
+        JoinDTO.Response res = userAuthService.join(req);
+        return result(res.isSuccess(), res, HttpStatus.CREATED);
     }
 
     @PostMapping("/{socialType}")

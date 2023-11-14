@@ -170,51 +170,57 @@ public class UserAuthServiceImpl implements UserAuthService {
         String nickname = req.getNickname();
         String fcmToken = req.getFcmToken();
 
-        if (NAME.validate(name) && NICKNAME.validate(nickname) && EMAIL.validate(email) && ID.validate(id) && PASSWORD.validate(pw)) {
-            UserEntity user = UserEntity.builder()
-                    .id(id)
-                    .pw(pw)
-                    .email(email)
-                    .name(name)
-                    .nickname(nickname)
-                    .socialId(StringUtils.generateRandomString(250))
-                    .socialType(SocialType.HOME)
-                    .build();
-
-            //setting 만들기
-            UserSettingEntity setting = UserSettingEntity.builder()
-                    .sugarAlert(false)
-                    .pokeAlert(false)
-                    .challengeAlert(false)
-                    .sugarAlertHour(1)
-                    .fcmToken(fcmToken)
-                    .build();
-
-            //user image만들기
-            UserImageEntity profile = UserImageEntity.builder()
-                    .build();
-
-            //권한
-            Set<UserRoleEntity> roles = Set.of(
-                    UserRoleEntity.builder()
-                            .role(RoleType.MEMBER)
-                            .build()
-            );
-
-            user.addProfileImage(profile);
-            user.addSetting(setting);
-            user.addRoles(roles);
-
-            userRepository.save(user);
-
-            return JoinDTO.Response.builder()
-                    .success(true)
-                    .id(id)
-                    .build();
-        } else {
-            return JoinDTO.Response.builder()
-                    .success(false)
-                    .build();
+        String[] values = {name, nickname, email, id, pw};
+        UserInfoValidation[] keys = {NAME, NICKNAME, EMAIL, ID, PASSWORD};
+        for (int i = 0; i < keys.length; i++) {
+            UserInfoValidation validation = keys[i];
+            if (!validation.validate(values[i])) {
+                return JoinDTO.Response.builder()
+                        .success(false)
+                        .id(validation.getMessage())
+                        .build();
+            }
         }
+
+        UserEntity user = UserEntity.builder()
+                .id(id)
+                .pw(passwordEncoder.encode(pw))
+                .email(email)
+                .name(name)
+                .nickname(nickname)
+                .socialId(StringUtils.generateRandomString(250))
+                .socialType(SocialType.HOME)
+                .build();
+
+        //setting 만들기
+        UserSettingEntity setting = UserSettingEntity.builder()
+                .sugarAlert(false)
+                .pokeAlert(false)
+                .challengeAlert(false)
+                .sugarAlertHour(1)
+                .fcmToken(fcmToken)
+                .build();
+
+        //user image만들기
+        UserImageEntity profile = UserImageEntity.builder()
+                .build();
+
+        //권한
+        Set<UserRoleEntity> roles = Set.of(
+                UserRoleEntity.builder()
+                        .role(RoleType.MEMBER)
+                        .build()
+        );
+
+        user.addProfileImage(profile);
+        user.addSetting(setting);
+        user.addRoles(roles);
+
+        userRepository.save(user);
+
+        return JoinDTO.Response.builder()
+                .success(true)
+                .id(id)
+                .build();
     }
 }
