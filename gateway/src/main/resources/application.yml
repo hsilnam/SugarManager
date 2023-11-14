@@ -59,5 +59,12 @@ spring:
           filters:
             - RewritePath=/alarm-bloodsugar-service/(?<segment>.*), /$\{segment}
 
+        - id: search-service
+          uri: lb://SEARCH-SERVICE
+          predicates:
+            - Path=/search-service/api/v1/**
+          filters:
+            - RewritePath=/search-service/(?<segment>.*), /$\{segment}
+
   profiles:
     include: jwt,eureka
