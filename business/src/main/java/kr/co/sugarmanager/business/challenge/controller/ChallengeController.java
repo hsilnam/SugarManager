@@ -57,10 +57,11 @@ public class ChallengeController {
     }
 
     @PostMapping("/{challengePk}")
-    public void claim(
+    public ResponseEntity<ChallengeClaimDTO.Response> claim(
             @RequestHeader("X-Authorization-Id") Long pk,
             @PathVariable Long challengePk){
-        challengeService.claim(pk,challengePk);
+        ChallengeClaimDTO.Response response = challengeService.claim(pk,challengePk);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 

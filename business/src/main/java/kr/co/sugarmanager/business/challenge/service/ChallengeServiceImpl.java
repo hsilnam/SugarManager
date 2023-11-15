@@ -270,7 +270,7 @@ public class ChallengeServiceImpl implements ChallengeService {
 
     @Override
     @Transactional
-    public void claim(Long pk, Long challengePk) {
+    public ChallengeClaimDTO.Response claim(Long pk, Long challengePk) {
         if (challengeTemplateRepository.findChallengeByPk(challengePk).getUserPk() != pk) {
             throw new ValidationException(ErrorCode.HANDLE_ACCESS_DENIED);
         }
@@ -278,6 +278,9 @@ public class ChallengeServiceImpl implements ChallengeService {
                 .challengeTemplatePk(challengePk)
                 .build();
         challengeLogRepository.save(log);
+        return ChallengeClaimDTO.Response.builder()
+                .success(true)
+                .build();
     }
 
     private List<String> convertToList(int challengeDays) {
