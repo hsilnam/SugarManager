@@ -17,9 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -38,24 +36,26 @@ public class ChallengeServiceImpl implements ChallengeService {
     public TodayChallengesDTO.Response todaysChallenges() {
 
         int day = 1 << (LocalDateTime.now().getDayOfWeek().getValue() - 1);
-        List<ChallengeTemplateEntity> challenges = challengeTemplateRepository.findTodaysChallenges(day);
 
         List<ChallengeInfoDTO> userInfos = new ArrayList<>();
-
-        for (ChallengeTemplateEntity challenge : challenges) {
-            int challengeDays = challenge.getDays();
-            List<String> days = convertToList(challengeDays);
-            ChallengeInfoDTO userInfo = ChallengeInfoDTO.builder()
-                    .challengePk(challenge.getPk())
-                    .challengeTitle(challenge.getTitle())
-                    .goal(challenge.getGoal())
-                    .type(challenge.getType())
-                    .alert(challenge.isAlert())
-                    .hour(challenge.getHour())
-                    .minute(challenge.getMinute())
-                    .days(days)
-                    .build();
-            userInfos.add(userInfo);
+        List<ChallengeTemplateEntity> challenges = challengeTemplateRepository.findTodaysChallenges(day)
+                .orElse(null);
+        if(challenges != null) {
+            for (ChallengeTemplateEntity challenge : challenges) {
+                int challengeDays = challenge.getDays();
+                List<String> days = convertToList(challengeDays);
+                ChallengeInfoDTO userInfo = ChallengeInfoDTO.builder()
+                        .challengePk(challenge.getPk())
+                        .challengeTitle(challenge.getTitle())
+                        .goal(challenge.getGoal())
+                        .type(challenge.getType())
+                        .alert(challenge.isAlert())
+                        .hour(challenge.getHour())
+                        .minute(challenge.getMinute())
+                        .days(days)
+                        .build();
+                userInfos.add(userInfo);
+            }
         }
         return TodayChallengesDTO.Response.builder()
                 .success(true)
@@ -76,9 +76,8 @@ public class ChallengeServiceImpl implements ChallengeService {
             throw new ValidationException(ErrorCode.HANDLE_ACCESS_DENIED);
         }
         // [1-3] 등록할 사람이 없는 유저
-        if (userRepository.findIdByNickname(dto.getNickname()) == null) {
-            throw new ValidationException(ErrorCode.NO_SUCH_USER);
-        }
+        Long userPk = userRepository.findIdByNickname(dto.getNickname())
+                .orElseThrow(() -> new ValidationException(ErrorCode.NO_SUCH_USER));
         // [1-4] 필수 조건들이 누락되어 있을 때 (제목, 목표 횟수, 종류, 반복 요일)
         if (dto.getTitle() == null || dto.getGoal() == 0 || dto.getType() == null || dto.getDays().isEmpty()) {
             throw new ValidationException(ErrorCode.MISSING_INPUT_VALUE);
@@ -116,7 +115,7 @@ public class ChallengeServiceImpl implements ChallengeService {
                 .hour(dto.getHour())
                 .minute(dto.getMinute())
                 .days(days)
-                .userPk(userRepository.findIdByNickname(dto.getNickname()))
+                .userPk(userPk)
                 .build();
         challengeTemplateRepository.save(challenge);
         return ChallengeAddDTO.Response.builder()
@@ -158,61 +157,54 @@ public class ChallengeServiceImpl implements ChallengeService {
             throw new ValidationException(ErrorCode.UNAUTHORIZED_USER_ACCESS);
         }
         // [1-2] 없는 유저일 때
-        if (userRepository.findIdByNickname(nickname) == null) {
-            throw new ValidationException(ErrorCode.HANDLE_ACCESS_DENIED);
-        }
+        Long userPk = userRepository.findIdByNickname(nickname)
+                .orElseThrow(() -> new ValidationException(ErrorCode.NO_SUCH_USER));
         // [1-3] 내 그룹이 아니거나 내 것이 아닐 때
-        if (userRepository.findGroupIdByNickname(nickname) != null){
+        if (userRepository.findGroupIdByNickname(nickname).isPresent()){
             if (!userRepository.inSameGroup(pk, nickname)){
                 throw new ValidationException(ErrorCode.HANDLE_ACCESS_DENIED);
             }
         }
         else {
-            if (!Objects.equals(userRepository.findIdByNickname(nickname), pk)){
+            if (!Objects.equals(userPk, pk)){
                 throw new ValidationException(ErrorCode.HANDLE_ACCESS_DENIED);
             }
         }
-
-        Long userPk = userRepository.findIdByNickname(nickname);
 
         // [2] 조회
         LocalDateTime start = LocalDate.now().atStartOfDay(ZoneId.of("Asia/Seoul")).toLocalDateTime();
         LocalDateTime end = start.plusDays(1);
 
-        List<ChallengeTemplateEntity> userChallenges = challengeTemplateRepository.findAllChallengesByUser(userPk);
-
         List<UserChallengeAllDTO.Info> list = new ArrayList<>();
-
-        for (ChallengeTemplateEntity challenge : userChallenges) {
-            long challengePk = challenge.getPk();
-            int logs = challengeLogRepository.findChallengeLogs(start, end, challengePk);
-            List<String> days = convertToList(challenge.getDays());
-
-            UserChallengeAllDTO.Info info = UserChallengeAllDTO.Info.builder()
-                    .challengePk(challenge.getPk())
-                    .type(ChallengeTypeEnum.valueOf(challenge.getType()))
-                    .title(challenge.getTitle())
-                    .count(logs)
-                    .goal(challenge.getGoal())
-                    .alert(challenge.isAlert())
-                    .hour(challenge.getHour())
-                    .minute(challenge.getMinute())
-                    .days(days)
-                    .build();
-            list.add(info);
+        List<ChallengeTemplateEntity> userChallenges = challengeTemplateRepository.findAllChallengesByUser(userPk)
+                .orElse(null);
+        if(userChallenges!=null) {
+            for (ChallengeTemplateEntity challenge : userChallenges) {
+                long challengePk = challenge.getPk();
+                int logs = challengeLogRepository.findChallengeLogs(start, end, challengePk);
+                List<String> days = convertToList(challenge.getDays());
+                UserChallengeAllDTO.Info info = UserChallengeAllDTO.Info.builder()
+                        .challengePk(challenge.getPk())
+                        .type(ChallengeTypeEnum.valueOf(challenge.getType()))
+                        .title(challenge.getTitle())
+                        .count(logs)
+                        .goal(challenge.getGoal())
+                        .alert(challenge.isAlert())
+                        .hour(challenge.getHour())
+                        .minute(challenge.getMinute())
+                        .days(days)
+                        .build();
+                list.add(info);
+            }
         }
-
         UserChallengeAllDTO.InfoResponse infoResponse = UserChallengeAllDTO.InfoResponse.builder()
-                .pokeAbled(settingsRepository.isPokeAlarm(userRepository.findIdByNickname(nickname)))
+                .pokeAbled(settingsRepository.isPokeAlarm(userPk))
                 .list(list)
                 .build();
-
         return UserChallengeAllDTO.Response.builder()
                 .success(true)
                 .response(infoResponse)
                 .build();
-
-
     }
 
     // 단일 챌린지 조회
@@ -224,17 +216,16 @@ public class ChallengeServiceImpl implements ChallengeService {
             throw new ValidationException(ErrorCode.UNAUTHORIZED_USER_ACCESS);
         }
         // [1-2] 없는 유저일 때
-        if (userRepository.findIdByNickname(nickname) == null) {
-            throw new ValidationException(ErrorCode.HANDLE_ACCESS_DENIED);
-        }
+        Long userPk = userRepository.findIdByNickname(nickname)
+                .orElseThrow(() -> new ValidationException(ErrorCode.HANDLE_ACCESS_DENIED));
         // [1-3] 내 그룹이 아니거나 내 것이 아닐 때
-        if (userRepository.findGroupIdByNickname(nickname) != null){
+        if (userRepository.findGroupIdByNickname(nickname).isPresent()){
             if (!userRepository.inSameGroup(pk, nickname)){
                 throw new ValidationException(ErrorCode.HANDLE_ACCESS_DENIED);
             }
         }
         else {
-            if (!Objects.equals(userRepository.findIdByNickname(nickname), pk)){
+            if (!Objects.equals(userPk, pk)){
                 throw new ValidationException(ErrorCode.HANDLE_ACCESS_DENIED);
             }
         }
@@ -242,10 +233,9 @@ public class ChallengeServiceImpl implements ChallengeService {
         LocalDateTime end = start.plusDays(1);
 
         UserChallengeAllDTO.Info info = new UserChallengeAllDTO.Info();
-
-        try {
-            ChallengeTemplateEntity challenge = challengeTemplateRepository.findChallengeByPk(challengePk);
-
+        ChallengeTemplateEntity challenge = challengeTemplateRepository.findChallengeByPk(challengePk)
+                .orElse(null);
+        if (challenge != null){
             Integer logs = challengeLogRepository.findChallengeLogs(start, end, challengePk);
             List<String> days = convertToList(challenge.getDays());
             info = UserChallengeAllDTO.Info.builder()
@@ -259,8 +249,6 @@ public class ChallengeServiceImpl implements ChallengeService {
                     .minute(challenge.getMinute())
                     .days(days)
                     .build();
-        } catch (Exception e) {
-            log.info(e.getMessage());
         }
         return UserChallengeInfoDTO.Response.builder()
                 .success(true)
@@ -271,7 +259,9 @@ public class ChallengeServiceImpl implements ChallengeService {
     @Override
     @Transactional
     public ChallengeClaimDTO.Response claim(Long pk, Long challengePk) {
-        if (challengeTemplateRepository.findChallengeByPk(challengePk).getUserPk() != pk) {
+        ChallengeTemplateEntity challenge = challengeTemplateRepository.findChallengeByPk(challengePk)
+                .orElseThrow(() -> new ValidationException(ErrorCode.INVALID_PATH_VALUE));
+        if (challenge.getUserPk() != pk) {
             throw new ValidationException(ErrorCode.HANDLE_ACCESS_DENIED);
         }
         ChallengeLogEntity log = ChallengeLogEntity.builder()
