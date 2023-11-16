@@ -50,7 +50,7 @@ public interface BloodSugarRepository extends JpaRepository<BloodSugarEntity, Lo
 
 
     @Query("SELECT e FROM BloodSugarEntity e WHERE e.userPk = :userPk AND e.category = :category AND e.registedAt BETWEEN :startDate AND :endDate ORDER BY e.registedAt DESC LIMIT 1")
-    Optional<BloodSugarEntity> findOneByUserPkAndCategoryAndCreatedAt(
+    Optional<BloodSugarEntity> findOneByUserPkAndCategoryAndRegistedAt(
             @Param("userPk") Long userPk,
             @Param("category") String category,
             @Param("startDate") LocalDateTime startDate,

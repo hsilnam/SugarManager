@@ -24,7 +24,6 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -105,12 +104,12 @@ public class MenuServiceImpl implements MenuService {
         LocalDateTime threeHoursBefore = registedAt.minusHours(3);
         LocalDateTime threeHoursAfter = registedAt.plusHours(3);
 
-        BloodSugarEntity beforeBloodSuger = bloodSugarRepository.findOneByUserPkAndCategoryAndCreatedAt(userPk,
+        BloodSugarEntity beforeBloodSuger = bloodSugarRepository.findOneByUserPkAndCategoryAndRegistedAt(userPk,
                         BLOODSUGARCATEGORY.BEFORE.name(),
                         threeHoursBefore,
                         registedAt)
                 .orElse(null);
-        BloodSugarEntity afterBloodSuger = bloodSugarRepository.findOneByUserPkAndCategoryAndCreatedAt(userPk,
+        BloodSugarEntity afterBloodSuger = bloodSugarRepository.findOneByUserPkAndCategoryAndRegistedAt(userPk,
                         BLOODSUGARCATEGORY.AFTER.name(),
                         registedAt,
                         threeHoursAfter)
