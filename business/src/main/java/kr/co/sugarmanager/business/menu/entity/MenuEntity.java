@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Builder
@@ -27,6 +28,9 @@ public class MenuEntity extends CUDEntity {
 
     @Column(name = "USER_PK")
     private Long userPk;
+
+    @Column(name = "REGISTED_AT")
+    private LocalDateTime registedAt;
 
     @OneToMany(mappedBy = "menuEntity")
     private List<FoodEntity> foodList;

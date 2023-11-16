@@ -8,6 +8,8 @@ import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
+import java.time.LocalDateTime;
+
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -25,6 +27,8 @@ public class BloodSugarEntity extends CUDEntity {
     private Long bloodSugarPk;
     @Column(name = "USER_PK")
     private Long userPk;
+    @Column(name = "REGISTED_AT")
+    private LocalDateTime registedAt;
     @Column(name = "BLOOD_SUGAR_CATEGORY")
     private String category;
     @Column(name = "BLOOD_SUGAR_LEVEL")
