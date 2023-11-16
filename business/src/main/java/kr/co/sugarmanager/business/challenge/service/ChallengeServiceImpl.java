@@ -212,7 +212,7 @@ public class ChallengeServiceImpl implements ChallengeService {
 
         // [1] 유효성 검사
         // [1-1] 권한 관련
-        if (userRepository.isAuthorized(pk)) {
+        if (!userRepository.isAuthorized(pk)) {
             throw new ValidationException(ErrorCode.UNAUTHORIZED_USER_ACCESS);
         }
         // [1-2] 없는 유저일 때
