@@ -24,7 +24,6 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -100,18 +99,18 @@ public class MenuServiceImpl implements MenuService {
                         .build()
                 ).toList();
 
-        LocalDateTime createdAt = menu.getCreatedAt();
-        LocalDateTime threeHoursBefore = createdAt.minusHours(3);
-        LocalDateTime threeHoursAfter = createdAt.plusHours(3);
+        LocalDateTime registedAt = menu.getRegistedAt();
+        LocalDateTime threeHoursBefore = registedAt.minusHours(3);
+        LocalDateTime threeHoursAfter = registedAt.plusHours(3);
 
-        BloodSugarEntity beforeBloodSuger = bloodSugarRepository.findOneByUserPkAndCategoryAndCreatedAt(userPk,
+        BloodSugarEntity beforeBloodSuger = bloodSugarRepository.findOneByUserPkAndCategoryAndRegistedAt(userPk,
                         BLOODSUGARCATEGORY.BEFORE.name(),
                         threeHoursBefore,
-                        createdAt)
+                        registedAt)
                 .orElse(null);
-        BloodSugarEntity afterBloodSuger = bloodSugarRepository.findOneByUserPkAndCategoryAndCreatedAt(userPk,
+        BloodSugarEntity afterBloodSuger = bloodSugarRepository.findOneByUserPkAndCategoryAndRegistedAt(userPk,
                         BLOODSUGARCATEGORY.AFTER.name(),
-                        createdAt,
+                        registedAt,
                         threeHoursAfter)
                 .orElse(null);
         MenuSelectDTO.BloodSugar repBloodSugar = MenuSelectDTO.BloodSugar.builder()
