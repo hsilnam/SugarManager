@@ -19,7 +19,7 @@ public class TimelineController {
 
     @GetMapping("/{nickname}/{year}/{month}")
     public ResponseEntity<TimelineMonthDTO.Response> timelineMonth(
-            @RequestHeader("X-Authrization-Id") Long pk,
+            @RequestHeader("X-Authorization-Id") Long pk,
             @PathVariable String nickname,
             @PathVariable Integer year,
             @PathVariable Integer month){
@@ -30,7 +30,7 @@ public class TimelineController {
 
     @GetMapping("/{nickname}/{year}/{month}/{date}")
     public ResponseEntity<TimelineDateDTO.Response> timelineDate(
-            @RequestHeader("X-Authrization-Id") Long pk,
+            @RequestHeader("X-Authorization-Id") Long pk,
             @PathVariable String nickname,
             @PathVariable Integer year,
             @PathVariable Integer month,
