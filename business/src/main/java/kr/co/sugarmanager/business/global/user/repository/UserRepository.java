@@ -9,7 +9,7 @@ import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<UserEntity, Long> {
 
-    @Query("select case when coalesce(count(u.nickname),0) >= 1 then true else false end as check from UserEntity u where u.pk = :userPk")
+    @Query("select case when coalesce(count(u.nickname),0) > 1 then true else false end as check from UserEntity u where u.pk = :userPk")
     Boolean isAuthorized(@Param("userPk") Long userPk);
 
     @Query("select u.nickname from UserEntity u where u.pk = :userPk")
