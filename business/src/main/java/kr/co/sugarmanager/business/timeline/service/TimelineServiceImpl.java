@@ -40,9 +40,11 @@ public class TimelineServiceImpl implements TimelineService{
     @Override
     @Transactional(readOnly = true)
     public TimelineMonthDTO.Response timelineMonth(Long pk, String nickname, Integer year, Integer month){
+        String loggedInUserNickname = userRepository.findNicknameById(pk)
+                .orElseThrow(() -> new ValidationException(ErrorCode.NO_SUCH_USER));
         // [1] 유효성 검사
         // [1-1] 접근 권한이 있는 유저인지 검사
-        if (!Objects.equals(userRepository.findNicknameById(pk), nickname) && !userRepository.inSameGroup(pk, nickname)){
+        if (!Objects.equals(loggedInUserNickname, nickname) && !userRepository.inSameGroup(pk, nickname)){
             throw new ValidationException(ErrorCode.HANDLE_ACCESS_DENIED);
         }
         // [1-2] 요청하는 날짜 포맷을 벗어난 경우
@@ -50,15 +52,12 @@ public class TimelineServiceImpl implements TimelineService{
             throw new ValidationException(ErrorCode.INVALID_INPUT_VALUE);
         }
         // [1-3] 해당 닉네임이 없을 때
-        if(userRepository.findIdByNickname(nickname) == null){
-            throw new ValidationException(ErrorCode.NO_SUCH_USER);
-        }
+        Long searchUserPk = userRepository.findIdByNickname(nickname)
+                .orElseThrow(()->new ValidationException(ErrorCode.NO_SUCH_USER));
         // [1-4] 인증된 유저 검사
         if(!userRepository.isAuthorized(pk)){
             throw new ValidationException(ErrorCode.UNAUTHORIZED_USER_ACCESS);
         }
-        Long searchUserPk = userRepository.findIdByNickname(nickname);
-
         // [2] 해당 월의 기록들 불러오기
         List<LocalDate> total = new ArrayList<>();
         List<LocalDate> bloodsugar = bloodSugarRepository.findBloodSugarRecordsForMonth(searchUserPk,year, month);
@@ -85,9 +84,11 @@ public class TimelineServiceImpl implements TimelineService{
     @Override
     @Transactional(readOnly = true)
     public TimelineDateDTO.Response timelineDate(Long pk, String nickname, Integer year, Integer month, Integer date) {
+        String loggedInUserNickname = userRepository.findNicknameById(pk)
+                .orElseThrow(() -> new ValidationException(ErrorCode.NO_SUCH_USER));
         // [1] 유효성 검사
         // [1-1] 접근 권한이 있는 유저인지 검사
-        if (!Objects.equals(userRepository.findNicknameById(pk), nickname) && !userRepository.inSameGroup(pk, nickname)){
+        if (!Objects.equals(loggedInUserNickname, nickname) && !userRepository.inSameGroup(pk, nickname)){
             throw new ValidationException(ErrorCode.HANDLE_ACCESS_DENIED);
         }
         // [1-2] 요청하는 날짜 포맷을 벗어난 경우
@@ -95,17 +96,14 @@ public class TimelineServiceImpl implements TimelineService{
             throw new ValidationException(ErrorCode.INVALID_INPUT_VALUE);
         }
         // [1-3] 해당 닉네임이 없을 때
-        if(userRepository.findIdByNickname(nickname) == null){
-            throw new ValidationException(ErrorCode.NO_SUCH_USER);
-        }
+        Long searchUserPk = userRepository.findIdByNickname(nickname)
+                .orElseThrow(()->new ValidationException(ErrorCode.NO_SUCH_USER));
         // [1-4] 인증된 유저 검사
         if(!userRepository.isAuthorized(pk)){
             throw new ValidationException(ErrorCode.UNAUTHORIZED_USER_ACCESS);
         }
 
         List<TimelineDateDTO.Info> infos = new ArrayList<>();
-        Long searchUserPk = userRepository.findIdByNickname(nickname);
-
         LocalDateTime start = LocalDateTime.of(year, month, date, 0, 0, 0);
         LocalDateTime end = start.plusDays(1);
 
@@ -131,21 +129,24 @@ public class TimelineServiceImpl implements TimelineService{
                             .build());
         }
 
-        List<ChallengeTemplateEntity> challenge = challengeTemplateRepository.findAllChallengesByUser(searchUserPk);
-        for (ChallengeTemplateEntity c : challenge){
-            try {
-                LogsAndLatestInterface logs = challengeLogRepository.findChallengeLogsAndLatestUpdatedTime(start, end, c.getPk());
-                if (logs.getCount() >= c.getGoal()) {
-                    infos.add(TimelineDateDTO.Info.builder()
-                            .hour(logs.getLatest().getHour())
-                            .minute(logs.getLatest().getMinute())
-                            .second(logs.getLatest().getSecond())
-                            .category(InfoTypeEnum.CHALLENGE)
-                            .content(c.getTitle())
-                            .complete(true)
-                            .build());
+        List<ChallengeTemplateEntity> challenge = challengeTemplateRepository.findAllChallengesByUser(searchUserPk)
+                .orElse(null);
+        if (challenge != null) {
+            for (ChallengeTemplateEntity c : challenge) {
+                try {
+                    LogsAndLatestInterface logs = challengeLogRepository.findChallengeLogsAndLatestUpdatedTime(start, end, c.getPk());
+                    if (logs.getCount() >= c.getGoal()) {
+                        infos.add(TimelineDateDTO.Info.builder()
+                                .hour(logs.getLatest().getHour())
+                                .minute(logs.getLatest().getMinute())
+                                .second(logs.getLatest().getSecond())
+                                .category(InfoTypeEnum.CHALLENGE)
+                                .content(c.getTitle())
+                                .complete(true)
+                                .build());
+                    }
+                } catch (Exception ignored) {
                 }
-            } catch(Exception ignored){
             }
         }
 

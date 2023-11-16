@@ -29,10 +29,10 @@ public class MenuController {
     public ResponseEntity<MenuSaveDTO.Response> save(
             @RequestHeader("Authorization") String auth,
             @RequestPart(value = "file", required = false) List<MultipartFile> imageFile,
-            @Validated @RequestPart MenuSaveDTO.Request memuDto) {
-        log.info("MenuSave - Authorization: {}, menuDto: {}", auth, memuDto.getFoods());
+            @Validated @RequestPart MenuSaveDTO.Request menuDto) {
+        log.info("MenuSave - Authorization: {}, menuDto: {}", auth, menuDto.getFoods());
         Long userPk = 1L;       // TODO: 서버간 통신 필요
-        return new ResponseEntity<>(menuService.save(userPk, imageFile, memuDto), HttpStatus.CREATED);
+        return new ResponseEntity<>(menuService.save(userPk, imageFile, menuDto), HttpStatus.CREATED);
     }
 
     @PostMapping(value = "/delete", produces = APPLICATION_JSON_VALUE, consumes = {APPLICATION_JSON_VALUE})

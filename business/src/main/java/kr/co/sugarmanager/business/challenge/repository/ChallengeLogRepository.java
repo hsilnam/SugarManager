@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 
 public interface ChallengeLogRepository extends JpaRepository<ChallengeLogEntity, Long> {
 
-    @Query("select count(c) " +
+    @Query("select coalesce(count(c),0) " +
             "from ChallengeLogEntity c " +
             "left join ChallengeTemplateEntity t on c.challengeTemplatePk = t.pk " +
             "where " +
