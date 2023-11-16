@@ -110,9 +110,9 @@ public class TimelineServiceImpl implements TimelineService{
         List<MenuEntity> menu = menuRepository.findMenuRecordsForDay(searchUserPk,start,end);
         for(MenuEntity m : menu){
             infos.add(TimelineDateDTO.Info.builder()
-                            .hour(m.getCreatedAt().getHour())
-                            .minute(m.getCreatedAt().getMinute())
-                            .second(m.getCreatedAt().getSecond())
+                            .hour(m.getRegistedAt().getHour())
+                            .minute(m.getRegistedAt().getMinute())
+                            .second(m.getRegistedAt().getSecond())
                             .category(InfoTypeEnum.MENU)
                             .content(String.valueOf(foodRepository.caloriesPerMenu(m.getMenuPk())))
                             .build());
@@ -121,9 +121,9 @@ public class TimelineServiceImpl implements TimelineService{
         List<BloodSugarEntity> bloodSugar = bloodSugarRepository.findBloodSugarRecordsForDay(searchUserPk,start,end);
         for (BloodSugarEntity b : bloodSugar){
             infos.add(TimelineDateDTO.Info.builder()
-                            .hour(b.getCreatedAt().getHour())
-                            .minute(b.getCreatedAt().getMinute())
-                            .second(b.getCreatedAt().getSecond())
+                            .hour(b.getRegistedAt().getHour())
+                            .minute(b.getRegistedAt().getMinute())
+                            .second(b.getRegistedAt().getSecond())
                             .category(InfoTypeEnum.BLOODSUGAR)
                             .content(String.valueOf(b.getLevel()))
                             .build());

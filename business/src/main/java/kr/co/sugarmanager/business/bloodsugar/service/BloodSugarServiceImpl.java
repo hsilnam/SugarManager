@@ -104,7 +104,7 @@ public class BloodSugarServiceImpl implements BloodSugarService{
                     .bloodSugarPk(bloodSugarEntity.getBloodSugarPk())
                     .category(bloodSugarEntity.getCategory())
                     .content(bloodSugarEntity.getContent())
-                    .createdAt(bloodSugarEntity.getCreatedAt())
+                    .registedAt(bloodSugarEntity.getRegistedAt())
                     .level(bloodSugarEntity.getLevel())
                     .status(getSugarBloodStatus(BLOODSUGARCATEGORY.valueOf(bloodSugarEntity.getCategory()), bloodSugarEntity.getLevel()))
                     .build());
