@@ -6,11 +6,12 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 
 public interface SettingsRepository extends JpaRepository<UserSettingEntity, Long> {
     @Query("select s from UserSettingEntity s where s.userPk = :userPk")
-    UserSettingEntity findSettingByUserId(@Param("userPk") Long userPK);
+    Optional<UserSettingEntity> findSettingByUserId(@Param("userPk") Long userPK);
     @Query("select s from UserSettingEntity s where s.challengeAlert = true")
     List<UserSettingEntity> findUsersWithChallengeAlarmOn();
 

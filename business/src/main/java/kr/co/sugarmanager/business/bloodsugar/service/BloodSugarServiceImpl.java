@@ -53,7 +53,7 @@ public class BloodSugarServiceImpl implements BloodSugarService {
     public BloodSugarUpdateDTO.Response update(Long userPk, BloodSugarUpdateDTO.Request request) {
         Optional<BloodSugarEntity> optionalBloodSugarEntity = bloodSugarRepository.findByBloodSugarPkAndUserPk(request.getBloodSugarPk(), userPk);
         try {
-            if (!optionalBloodSugarEntity.isPresent()) {
+            if (optionalBloodSugarEntity.isEmpty()) {
                 throw new BloodSugarException(ErrorCode.HANDLE_ACCESS_DENIED);
             }
             BloodSugarEntity bloodSugar = optionalBloodSugarEntity.get();
@@ -75,7 +75,7 @@ public class BloodSugarServiceImpl implements BloodSugarService {
     @Override
     public BloodSugarDeleteDTO.Response delete(Long userPk, BloodSugarDeleteDTO.Request request) {
         Optional<BloodSugarEntity> optionalBloodSugarEntity = bloodSugarRepository.findByBloodSugarPkAndUserPk(request.getBloodSugarPk(), userPk);
-        if (!optionalBloodSugarEntity.isPresent()) {
+        if (optionalBloodSugarEntity.isEmpty()) {
             throw new BloodSugarException(ErrorCode.HANDLE_ACCESS_DENIED);
         }
 
@@ -109,7 +109,7 @@ public class BloodSugarServiceImpl implements BloodSugarService {
                     .bloodSugarPk(bloodSugarEntity.getBloodSugarPk())
                     .category(bloodSugarEntity.getCategory())
                     .content(bloodSugarEntity.getContent())
-                    .createdAt(bloodSugarEntity.getRegistedAt())
+                    .registedAt(bloodSugarEntity.getRegistedAt())
                     .level(bloodSugarEntity.getLevel())
                     .status(getSugarBloodStatus(BLOODSUGARCATEGORY.valueOf(bloodSugarEntity.getCategory()), bloodSugarEntity.getLevel()))
                     .build());
@@ -150,12 +150,13 @@ public class BloodSugarServiceImpl implements BloodSugarService {
     }
 
     private Long isSameGroup(Long userPk, String targetUserNickname) {
-        if (!userRepository.findIdByNickname(targetUserNickname).equals(userPk)
+        Long targetUserId = userRepository.findIdByNickname(targetUserNickname)
+                .orElseThrow(() -> new ValidationException(ErrorCode.NO_SUCH_USER));
+        if (!targetUserId.equals(userPk)
                 && !userRepository.inSameGroup(userPk, targetUserNickname)) {
             throw new BloodSugarException(ErrorCode.HANDLE_ACCESS_DENIED);
         }
-
-        return userRepository.findIdByNickname(targetUserNickname);
+        return targetUserId;
     }
 
     private SUGARBLOODSTATUS getSugarBloodStatus(BLOODSUGARCATEGORY category, int level) {
