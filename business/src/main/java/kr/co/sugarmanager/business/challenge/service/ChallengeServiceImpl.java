@@ -264,10 +264,10 @@ public class ChallengeServiceImpl implements ChallengeService {
         if (challenge.getUserPk() != pk) {
             throw new ValidationException(ErrorCode.HANDLE_ACCESS_DENIED);
         }
-        ChallengeLogEntity log = ChallengeLogEntity.builder()
+        ChallengeLogEntity challengeLog = ChallengeLogEntity.builder()
                 .challengeTemplatePk(challengePk)
                 .build();
-        challengeLogRepository.save(log);
+        challengeLogRepository.save(challengeLog);
         return ChallengeClaimDTO.Response.builder()
                 .success(true)
                 .build();
