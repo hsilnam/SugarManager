@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: ALARM-SERVICE
+  profiles:
+    active: secret, db, eureka
+
+server:
+  port : 8080

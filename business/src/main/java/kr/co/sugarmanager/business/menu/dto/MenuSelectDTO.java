@@ -1,8 +1,11 @@
 package kr.co.sugarmanager.business.menu.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import kr.co.sugarmanager.business.global.dto.ErrorResponse;
 import lombok.*;
+import org.springframework.format.annotation.DateTimeFormat;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,6 +38,9 @@ public class MenuSelectDTO {
     @Setter
     public static class ReturnResponse {
         private Long menuPk;
+        @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm")
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm", timezone = "Asia/Seoul")
+        private LocalDateTime registedAt;
         private List<MenuImage> menuImages;
         private BloodSugar bloodSugar;
         private List<Food> foods;

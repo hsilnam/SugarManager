@@ -30,13 +30,18 @@ public class MenuEntity extends CUDEntity {
     private Long userPk;
 
     @Column(name = "REGISTED_AT")
-    private LocalDateTime registedAt;
+    @Builder.Default
+    private LocalDateTime registedAt = LocalDateTime.now();
 
     @OneToMany(mappedBy = "menuEntity")
     private List<FoodEntity> foodList;
 
     @OneToMany(mappedBy = "menuEntity")
     private List<FoodImageEntity> foodImageList;
+
+    public void modifyRegistedAt(LocalDateTime registedAt) {
+        this.registedAt = registedAt == null ? LocalDateTime.now() : registedAt;
+    }
 
     public void addFoodEntity(FoodEntity foodEntity) {
         foodList.add(foodEntity);

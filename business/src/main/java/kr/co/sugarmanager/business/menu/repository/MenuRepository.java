@@ -18,6 +18,6 @@ public interface MenuRepository extends JpaRepository<MenuEntity, Long> {
     @Query("select distinct(cast (m.registedAt as localdate)) from MenuEntity m where year(m.registedAt) = :year and month(m.registedAt) = :month and m.userPk = :searchUserPk")
     List<LocalDate> findMenuRecordsForMonth(@Param("searchUserPk") Long searchUserPk, @Param("year") Integer year, @Param("month") Integer month);
 
-    @Query("select m from MenuEntity m where m.userPk = :searchUserPk and m.registedAt between :start and :end" )
+    @Query("select m from MenuEntity m where m.userPk = :searchUserPk and m.registedAt between :start and :end")
     List<MenuEntity> findMenuRecordsForDay(@Param("searchUserPk") Long searchUserPk, @Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
 }

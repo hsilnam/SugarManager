@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: IMAGE-SERVICE
+  profiles:
+    active: secret
+
+server:
+  port: 8080
