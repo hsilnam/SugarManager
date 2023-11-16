@@ -21,7 +21,7 @@ public class BloodSugarSaveDTO {
         private String content;
 
         @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm")
-        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM", timezone = "Asia/Seoul")
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm", timezone = "Asia/Seoul")
         private LocalDateTime registedAt;
     }
 
