@@ -1,9 +1,7 @@
 package kr.co.sugarmanager.business.challenge.dto;
 
 import kr.co.sugarmanager.business.global.dto.ErrorResponse;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 public class ChallengeClaimDTO {
     @Builder
