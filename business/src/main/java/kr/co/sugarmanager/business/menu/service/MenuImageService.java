@@ -8,6 +8,6 @@ import java.util.List;
 
 public interface MenuImageService {
     void saveImage(Long pk, ImageTypeEnum imageTypeEnum, List<MultipartFile> multipartFile);
-    void deleteImage(List<Long> pkList);
+    void deleteImage(List<String> imagePaths);
     ImageDTO createImageDTO(Long pk, ImageTypeEnum imageTypeEnum, MultipartFile multipartFile);
 }

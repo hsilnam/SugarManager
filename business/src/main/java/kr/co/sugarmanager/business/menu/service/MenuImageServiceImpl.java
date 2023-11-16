@@ -11,6 +11,7 @@ import kr.co.sugarmanager.business.menu.dto.OperationTypeEnum;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,6 +26,7 @@ public class MenuImageServiceImpl implements MenuImageService {
     private final ObjectMapper objectMapper;
 
     @Override
+    @Async
     public void saveImage(Long pk, ImageTypeEnum imageTypeEnum, List<MultipartFile> multipartFile) {
         if (multipartFile == null) return;
         try {
@@ -39,7 +41,7 @@ public class MenuImageServiceImpl implements MenuImageService {
     }
 
     @Override
-    public void deleteImage(List<Long> pkList) {
+    public void deleteImage(List<String> imagePaths) {
 
     }
 
@@ -52,7 +54,7 @@ public class MenuImageServiceImpl implements MenuImageService {
 
     @Override
     public ImageDTO createImageDTO(Long pk, ImageTypeEnum imageTypeEnum, MultipartFile multipartFile) {
-        String originalFilename = multipartFile.getName();
+        String originalFilename = multipartFile.getOriginalFilename();
         String extension = originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
         checkImageFileExtension(extension);
         try {
