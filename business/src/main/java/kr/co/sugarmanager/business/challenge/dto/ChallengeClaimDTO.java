@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 public class ChallengeClaimDTO {
     @Builder
+    @Getter
     @NoArgsConstructor
     @AllArgsConstructor
     public static class Response{
