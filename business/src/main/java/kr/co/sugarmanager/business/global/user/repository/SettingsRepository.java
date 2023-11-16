@@ -13,7 +13,7 @@ public interface SettingsRepository extends JpaRepository<UserSettingEntity, Lon
     @Query("select s from UserSettingEntity s where s.userPk = :userPk")
     Optional<UserSettingEntity> findSettingByUserId(@Param("userPk") Long userPK);
     @Query("select s from UserSettingEntity s where s.challengeAlert = true")
-    Optional<List<UserSettingEntity>> findUsersWithChallengeAlarmOn();
+    List<UserSettingEntity> findUsersWithChallengeAlarmOn();
 
     @Query("select s.pokeAlert from UserSettingEntity s where s.userPk = :userPk")
     Boolean isPokeAlarm(@Param("userPk") Long userPk);
