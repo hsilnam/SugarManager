@@ -46,6 +46,7 @@ public class MenuServiceImpl implements MenuService {
 
         MenuEntity menuEntity = MenuEntity.builder()
                 .userPk(userPk)
+                .registedAt(request.getRegistedAt())
                 .foodList(new ArrayList<>())
                 .foodImageList(new ArrayList<>())
                 .build();
@@ -54,7 +55,7 @@ public class MenuServiceImpl implements MenuService {
         for (FoodDTO food : request.getFoods()) {
             FoodEntity foodEntity = new FoodEntity(food);
             foodEntity.setMenuEntity(menu);
-            foodEntity.setMenuEntity(menu);
+//            foodEntity.setMenuEntity(menu);
             menuEntity.addFoodEntity(foodEntity);
             foodRepository.save(foodEntity);
         }
@@ -100,18 +101,18 @@ public class MenuServiceImpl implements MenuService {
                         .build()
                 ).toList();
 
-        LocalDateTime createdAt = menu.getCreatedAt();
-        LocalDateTime threeHoursBefore = createdAt.minusHours(3);
-        LocalDateTime threeHoursAfter = createdAt.plusHours(3);
+        LocalDateTime registedAt = menu.getRegistedAt();
+        LocalDateTime threeHoursBefore = registedAt.minusHours(3);
+        LocalDateTime threeHoursAfter = registedAt.plusHours(3);
 
         BloodSugarEntity beforeBloodSuger = bloodSugarRepository.findOneByUserPkAndCategoryAndCreatedAt(userPk,
                         BLOODSUGARCATEGORY.BEFORE.name(),
                         threeHoursBefore,
-                        createdAt)
+                        registedAt)
                 .orElse(null);
         BloodSugarEntity afterBloodSuger = bloodSugarRepository.findOneByUserPkAndCategoryAndCreatedAt(userPk,
                         BLOODSUGARCATEGORY.AFTER.name(),
-                        createdAt,
+                        registedAt,
                         threeHoursAfter)
                 .orElse(null);
         MenuSelectDTO.BloodSugar repBloodSugar = MenuSelectDTO.BloodSugar.builder()
@@ -137,6 +138,7 @@ public class MenuServiceImpl implements MenuService {
 
         MenuSelectDTO.ReturnResponse returnResponse = MenuSelectDTO.ReturnResponse.builder()
                 .menuPk(menuPk)
+                .registedAt(registedAt)
                 .menuImages(repFoodImages)
                 .bloodSugar(repBloodSugar)
                 .foods(repFoods)
@@ -158,6 +160,8 @@ public class MenuServiceImpl implements MenuService {
         Optional<MenuEntity> menuOptional = menuRepository.findByMenuPkAndUserPk(menuPk, userPk);
         if (!menuOptional.isPresent()) throw new MenuException(ErrorCode.MENU_NOT_FOUND_ERROR);
         MenuEntity menu = menuOptional.get();
+
+        menu.modifyRegistedAt(request.getRegistedAt());
 
         if(request.getCreatedMenuImages() != null && !request.getCreatedMenuImages().isEmpty()) {
             menuImageService.saveImage(menuPk, ImageTypeEnum.FOOD, request.getCreatedMenuImages());

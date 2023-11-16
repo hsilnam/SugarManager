@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -22,9 +23,10 @@ import java.util.Optional;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class BloodSugarServiceImpl implements BloodSugarService{
+public class BloodSugarServiceImpl implements BloodSugarService {
     private final BloodSugarRepository bloodSugarRepository;
     private final UserRepository userRepository;
+
     @Override
     public BloodSugarSaveDTO.Response save(Long userPk, BloodSugarSaveDTO.Request request) {
         try {
@@ -33,6 +35,7 @@ public class BloodSugarServiceImpl implements BloodSugarService{
                     .category(request.getCategory().name())
                     .level(request.getLevel())
                     .content(request.getContent())
+                    .registedAt(request.getRegistedAt())
                     .build();
             bloodSugarRepository.save(bloodSugar);
             return BloodSugarSaveDTO.Response.builder()
@@ -46,6 +49,7 @@ public class BloodSugarServiceImpl implements BloodSugarService{
     }
 
     @Override
+    @Transactional
     public BloodSugarUpdateDTO.Response update(Long userPk, BloodSugarUpdateDTO.Request request) {
         Optional<BloodSugarEntity> optionalBloodSugarEntity = bloodSugarRepository.findByBloodSugarPkAndUserPk(request.getBloodSugarPk(), userPk);
         try {
@@ -56,7 +60,8 @@ public class BloodSugarServiceImpl implements BloodSugarService{
             bloodSugar.setLevel(request.getLevel());
             bloodSugar.setCategory(request.getCategory().name());
             bloodSugar.setContent(request.getContent());
-            bloodSugarRepository.save(bloodSugar);
+            bloodSugar.setRegistedAt(request.getRegistedAt());
+//            bloodSugarRepository.save(bloodSugar);
             return BloodSugarUpdateDTO.Response.builder()
                     .success(true)
                     .response(null)
@@ -96,7 +101,7 @@ public class BloodSugarServiceImpl implements BloodSugarService{
                 .error(null)
                 .build();
         returnDTO.getResponse().setList(new ArrayList<>());
-        for (BloodSugarEntity bloodSugarEntity: selectResult) {
+        for (BloodSugarEntity bloodSugarEntity : selectResult) {
             minBloodSugar = Math.min(minBloodSugar, bloodSugarEntity.getLevel());
             maxBloodSugar = Math.max(maxBloodSugar, bloodSugarEntity.getLevel());
 
@@ -104,7 +109,7 @@ public class BloodSugarServiceImpl implements BloodSugarService{
                     .bloodSugarPk(bloodSugarEntity.getBloodSugarPk())
                     .category(bloodSugarEntity.getCategory())
                     .content(bloodSugarEntity.getContent())
-                    .createdAt(bloodSugarEntity.getCreatedAt())
+                    .createdAt(bloodSugarEntity.getRegistedAt())
                     .level(bloodSugarEntity.getLevel())
                     .status(getSugarBloodStatus(BLOODSUGARCATEGORY.valueOf(bloodSugarEntity.getCategory()), bloodSugarEntity.getLevel()))
                     .build());
@@ -112,7 +117,7 @@ public class BloodSugarServiceImpl implements BloodSugarService{
 
 
         returnDTO.getResponse().setBloodSugarMax(maxBloodSugar == -1 ? 0 : maxBloodSugar);
-        returnDTO.getResponse().setBloodSugarMin(minBloodSugar == 501 ? 0: minBloodSugar);
+        returnDTO.getResponse().setBloodSugarMin(minBloodSugar == 501 ? 0 : minBloodSugar);
 
         return returnDTO;
     }

@@ -5,8 +5,13 @@ import kr.co.sugarmanager.business.bloodsugar.exception.BloodSugarException;
 import kr.co.sugarmanager.business.global.entity.CUDEntity;
 import kr.co.sugarmanager.business.global.exception.ErrorCode;
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
+import org.springframework.data.annotation.CreatedDate;
+
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 @Builder
 @NoArgsConstructor
@@ -31,6 +36,9 @@ public class BloodSugarEntity extends CUDEntity {
     private int level;
     @Column(name = "BLOOD_SUGAR_CONTENT")
     private String content;
+    @Column(name = "REGISTED_AT")
+    @Builder.Default
+    private LocalDateTime registedAt = LocalDateTime.now();
 
     @Builder
     public BloodSugarEntity(Long userPk, String category, int level, String content) {
