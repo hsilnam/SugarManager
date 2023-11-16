@@ -8,5 +8,5 @@ public interface ChallengeService {
     ChallengeDeleteDTO.Response deleteChallenge(Long pk, ChallengeDeleteDTO.Request dto);
     UserChallengeAllDTO.Response userChallengesAll(Long pk, String nickname);
     UserChallengeInfoDTO.Response userChallengeInfo(Long pk, String nickname, Long challengePk);
-    ChallengePokeDTO.Response infoForPoke(ChallengePokeDTO.Request dto);
+    ChallengeClaimDTO.Response claim(Long pk, Long challengePk);
 }
