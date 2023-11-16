@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -33,6 +34,7 @@ public class BloodSugarServiceImpl implements BloodSugarService{
                     .category(request.getCategory().name())
                     .level(request.getLevel())
                     .content(request.getContent())
+                    .registedAt(request.getRegistedAt())
                     .build();
             bloodSugarRepository.save(bloodSugar);
             return BloodSugarSaveDTO.Response.builder()
@@ -46,6 +48,7 @@ public class BloodSugarServiceImpl implements BloodSugarService{
     }
 
     @Override
+    @Transactional
     public BloodSugarUpdateDTO.Response update(Long userPk, BloodSugarUpdateDTO.Request request) {
         Optional<BloodSugarEntity> optionalBloodSugarEntity = bloodSugarRepository.findByBloodSugarPkAndUserPk(request.getBloodSugarPk(), userPk);
         try {
@@ -56,7 +59,8 @@ public class BloodSugarServiceImpl implements BloodSugarService{
             bloodSugar.setLevel(request.getLevel());
             bloodSugar.setCategory(request.getCategory().name());
             bloodSugar.setContent(request.getContent());
-            bloodSugarRepository.save(bloodSugar);
+            bloodSugar.setRegistedAt(request.getRegistedAt());
+//            bloodSugarRepository.save(bloodSugar);
             return BloodSugarUpdateDTO.Response.builder()
                     .success(true)
                     .response(null)

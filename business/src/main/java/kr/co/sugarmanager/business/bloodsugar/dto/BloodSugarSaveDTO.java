@@ -1,8 +1,12 @@
 package kr.co.sugarmanager.business.bloodsugar.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonValue;
 import kr.co.sugarmanager.business.global.dto.ErrorResponse;
 import lombok.*;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import java.time.LocalDateTime;
 
 public class BloodSugarSaveDTO {
     @Builder
@@ -15,6 +19,10 @@ public class BloodSugarSaveDTO {
         private BLOODSUGARCATEGORY category;
         private int level;
         private String content;
+
+        @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm")
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM", timezone = "Asia/Seoul")
+        private LocalDateTime registedAt;
     }
 
     @Builder
