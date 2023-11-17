@@ -55,11 +55,12 @@ public class UserEntity{
     @Column(name = "USER_GENDER")
     private Boolean gender;
 
-    @Column(name = "USER_SOCIAL_TYPE", nullable = false)
-    private boolean socialType;
+    @Column(name = "USER_SOCIAL_TYPE", length = 10)
+    @Enumerated(EnumType.STRING)
+    private SocialType socialType;
 
     @Column(name = "USER_SOCIAL_ID")
-    private Long socialId;
+    private String socialId;
 
     @Column(name = "BLOOD_SUGAR_MAX")
     private int sugarMax;
@@ -73,5 +74,9 @@ public class UserEntity{
 
     @Column(name = "GROUP_PK")
     private long groupPk;
+
+    public enum SocialType {
+        KAKAO, HOME;
+    }
 
 }

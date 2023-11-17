@@ -14,7 +14,7 @@ public class FoodDTO {
     private float foodProtein;
     private float foodDietaryFiber;
     private float foodVitamin;
-    private float foodMineral;
+    private float foodFat;
     private float foodSalt;
     private float foodSugars;
     private float foodCal;

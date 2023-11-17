@@ -41,8 +41,8 @@ public class FoodEntity extends CUDEntity {
     @Column(name = "FOOD_VITAMIN")
     private float foodVitamin;
 
-    @Column(name = "FOOD_MINERAL")
-    private float foodMineral;
+    @Column(name = "FOOD_FAT")
+    private float foodFat;
 
     @Column(name = "FOOD_SALT")
     private float foodSalt;
@@ -62,7 +62,7 @@ public class FoodEntity extends CUDEntity {
         setFoodProtein(foodDTO.getFoodProtein());
         setFoodDietaryFiber(foodDTO.getFoodDietaryFiber());
         setFoodVitamin(foodDTO.getFoodVitamin());
-        setFoodMineral(foodDTO.getFoodMineral());
+        setFoodFat(foodDTO.getFoodFat());
         setFoodSalt(getFoodSalt());
         setFoodSugars(foodDTO.getFoodSugars());
         setFoodCal(foodDTO.getFoodCal());
