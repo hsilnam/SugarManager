@@ -80,7 +80,7 @@ public class MenuSelectDTO {
         private Float foodProtein;
         private Float foodDietaryFiber;
         private Float foodVitamin;
-        private Float foodMineral;
+        private Float foodFat;
         private Float foodSalt;
         private Float foodSugars;
     }
