@@ -1,18 +1,24 @@
 ### Part
-  - [ ] FE
-  - [ ] BE
-  - [ ] etc.
-<br>
+
+- [ ] FE
+- [ ] BE
+- [ ] etc.
+      <br>
 
 ### Changes
-	- Feat: 
-	- Fix:
-	- 논의사항: 
+
+    - Feat:
+    - Fix:
+    - 논의사항:
+
 <br>
 
 ### Test Checklist ☑️
+
 - [ ] 논의사항
-<br>
+      <br>
 
 ### Screenshot(option)
+
 <br>
+
