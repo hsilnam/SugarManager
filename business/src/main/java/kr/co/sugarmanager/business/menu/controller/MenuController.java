@@ -1,9 +1,6 @@
 package kr.co.sugarmanager.business.menu.controller;
 
-import kr.co.sugarmanager.business.menu.dto.MenuDeleteDTO;
-import kr.co.sugarmanager.business.menu.dto.MenuEditDTO;
-import kr.co.sugarmanager.business.menu.dto.MenuSaveDTO;
-import kr.co.sugarmanager.business.menu.dto.MenuSelectDTO;
+import kr.co.sugarmanager.business.menu.dto.*;
 import kr.co.sugarmanager.business.menu.service.MenuService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,11 +24,11 @@ public class MenuController {
 
     @PostMapping(value = "/save", produces = APPLICATION_JSON_VALUE, consumes = {APPLICATION_JSON_VALUE, MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<MenuSaveDTO.Response> save(
-            @RequestHeader("Authorization") String auth,
+            @RequestHeader("X-Authorization-Id") Long userPk,
             @RequestPart(value = "file", required = false) List<MultipartFile> imageFile,
             @Validated @RequestPart MenuSaveDTO.Request memuDto) {
-        log.info("MenuSave - Authorization: {}, menuDto: {}", auth, memuDto.getFoods());
-        Long userPk = 1L;       // TODO: 서버간 통신 필요
+        log.info("MenuSave - Authorization: {}, menuDto: {}", userPk, memuDto.getFoods());
+
         return new ResponseEntity<>(menuService.save(userPk, imageFile, memuDto), HttpStatus.CREATED);
     }
 
@@ -69,5 +66,29 @@ public class MenuController {
         log.info("MenuEdit - userPk: {}, request: {}", userPk, request);
 
         return new ResponseEntity<>(menuService.edit(request), HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/{nickname}/{year}/{month}/{day}")
+    public ResponseEntity<MenuDayDTO.Response> seletDay(
+            @RequestHeader("X-Authorization-Id") Long userPk,
+            @PathVariable("nickname") String nickname,
+            @PathVariable("year") int year,
+            @PathVariable("month") int month,
+            @PathVariable("day") int day) {
+        log.info("BloodSugar select - userPk: {}, nickname: {}, date: {}-{}-{}", userPk, nickname, year, month, day);
+
+        return new ResponseEntity<>(menuService.selectDay(userPk, nickname, year, month, day), HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/period/{nickname}/{startDate}/{endDate}/{page}")
+    public ResponseEntity<MenuPeriodDTO.Response> seletPeriod(
+            @RequestHeader("X-Authorization-Id") Long userPk,
+            @PathVariable("nickname") String nickname,
+            @PathVariable("startDate") String startDate,
+            @PathVariable("endDate") String endDate,
+            @PathVariable("page") Integer page) {
+        log.info("BloodSugar Period Select - userPk: {}, nickname: {}, startDate: {}, endDate: {}, page: {},", userPk, nickname, startDate, endDate, page);
+
+        return new ResponseEntity<>(menuService.selectPeriod(userPk, nickname, startDate, endDate, page), HttpStatus.OK);
     }
 }

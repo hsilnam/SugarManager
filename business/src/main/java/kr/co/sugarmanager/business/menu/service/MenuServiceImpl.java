@@ -5,6 +5,7 @@ import kr.co.sugarmanager.business.bloodsugar.entity.BloodSugarEntity;
 import kr.co.sugarmanager.business.bloodsugar.repository.BloodSugarRepository;
 import kr.co.sugarmanager.business.global.exception.ErrorCode;
 import kr.co.sugarmanager.business.global.exception.ValidationException;
+import kr.co.sugarmanager.business.global.user.repository.UserRepository;
 import kr.co.sugarmanager.business.menu.dto.*;
 import kr.co.sugarmanager.business.menu.entity.FoodEntity;
 import kr.co.sugarmanager.business.menu.entity.FoodImageEntity;
@@ -16,15 +17,17 @@ import kr.co.sugarmanager.business.menu.repository.FoodRepository;
 import kr.co.sugarmanager.business.menu.repository.MenuRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.nio.file.Paths;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -36,6 +39,7 @@ public class MenuServiceImpl implements MenuService {
     private final FoodImageRepository foodImageRepository;
     private final MenuImageService menuImageService;
     private final BloodSugarRepository bloodSugarRepository;
+    private final UserRepository userRepository;
 
     @Override
     @Transactional
@@ -90,7 +94,7 @@ public class MenuServiceImpl implements MenuService {
 
         // TODO: 내 그룹원이 아닌 다른 사람의 메뉴 조회 할 경우(403 Forbidden) 체크 및 처리 필요
         MenuEntity menu = menuRepository.findByMenuPkAndUserPk(menuPk, userPk)
-                .orElseThrow(()-> new MenuException(ErrorCode.MENU_NOT_FOUND_ERROR));
+                .orElseThrow(() -> new MenuException(ErrorCode.MENU_NOT_FOUND_ERROR));
 
         List<FoodImageEntity> foodImages = menu.getFoodImageList();
         List<MenuSelectDTO.MenuImage> repFoodImages = (foodImages == null) ? new ArrayList<>() : foodImages.stream()
@@ -129,7 +133,7 @@ public class MenuServiceImpl implements MenuService {
                 .foodProtein(food.getFoodProtein())
                 .foodDietaryFiber(food.getFoodDietaryFiber())
                 .foodVitamin(food.getFoodVitamin())
-                .foodMineral(food.getFoodMineral())
+                .foodFat(food.getFoodFat())
                 .foodSalt(food.getFoodSalt())
                 .foodSugars(food.getFoodSugars())
                 .build()
@@ -159,11 +163,11 @@ public class MenuServiceImpl implements MenuService {
         if (!menuOptional.isPresent()) throw new MenuException(ErrorCode.MENU_NOT_FOUND_ERROR);
         MenuEntity menu = menuOptional.get();
 
-        if(request.getCreatedMenuImages() != null && !request.getCreatedMenuImages().isEmpty()) {
+        if (request.getCreatedMenuImages() != null && !request.getCreatedMenuImages().isEmpty()) {
             menuImageService.saveImage(menuPk, ImageTypeEnum.FOOD, request.getCreatedMenuImages());
         }
 
-        if(request.getDeletedMenuImagePks() != null && !request.getDeletedMenuImagePks().isEmpty()) {
+        if (request.getDeletedMenuImagePks() != null && !request.getDeletedMenuImagePks().isEmpty()) {
             List<String> deletedImagePaths = new ArrayList<>();
             for (Long deletedMenuImagePk : request.getDeletedMenuImagePks()) {
                 Optional<FoodImageEntity> optionalFoodImage = foodImageRepository.findByMenuPkAndFoodImagePk(menuPk, deletedMenuImagePk);
@@ -178,7 +182,7 @@ public class MenuServiceImpl implements MenuService {
             foodImageRepository.deleteByFoodImagePkInAndMenuPK(request.getDeletedMenuImagePks(), menuPk);
         }
 
-        if(request.getCreatedFoods() != null && !request.getCreatedFoods().isEmpty()) {
+        if (request.getCreatedFoods() != null && !request.getCreatedFoods().isEmpty()) {
             List<FoodEntity> createdFoodEntities = request.getCreatedFoods().stream()
                     .map(food -> FoodEntity.builder()
                             .menuEntity(menu)
@@ -189,7 +193,7 @@ public class MenuServiceImpl implements MenuService {
                             .foodProtein(food.getFoodProtein())
                             .foodDietaryFiber(food.getFoodDietaryFiber())
                             .foodVitamin(food.getFoodVitamin())
-                            .foodMineral(food.getFoodMineral())
+                            .foodFat(food.getFoodFat())
                             .foodSalt(food.getFoodSalt())
                             .foodSugars(food.getFoodSugars())
                             .build())
@@ -197,7 +201,7 @@ public class MenuServiceImpl implements MenuService {
             foodRepository.saveAll(createdFoodEntities);
         }
 
-        if(request.getUpdatedFoods() != null && !request.getUpdatedFoods().isEmpty()) {
+        if (request.getUpdatedFoods() != null && !request.getUpdatedFoods().isEmpty()) {
             for (MenuEditDTO.UpdatedFood food : request.getUpdatedFoods()) {
                 Optional<FoodEntity> optionalFood = foodRepository.findByMenuPkAndFoodPk(menuPk, food.getFoodPk());
                 if (!optionalFood.isPresent()) {
@@ -212,13 +216,13 @@ public class MenuServiceImpl implements MenuService {
                 originFood.setFoodProtein(food.getFoodProtein());
                 originFood.setFoodDietaryFiber(food.getFoodDietaryFiber());
                 originFood.setFoodVitamin(food.getFoodVitamin());
-                originFood.setFoodMineral(food.getFoodMineral());
+                originFood.setFoodFat(food.getFoodFat());
                 originFood.setFoodSalt(food.getFoodSalt());
                 originFood.setFoodSugars(food.getFoodSugars());
             }
         }
 
-        if(request.getDeletedFoodPks() != null && !request.getDeletedFoodPks().isEmpty()) {
+        if (request.getDeletedFoodPks() != null && !request.getDeletedFoodPks().isEmpty()) {
             foodRepository.deleteByFoodPkInAndMenuPK(request.getDeletedFoodPks(), menuPk);
         }
 
@@ -226,5 +230,79 @@ public class MenuServiceImpl implements MenuService {
                 .builder()
                 .success(true)
                 .build();
+    }
+
+
+    @Override
+    public MenuDayDTO.Response selectDay(Long userPk, String targetUserNickname, int year, int month, int day) {
+        Long targetUserPk = isSameGroup(userPk, targetUserNickname);
+
+        List<MenuEntity> menus = menuRepository.findByUserPkAndCreatedAt(targetUserPk, year, month, day);
+
+        MenuDayDTO.Response returnDTO = MenuDayDTO.Response.builder()
+                .success(true)
+                .response(MenuDayDTO.ReturnResponse.builder().build())
+                .error(null)
+                .build();
+        returnDTO.getResponse().setMenuPreviews(new ArrayList<>());
+        Double daySugars = null;
+        for (MenuEntity menu : menus) {
+            MenuDayDTO.MenuPreview menuPreview = new MenuDayDTO.MenuPreview();
+            menuPreview.setMenuPk(menu.getMenuPk());
+            menuPreview.setCreatedAt(menu.getCreatedAt());
+
+            for (FoodEntity food : menu.getFoodList()) {
+                menuPreview.setFoodCal((menuPreview.getFoodCal() == null) ? food.getFoodCal() : menuPreview.getMenuPk() + food.getFoodCal());
+                menuPreview.setFoodSugars((menuPreview.getFoodSugars() == null) ? food.getFoodSugars() : menuPreview.getFoodSugars() + food.getFoodSugars());
+                menuPreview.setFoodProtein((menuPreview.getFoodProtein() == null) ? food.getFoodProtein() : menuPreview.getFoodProtein() + food.getFoodProtein());
+                menuPreview.setFoodCarbohydrate((menuPreview.getFoodCarbohydrate() == null) ? food.getFoodCarbohydrate() : menuPreview.getFoodCarbohydrate() + food.getFoodCarbohydrate());
+                menuPreview.setFoodFat((menuPreview.getFoodFat() == null) ? food.getFoodFat() : menuPreview.getFoodFat() + food.getFoodFat());
+            }
+
+            if (menuPreview.getFoodSugars() != null) {
+                daySugars = (daySugars == null) ? (double) menuPreview.getFoodSugars() : daySugars + menuPreview.getFoodSugars();
+            }
+            returnDTO.getResponse().addList(menuPreview);
+        }
+
+        returnDTO.getResponse().setDaySugars(daySugars);
+        return returnDTO;
+    }
+
+    @Override
+    public MenuPeriodDTO.Response selectPeriod(Long userPk, String targetUserNickname, String startDate, String endDate, int page) {
+        Long targetUserPk = isSameGroup(userPk, targetUserNickname);
+
+        PageRequest pageRequest = PageRequest.of(page, 30);
+        LocalDateTime startLocalDate = convertStringToLocalDateTime(startDate);
+        LocalDateTime endLocalDate = convertStringToLocalDateTime(endDate).plusDays(1L);
+
+        if (startLocalDate.isAfter(endLocalDate)) {
+            throw new MenuException(ErrorCode.INVALID_INPUT_VALUE);
+        }
+
+        return MenuPeriodDTO.Response.builder()
+                .success(true)
+                .response(menuRepository.findByPeriod(targetUserPk, startLocalDate, endLocalDate, pageRequest).getContent())
+                .error(null)
+                .build();
+    }
+
+    private Long isSameGroup(Long userPk, String targetUserNickname) {
+        if (userRepository.findIdByNickname(targetUserNickname) == null
+                || (!userRepository.findIdByNickname(targetUserNickname).equals(userPk)
+                && !userRepository.inSameGroup(userPk, targetUserNickname))) {
+            throw new MenuException(ErrorCode.HANDLE_ACCESS_DENIED);
+        }
+
+        return userRepository.findIdByNickname(targetUserNickname);
+    }
+
+    private LocalDateTime convertStringToLocalDateTime(String date) {
+        try {
+            return LocalDate.parse(date, DateTimeFormatter.ISO_DATE).atStartOfDay();
+        } catch (RuntimeException e) {
+            throw new MenuException(ErrorCode.INVALID_INPUT_VALUE);
+        }
     }
 }
