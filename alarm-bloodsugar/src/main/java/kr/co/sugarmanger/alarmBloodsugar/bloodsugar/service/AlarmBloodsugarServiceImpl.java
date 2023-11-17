@@ -48,28 +48,31 @@ public class AlarmBloodsugarServiceImpl implements  AlarmBloodsugarService{
             LocalDateTime endOfDay = startOfDay.plusDays(1);
             for (UserSettingEntity userSetting : userList) {
                 // [2-1] menu 테이블의 오늘의 가장 최신 created_at 확인
-                MenuEntity latestMenu = menuRepository.findLatestMenu(userSetting.getUserPk(), startOfDay, endOfDay);
-                log.info("latestMenu : {}", latestMenu);
+                MenuEntity latestMenu = menuRepository.findLatestMenu(userSetting.getUserPk(), startOfDay, endOfDay)
+                        .orElse(null);
+                if (latestMenu != null){
+                    log.info("latestMenu : {}", latestMenu);
 
-                // [2-2] 혈당 기록 여부 검사
-                LocalDateTime start = latestMenu.getCreated_at();
-                // 현욱이가 만들어주면 수정
-                LocalDateTime end = start.plusHours(userSetting.getSugarAlertHour());
-                BloodSugarEntity record = bloodSugarRepository.checkRecord(start, end);
-                log.info("check data: {} ", record);
+                    // [2-2] 혈당 기록 여부 검사
+                    LocalDateTime start = latestMenu.getCreated_at();
+                    // 현욱이가 만들어주면 수정
+                    LocalDateTime end = start.plusHours(userSetting.getSugarAlertHour());
+                    BloodSugarEntity record = bloodSugarRepository.checkRecord(start, end);
+                    log.info("check data: {} ", record);
 
-                // message body
-                StringBuilder body = new StringBuilder();
-                body.append(userRepository.findNicknameById(userSetting.getUserPk())).append("님 ").append(" 혈당을 기록할 시간이에요!");
+                    // message body
+                    StringBuilder body = new StringBuilder();
+                    body.append(userRepository.findNicknameById(userSetting.getUserPk())).append("님 ").append(" 혈당을 기록할 시간이에요!");
 
-                // [2-3] 대상자일 경우 추가
-                if (record == null) {
-                    UserInfoDTO user = UserInfoDTO.builder()
-                            .title("혈당 기록 알림")
-                            .body(body.toString())
-                            .fcmToken(userSetting.getFcmToken())
-                            .build();
-                    users.add(user);
+                    // [2-3] 대상자일 경우 추가
+                    if (record == null) {
+                        UserInfoDTO user = UserInfoDTO.builder()
+                                .title("혈당 기록 알림")
+                                .body(body.toString())
+                                .fcmToken(userSetting.getFcmToken())
+                                .build();
+                        users.add(user);
+                    }
                 }
             }
         } catch (Exception e){
