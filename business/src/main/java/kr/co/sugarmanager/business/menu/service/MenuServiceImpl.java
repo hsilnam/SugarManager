@@ -293,13 +293,14 @@ public class MenuServiceImpl implements MenuService {
     }
 
     private Long isSameGroup(Long userPk, String targetUserNickname) {
-        if (userRepository.findIdByNickname(targetUserNickname) == null
-                || (!userRepository.findIdByNickname(targetUserNickname).equals(userPk)
+        Long targetUserPk = userRepository.findIdByNickname(targetUserNickname).orElse(null);
+        if (targetUserPk == null
+                || (!targetUserPk.equals(userPk)
                 && !userRepository.inSameGroup(userPk, targetUserNickname))) {
             throw new MenuException(ErrorCode.HANDLE_ACCESS_DENIED);
         }
 
-        return userRepository.findIdByNickname(targetUserNickname);
+        return targetUserPk;
     }
 
     private LocalDateTime convertStringToLocalDateTime(String date) {
