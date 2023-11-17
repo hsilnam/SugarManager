@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: BUSINESS-SERVICE
+  profiles:
+    active: secret, eureka, db
+server:
+  port: 8080

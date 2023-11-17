@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: SEARCH-SERVICE
+  profiles:
+    active: db, eureka
+server:
+  port: 8080

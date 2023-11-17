@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: USER-SERVICE
+  profiles:
+    include: db,jwt,eureka,oauth,redis,kafka
+server:
+  port: 0
+eureka:
+  instance:
+    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+  client:
+    register-with-eureka: false
+    fetch-registry: false
