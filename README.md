@@ -1,13 +1,14 @@
 # A304 관리하당 
 
+<center>![image.png](./EXEC/images/logo.png)</center>
 
-<center>
-  ![image.png](./EXEC/images/logo.png)
-</center>
-
-## 개요
+# 주제
 ### 당뇨병 환자의 식단 관리를 도와주는 어플리케이션
 
+## 개발 기간
+#### 2023.10.09 - 2023.11.17 (7주)
+
+<br/><br/>
 ## 🛠️ Tech Stack 🛠️
 ### Infra
 <img src="https://img.shields.io/badge/MySQL-4479A1?style=for-the-badge&logo=mysql&logoColor=white"/>
@@ -23,7 +24,6 @@
 <img src="https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white"/>
 <img src="https://img.shields.io/badge/eslint-4B32C3?style=for-the-badge&logo=eslint&logoColor=white"/>
 <img src="https://img.shields.io/badge/redux-764ABC?style=for-the-badge&logo=redux&logoColor=white"/>
-<img src="https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white"/>
 <img src="https://img.shields.io/badge/reactquery-FF4154?style=for-the-badge&logo=reactquery&logoColor=white"/>
 <img src="https://img.shields.io/badge/styledcomponents-DB7093?style=for-the-badge&logo=styledcomponents&logoColor=white"/>
 
@@ -31,6 +31,7 @@
 <img src="https://img.shields.io/badge/springboot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white">
 <img src="https://img.shields.io/badge/Java-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white"/>
 
+<br/><br/>
 
 ## 아키텍처
 ![architecure.png](./EXEC/SoftwareArchitecture.png)
@@ -38,4 +39,6 @@
 ## ERD 
 ![ERD.png](./EXEC/ERD.png)
 
+<br/><br/>
+## 결과물
 
