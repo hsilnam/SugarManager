@@ -43,6 +43,7 @@ public class BloodSugarSelectDTO {
         private String category;
         private int level;
         private String content;
-        private LocalDateTime updatedAt;
+        private LocalDateTime registedAt;
+        private SUGARBLOODSTATUS status;
     }
 }

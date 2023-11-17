@@ -19,22 +19,23 @@ public class TimelineController {
 
     @GetMapping("/{nickname}/{year}/{month}")
     public ResponseEntity<TimelineMonthDTO.Response> timelineMonth(
-//            @RequestHeader("X-Authrization-Id") Long id,
+            @RequestHeader("X-Authorization-Id") Long pk,
             @PathVariable String nickname,
             @PathVariable Integer year,
             @PathVariable Integer month){
-        TimelineMonthDTO.Response response = timelineService.timelineMonth(nickname,year,month); //id, nickname, year, month);
+        log.info("컨트롤러 호출");
+        TimelineMonthDTO.Response response = timelineService.timelineMonth(pk,nickname,year,month);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @GetMapping("/{nickname}/{year}/{month}/{date}")
     public ResponseEntity<TimelineDateDTO.Response> timelineDate(
-//            @RequestHeader("X-Authrization-Id") Long id,
+            @RequestHeader("X-Authorization-Id") Long pk,
             @PathVariable String nickname,
             @PathVariable Integer year,
             @PathVariable Integer month,
             @PathVariable Integer date){
-        TimelineDateDTO.Response response = timelineService.timelineDate(nickname,year,month,date); //id, nickname, year, month, date);
+        TimelineDateDTO.Response response = timelineService.timelineDate(pk,nickname,year,month,date);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

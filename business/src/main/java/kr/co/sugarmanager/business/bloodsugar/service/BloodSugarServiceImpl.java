@@ -6,10 +6,12 @@ import kr.co.sugarmanager.business.bloodsugar.exception.BloodSugarException;
 import kr.co.sugarmanager.business.bloodsugar.repository.BloodSugarRepository;
 import kr.co.sugarmanager.business.global.exception.ErrorCode;
 import kr.co.sugarmanager.business.global.exception.ValidationException;
+import kr.co.sugarmanager.business.global.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -21,8 +23,9 @@ import java.util.Optional;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class BloodSugarServiceImpl implements BloodSugarService{
+public class BloodSugarServiceImpl implements BloodSugarService {
     private final BloodSugarRepository bloodSugarRepository;
+    private final UserRepository userRepository;
 
     @Override
     public BloodSugarSaveDTO.Response save(Long userPk, BloodSugarSaveDTO.Request request) {
@@ -32,6 +35,7 @@ public class BloodSugarServiceImpl implements BloodSugarService{
                     .category(request.getCategory().name())
                     .level(request.getLevel())
                     .content(request.getContent())
+                    .registedAt(request.getRegistedAt())
                     .build();
             bloodSugarRepository.save(bloodSugar);
             return BloodSugarSaveDTO.Response.builder()
@@ -45,17 +49,19 @@ public class BloodSugarServiceImpl implements BloodSugarService{
     }
 
     @Override
+    @Transactional
     public BloodSugarUpdateDTO.Response update(Long userPk, BloodSugarUpdateDTO.Request request) {
         Optional<BloodSugarEntity> optionalBloodSugarEntity = bloodSugarRepository.findByBloodSugarPkAndUserPk(request.getBloodSugarPk(), userPk);
         try {
-            if (!optionalBloodSugarEntity.isPresent()) {
+            if (optionalBloodSugarEntity.isEmpty()) {
                 throw new BloodSugarException(ErrorCode.HANDLE_ACCESS_DENIED);
             }
             BloodSugarEntity bloodSugar = optionalBloodSugarEntity.get();
             bloodSugar.setLevel(request.getLevel());
             bloodSugar.setCategory(request.getCategory().name());
             bloodSugar.setContent(request.getContent());
-            bloodSugarRepository.save(bloodSugar);
+            bloodSugar.setRegistedAt(request.getRegistedAt());
+//            bloodSugarRepository.save(bloodSugar);
             return BloodSugarUpdateDTO.Response.builder()
                     .success(true)
                     .response(null)
@@ -69,7 +75,7 @@ public class BloodSugarServiceImpl implements BloodSugarService{
     @Override
     public BloodSugarDeleteDTO.Response delete(Long userPk, BloodSugarDeleteDTO.Request request) {
         Optional<BloodSugarEntity> optionalBloodSugarEntity = bloodSugarRepository.findByBloodSugarPkAndUserPk(request.getBloodSugarPk(), userPk);
-        if (!optionalBloodSugarEntity.isPresent()) {
+        if (optionalBloodSugarEntity.isEmpty()) {
             throw new BloodSugarException(ErrorCode.HANDLE_ACCESS_DENIED);
         }
 
@@ -83,8 +89,10 @@ public class BloodSugarServiceImpl implements BloodSugarService{
     }
 
     @Override
-    public BloodSugarSelectDTO.Response select(Long userPk, int year, int month, int day) {
-        List<BloodSugarEntity> selectResult = bloodSugarRepository.findByUserPkAndUpdatedAt(userPk, year, month, day);
+    public BloodSugarSelectDTO.Response select(Long userPk, String targetUserNickname, int year, int month, int day) {
+        Long targetUserPk = isSameGroup(userPk, targetUserNickname);
+
+        List<BloodSugarEntity> selectResult = bloodSugarRepository.findByUserPkAndUpdatedAt(targetUserPk, year, month, day);
         int minBloodSugar = 501;
         int maxBloodSugar = -1;
         BloodSugarSelectDTO.Response returnDTO = BloodSugarSelectDTO.Response.builder()
@@ -93,27 +101,31 @@ public class BloodSugarServiceImpl implements BloodSugarService{
                 .error(null)
                 .build();
         returnDTO.getResponse().setList(new ArrayList<>());
-        for (BloodSugarEntity bloodSugarEntity: selectResult) {
+        for (BloodSugarEntity bloodSugarEntity : selectResult) {
             minBloodSugar = Math.min(minBloodSugar, bloodSugarEntity.getLevel());
             maxBloodSugar = Math.max(maxBloodSugar, bloodSugarEntity.getLevel());
 
             returnDTO.getResponse().addList(BloodSugarSelectDTO.EntityResponse.builder()
-                            .bloodSugarPk(bloodSugarEntity.getBloodSugarPk())
-                            .category(bloodSugarEntity.getCategory())
-                            .content(bloodSugarEntity.getContent())
-                            .updatedAt(bloodSugarEntity.getUpdatedAt())
-                            .level(bloodSugarEntity.getLevel())
+                    .bloodSugarPk(bloodSugarEntity.getBloodSugarPk())
+                    .category(bloodSugarEntity.getCategory())
+                    .content(bloodSugarEntity.getContent())
+                    .registedAt(bloodSugarEntity.getRegistedAt())
+                    .level(bloodSugarEntity.getLevel())
+                    .status(getSugarBloodStatus(BLOODSUGARCATEGORY.valueOf(bloodSugarEntity.getCategory()), bloodSugarEntity.getLevel()))
                     .build());
         }
 
+
         returnDTO.getResponse().setBloodSugarMax(maxBloodSugar == -1 ? 0 : maxBloodSugar);
-        returnDTO.getResponse().setBloodSugarMin(minBloodSugar == 501 ? 0: minBloodSugar);
+        returnDTO.getResponse().setBloodSugarMin(minBloodSugar == 501 ? 0 : minBloodSugar);
 
         return returnDTO;
     }
 
     @Override
-    public BloodSugarPeriodDTO.Response selectPeriod(Long userPk, String startDate, String endDate, int page) {
+    public BloodSugarPeriodDTO.Response selectPeriod(Long userPk, String targetUserNickname, String startDate, String endDate, int page) {
+        Long targetUserPk = isSameGroup(userPk, targetUserNickname);
+
         PageRequest pageRequest = PageRequest.of(page, 30);
         LocalDateTime startLocalDate = convertStringToLocalDateTime(startDate);
         LocalDateTime endLocalDate = convertStringToLocalDateTime(endDate).plusDays(1L);
@@ -124,7 +136,7 @@ public class BloodSugarServiceImpl implements BloodSugarService{
 
         return BloodSugarPeriodDTO.Response.builder()
                 .success(true)
-                .response(bloodSugarRepository.findByPeriod(userPk, startLocalDate, endLocalDate, pageRequest).getContent())
+                .response(bloodSugarRepository.findByPeriod(targetUserPk, startLocalDate, endLocalDate, pageRequest).getContent())
                 .error(null)
                 .build();
     }
@@ -135,5 +147,31 @@ public class BloodSugarServiceImpl implements BloodSugarService{
         } catch (RuntimeException e) {
             throw new BloodSugarException(ErrorCode.INVALID_INPUT_VALUE);
         }
+    }
+
+    private Long isSameGroup(Long userPk, String targetUserNickname) {
+        Long targetUserId = userRepository.findIdByNickname(targetUserNickname)
+                .orElseThrow(() -> new ValidationException(ErrorCode.NO_SUCH_USER));
+        if (!targetUserId.equals(userPk)
+                && !userRepository.inSameGroup(userPk, targetUserNickname)) {
+            throw new BloodSugarException(ErrorCode.HANDLE_ACCESS_DENIED);
+        }
+        return targetUserId;
+    }
+
+    private SUGARBLOODSTATUS getSugarBloodStatus(BLOODSUGARCATEGORY category, int level) {
+        switch (category) {
+            case BEFORE -> {
+                if (level >= 70 && level <= 130) return SUGARBLOODSTATUS.SAFETY;
+                else if (level >= 63 && level < 143) return SUGARBLOODSTATUS.WARNING;
+                else if (level >= 0 && level < 1000) return SUGARBLOODSTATUS.DANGER;
+            }
+            case AFTER -> {
+                if (level >= 90 && level <= 180) return SUGARBLOODSTATUS.SAFETY;
+                else if (level >= 81 && level < 198) return SUGARBLOODSTATUS.WARNING;
+                else if (level >= 0 && level < 1000) return SUGARBLOODSTATUS.DANGER;
+            }
+        }
+        return null;
     }
 }

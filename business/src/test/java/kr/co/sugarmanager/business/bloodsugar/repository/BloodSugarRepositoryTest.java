@@ -107,9 +107,9 @@ public class BloodSugarRepositoryTest {
         //when
         List<BloodSugarEntity> result = bloodSugarRepository.findByUserPkAndUpdatedAt(
                 1L,
-                bloodSugarEntity.getCreatedAt().getYear(),
-                bloodSugarEntity.getCreatedAt().getMonthValue(),
-                bloodSugarEntity.getCreatedAt().getDayOfMonth());
+                bloodSugarEntity.getRegistedAt().getYear(),
+                bloodSugarEntity.getRegistedAt().getMonthValue(),
+                bloodSugarEntity.getRegistedAt().getDayOfMonth());
         //then
         assertTrue(result.size() > 0);
     }

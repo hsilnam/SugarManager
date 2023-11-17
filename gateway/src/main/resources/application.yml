@@ -1,43 +1,70 @@
 server:
   port: 8000
 
-eureka:
-  client:
-    register-with-eureka: true
-    fetch-registry: true
-    serviceUrl:
-      defaultZone: http://localhost:8761/eureka # eureka server url
-
 spring:
   application:
     name: gateway-service
   cloud:
     gateway:
       default-filters:
-        # global filter example
         - name: GlobalFilter
           args:
             baseMessage: Spring Cloud Gateway Global Filter
             preLogger: true
             postLogger: true
+        - name: AuthorizationFilter
+          args:
+            whiteList:
+              - /**/api/v1/auth/**
       routes:
         # TODO: setting MS
-        # demo service example
-        - id: demo-service
-          uri: lb://DEMO-SERVICE # lb:{service_name} # Write uppercase!
-          predicates:
-            - Path=/demo-service/** # routing start path
-          filters:
-            - RewritePath=/demo-service/(?<segment>.*), /$\{segment} # Rewrite the incoming request path. When sending a request to MS, remove the '/demo-service' part from the path.
-            - name: CustomFilter # CustomFilter exmaple
-            - name: LoggingFilter # LoggingFilter example
-              args:
-                baseMessage: demo logging filter test.
-                preLogger: true
-                postLogger: true
+#        # demo service example
+#        - id: demo-service
+#          uri: lb://DEMO-SERVICE # lb:{service_name} # Write uppercase!
+#          predicates:
+#            - Path=/demo-service/** # routing start path
+#          filters:
+#            - RewritePath=/demo-service/(?<segment>.*), /$\{segment} # Rewrite the incoming request path. When sending a request to MS, remove the '/demo-service' part from the path.
+#            - name: CustomFilter # CustomFilter exmaple
+#            - name: LoggingFilter # LoggingFilter example
+#              args:
+#                baseMessage: demo logging filter test.
+#                preLogger: true
+#                postLogger: true
         - id: user-service
           uri: lb://USER-SERVICE
           predicates:
-            - Path=/user-service/api/v1/auth/**
+            - Path=/user-service/api/v1/**
           filters:
             - RewritePath=/user-service/(?<segment>.*), /$\{segment}
+
+        - id: business-service
+          uri: lb://BUSINESS-SERVICE
+          predicates:
+            - Path=/business-service/api/v1/**
+          filters:
+            - RewritePath=/business-service/(?<segment>.*), /$\{segment}
+
+        - id:  alarm-challenge-service
+          uri: lb://ALARM-CHALLENGE-SERVICE
+          predicates:
+            - Path=/alarm-challenge-service/api/v1/**
+          filters:
+            - RewritePath=/alarm-challenge-service/(?<segment>.*), /$\{segment}
+
+        - id: alarm-bloodsugar-service
+          uri: lb://ALARM-BLOOD-SERVICE
+          predicates:
+            - Path=/alarm-bloodsugar-service/api/v1/**
+          filters:
+            - RewritePath=/alarm-bloodsugar-service/(?<segment>.*), /$\{segment}
+
+        - id: search-service
+          uri: lb://SEARCH-SERVICE
+          predicates:
+            - Path=/search-service/api/v1/**
+          filters:
+            - RewritePath=/search-service/(?<segment>.*), /$\{segment}
+
+  profiles:
+    include: jwt,eureka
