@@ -42,4 +42,22 @@
 <br/><br/>
 ## 결과물
 
+### 메인
+<p align="center">
+<img src="./EXEC/images/main.jpeg" width=200/>
+<img src="./EXEC/images/login.jpeg" width=200/>
+</p>
 
+### 혈당 등록
+<p align="center">
+<img src="./EXEC/images/bloodsugar1.jpeg" width=200/>
+<img src="./EXEC/images/bloodsugar2.jpeg" width=200/>
+<img src="./EXEC/images/bloodsugar3.jpeg" width=200/>
+</p>
+
+### 챌린지
+<p align="center">
+<img src="./EXEC/images/challenge.jpeg" width=200/>
+<img src="./EXEC/images/challenge1.jpeg" width=200/>
+<img src="./EXEC/images/challenge2.jpeg" width=200/>
+</p>
