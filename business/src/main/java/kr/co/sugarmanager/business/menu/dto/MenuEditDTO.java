@@ -4,7 +4,6 @@ import kr.co.sugarmanager.business.global.dto.ErrorResponse;
 import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class MenuEditDTO {
@@ -41,7 +40,7 @@ public class MenuEditDTO {
         private Float foodProtein;
         private Float foodDietaryFiber;
         private Float foodVitamin;
-        private Float foodMineral;
+        private Float foodFat;
         private Float foodSalt;
         private Float foodSugars;
     }
@@ -61,7 +60,7 @@ public class MenuEditDTO {
         private Float foodProtein;
         private Float foodDietaryFiber;
         private Float foodVitamin;
-        private Float foodMineral;
+        private Float foodFat;
         private Float foodSalt;
         private Float foodSugars;
     }

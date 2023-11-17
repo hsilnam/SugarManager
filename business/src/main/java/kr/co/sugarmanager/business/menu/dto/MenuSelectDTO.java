@@ -3,7 +3,6 @@ package kr.co.sugarmanager.business.menu.dto;
 import kr.co.sugarmanager.business.global.dto.ErrorResponse;
 import lombok.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class MenuSelectDTO {
@@ -74,7 +73,7 @@ public class MenuSelectDTO {
         private Float foodProtein;
         private Float foodDietaryFiber;
         private Float foodVitamin;
-        private Float foodMineral;
+        private Float foodFat;
         private Float foodSalt;
         private Float foodSugars;
     }
