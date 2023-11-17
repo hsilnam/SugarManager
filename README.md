@@ -33,7 +33,7 @@
 
 
 ## 아키텍처
-![architecure.png](./EXEC/SoftwareArchitecure.png)
+![architecure.png](./EXEC/SoftwareArchitecture.png)
 
 ## ERD 
 ![ERD.png](./EXEC/ERD.png)
