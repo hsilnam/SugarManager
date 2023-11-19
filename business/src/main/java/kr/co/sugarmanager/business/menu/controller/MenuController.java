@@ -27,17 +27,16 @@ public class MenuController {
             @RequestHeader("X-Authorization-Id") Long userPk,
             @RequestPart(value = "file", required = false) List<MultipartFile> imageFile,
             @Validated @RequestPart MenuSaveDTO.Request memuDto) {
-        log.info("MenuSave - Authorization: {}, menuDto: {}", userPk, memuDto.getFoods());
+        log.info("MenuSave - userPk: {}, menuDto: {}", userPk, memuDto.getFoods());
 
         return new ResponseEntity<>(menuService.save(userPk, imageFile, memuDto), HttpStatus.CREATED);
     }
 
     @PostMapping(value = "/delete", produces = APPLICATION_JSON_VALUE, consumes = {APPLICATION_JSON_VALUE})
     public ResponseEntity<MenuDeleteDTO.Response> delete(
-            @RequestHeader("Authorization") String auth,
+            @RequestHeader("X-Authorization-Id") Long userPk,
             @Validated @RequestBody MenuDeleteDTO.Request menuPk) {
-        log.info("MenuDelete - Authorization: {}, menuDto: {}", auth, menuPk.getMenuPk());
-        Long userPk = 1L;       // TODO: 서버간 통신 필요
+        log.info("MenuDelete - userPk: {}, menuDto: {}", userPk, menuPk.getMenuPk());
         return new ResponseEntity<>(menuService.delete(userPk, menuPk), HttpStatus.OK);
     }
 
