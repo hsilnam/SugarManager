@@ -43,6 +43,48 @@ public class MenuServiceImpl implements MenuService {
 
     @Override
     @Transactional
+    public MenuSaveDTO.Response saveImage(Long userPk, Long menuPk, List<MultipartFile> imageFiles) {
+        menuImageService.saveImage(menuPk, ImageTypeEnum.FOOD, imageFiles);
+        return MenuSaveDTO.Response.builder()
+                .success(true)
+                .response(null)
+                .error(null)
+                .build();
+    }
+
+    @Override
+    @Transactional
+    public MenuSaveDTO.Response saveContent(Long userPk, MenuSaveDTO.Request request) {
+        if (request.getFoods() == null || request.getFoods().size() == 0) {
+            throw new ValidationException(ErrorCode.MISSING_INPUT_VALUE);
+        }
+
+        MenuEntity menuEntity = MenuEntity.builder()
+                .userPk(userPk)
+                .registedAt(request.getRegistedAt())
+                .foodList(new ArrayList<>())
+                .foodImageList(new ArrayList<>())
+                .build();
+        MenuEntity menu = menuRepository.save(menuEntity);
+
+        for (FoodDTO food : request.getFoods()) {
+            FoodEntity foodEntity = new FoodEntity(food);
+            foodEntity.setMenuEntity(menu);
+            menuEntity.addFoodEntity(foodEntity);
+            foodRepository.save(foodEntity);
+        }
+
+        return MenuSaveDTO.Response
+                .builder()
+                .success(true)
+                .response(MenuSaveDTO.Res.builder()
+                        .menuPk(menu.getMenuPk())
+                        .build())
+                .build();
+    }
+
+    @Override
+    @Transactional
     public MenuSaveDTO.Response save(Long userPk, List<MultipartFile> imageFiles, MenuSaveDTO.Request request) {
         if (request.getFoods() == null || request.getFoods().size() == 0) {
             throw new ValidationException(ErrorCode.MISSING_INPUT_VALUE);
@@ -167,7 +209,7 @@ public class MenuServiceImpl implements MenuService {
 
         menu.modifyRegistedAt(request.getRegistedAt());
 
-        if(request.getCreatedMenuImages() != null && !request.getCreatedMenuImages().isEmpty()) {
+        if (request.getCreatedMenuImages() != null && !request.getCreatedMenuImages().isEmpty()) {
             menuImageService.saveImage(menuPk, ImageTypeEnum.FOOD, request.getCreatedMenuImages());
         }
 
