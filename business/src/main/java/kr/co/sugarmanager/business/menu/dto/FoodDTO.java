@@ -17,6 +17,7 @@ public class FoodDTO {
     private float foodFat;
     private float foodSalt;
     private float foodSugars;
+    private float foodMineral;
     private float foodCal;
     private float foodGrams;
 }
