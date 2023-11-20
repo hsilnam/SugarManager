@@ -12,8 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
+import static org.springframework.http.MediaType.*;
 
 @RestController
 @RequestMapping("/api/v1/menu")
@@ -30,6 +29,25 @@ public class MenuController {
         log.info("MenuSave - userPk: {}, menuDto: {}", userPk, menuDto.getFoods());
 
         return new ResponseEntity<>(menuService.save(userPk, imageFile, menuDto), HttpStatus.CREATED);
+    }
+
+    @PostMapping(value = "/saveImage", produces = APPLICATION_JSON_VALUE, consumes = MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<MenuSaveDTO.Response> saveiMAGE(
+            @RequestHeader("X-Authorization-Id") Long userPk,
+            @RequestParam(value = "file", required = false) List<MultipartFile> imageFile,
+            @RequestParam(value = "menuPk") Long menuPk
+    ) {
+        log.info("MenuSave - userPk: {}, menuPk: {}", userPk, menuPk);
+        return new ResponseEntity<>(menuService.saveImage(userPk, menuPk, imageFile), HttpStatus.CREATED);
+    }
+
+    @PostMapping(value = "/saveContent", produces = APPLICATION_JSON_VALUE, consumes = APPLICATION_JSON_VALUE)
+    public ResponseEntity<MenuSaveDTO.Response> saveContent(
+            @RequestHeader("X-Authorization-Id") Long userPk,
+            @RequestBody MenuSaveDTO.Request menuDto
+    ) {
+        log.info("MenuSave - userPk: {}", userPk);
+        return new ResponseEntity<>(menuService.saveContent(userPk, menuDto), HttpStatus.CREATED);
     }
 
     @PostMapping(value = "/delete", produces = APPLICATION_JSON_VALUE, consumes = {APPLICATION_JSON_VALUE})

@@ -29,7 +29,16 @@ public class MenuSaveDTO {
     @Setter
     public static class Response {
         private boolean success;
-        private String response;
+        private Res response;
         private ErrorResponse error;
+    }
+
+    @Builder
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Res {
+        private Long menuPk;
     }
 }
