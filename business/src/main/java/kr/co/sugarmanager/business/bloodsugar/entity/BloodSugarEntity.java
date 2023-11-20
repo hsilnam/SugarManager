@@ -5,15 +5,11 @@ import kr.co.sugarmanager.business.bloodsugar.exception.BloodSugarException;
 import kr.co.sugarmanager.business.global.entity.CUDEntity;
 import kr.co.sugarmanager.business.global.exception.ErrorCode;
 import lombok.*;
-import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
-import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 
-import java.time.LocalDateTime;
 
 @Builder
 @NoArgsConstructor

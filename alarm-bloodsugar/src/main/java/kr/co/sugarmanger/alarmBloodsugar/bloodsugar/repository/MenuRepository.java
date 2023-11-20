@@ -8,11 +8,12 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 
 @Repository
 public interface MenuRepository extends JpaRepository<MenuEntity, Long> {
 
     @Query("select m from MenuEntity m where m.created_at = (select max(m1.created_at) from MenuEntity m1 where m1.userPk = :userPk and m1.created_at between :startOfDay and :endOfDay)")
-    MenuEntity findLatestMenu(@Param("userPk") long userPk, @Param("startOfDay")LocalDateTime startOfDay, @Param("endOfDay") LocalDateTime endOfDay);
+    Optional<MenuEntity> findLatestMenu(@Param("userPk") long userPk, @Param("startOfDay")LocalDateTime startOfDay, @Param("endOfDay") LocalDateTime endOfDay);
 }
