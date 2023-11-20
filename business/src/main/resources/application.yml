@@ -3,5 +3,10 @@ spring:
     name: BUSINESS-SERVICE
   profiles:
     active: secret, eureka, db
+  servlet:
+    multipart:
+      file-size-threshold: 1MB
+      max-file-size: 100MB
+      max-request-size: 100MB
 server:
   port: 8080
