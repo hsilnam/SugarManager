@@ -241,7 +241,7 @@ public class MenuServiceImpl implements MenuService {
     public MenuDayDTO.Response selectDay(Long userPk, String targetUserNickname, int year, int month, int day) {
         Long targetUserPk = isSameGroup(userPk, targetUserNickname);
 
-        List<MenuEntity> menus = menuRepository.findByUserPkAndCreatedAt(targetUserPk, year, month, day);
+        List<MenuEntity> menus = menuRepository.findByUserPkAndRegistedAt(targetUserPk, year, month, day);
 
         MenuDayDTO.Response returnDTO = MenuDayDTO.Response.builder()
                 .success(true)
@@ -253,7 +253,7 @@ public class MenuServiceImpl implements MenuService {
         for (MenuEntity menu : menus) {
             MenuDayDTO.MenuPreview menuPreview = new MenuDayDTO.MenuPreview();
             menuPreview.setMenuPk(menu.getMenuPk());
-            menuPreview.setCreatedAt(menu.getCreatedAt());
+            menuPreview.setRegistedAt(menu.getRegistedAt());
 
             for (FoodEntity food : menu.getFoodList()) {
                 menuPreview.setFoodCal((menuPreview.getFoodCal() == null) ? food.getFoodCal() : menuPreview.getMenuPk() + food.getFoodCal());
