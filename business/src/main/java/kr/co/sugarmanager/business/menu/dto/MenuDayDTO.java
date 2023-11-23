@@ -44,6 +44,6 @@ public class MenuDayDTO {
         private Float foodProtein;
         private Float foodCarbohydrate;
         private Float foodFat;
-        private LocalDateTime createdAt;
+        private LocalDateTime registedAt;
     }
 }
