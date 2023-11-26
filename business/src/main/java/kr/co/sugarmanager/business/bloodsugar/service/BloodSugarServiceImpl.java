@@ -111,7 +111,7 @@ public class BloodSugarServiceImpl implements BloodSugarService {
                     .content(bloodSugarEntity.getContent())
                     .registedAt(bloodSugarEntity.getRegistedAt())
                     .level(bloodSugarEntity.getLevel())
-                    .status(getSugarBloodStatus(BLOODSUGARCATEGORY.valueOf(bloodSugarEntity.getCategory()), bloodSugarEntity.getLevel()))
+                    .status(SUGARBLOODSTATUS.getSugarBloodStatus(BLOODSUGARCATEGORY.valueOf(bloodSugarEntity.getCategory()), bloodSugarEntity.getLevel()))
                     .build());
         }
 
@@ -157,21 +157,5 @@ public class BloodSugarServiceImpl implements BloodSugarService {
             throw new BloodSugarException(ErrorCode.HANDLE_ACCESS_DENIED);
         }
         return targetUserId;
-    }
-
-    private SUGARBLOODSTATUS getSugarBloodStatus(BLOODSUGARCATEGORY category, int level) {
-        switch (category) {
-            case BEFORE -> {
-                if (level >= 70 && level <= 130) return SUGARBLOODSTATUS.SAFETY;
-                else if (level >= 63 && level < 143) return SUGARBLOODSTATUS.WARNING;
-                else if (level >= 0 && level < 1000) return SUGARBLOODSTATUS.DANGER;
-            }
-            case AFTER -> {
-                if (level >= 90 && level <= 180) return SUGARBLOODSTATUS.SAFETY;
-                else if (level >= 81 && level < 198) return SUGARBLOODSTATUS.WARNING;
-                else if (level >= 0 && level < 1000) return SUGARBLOODSTATUS.DANGER;
-            }
-        }
-        return null;
     }
 }
