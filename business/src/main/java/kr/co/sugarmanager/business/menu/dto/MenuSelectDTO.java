@@ -1,12 +1,12 @@
 package kr.co.sugarmanager.business.menu.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import kr.co.sugarmanager.business.bloodsugar.dto.SUGARBLOODSTATUS;
 import kr.co.sugarmanager.business.global.dto.ErrorResponse;
 import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 public class MenuSelectDTO {
@@ -63,7 +63,9 @@ public class MenuSelectDTO {
     @Setter
     public static class BloodSugar {
         private Integer beforeLevel;
+        private SUGARBLOODSTATUS beforeStatus;
         private Integer afterLevel;
+        private SUGARBLOODSTATUS afterStatus;
     }
 
     @Builder

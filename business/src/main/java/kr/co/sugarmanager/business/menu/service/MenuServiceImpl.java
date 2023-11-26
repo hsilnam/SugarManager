@@ -1,6 +1,7 @@
 package kr.co.sugarmanager.business.menu.service;
 
 import kr.co.sugarmanager.business.bloodsugar.dto.BLOODSUGARCATEGORY;
+import kr.co.sugarmanager.business.bloodsugar.dto.SUGARBLOODSTATUS;
 import kr.co.sugarmanager.business.bloodsugar.entity.BloodSugarEntity;
 import kr.co.sugarmanager.business.bloodsugar.repository.BloodSugarRepository;
 import kr.co.sugarmanager.business.global.exception.ErrorCode;
@@ -114,14 +115,26 @@ public class MenuServiceImpl implements MenuService {
                         threeHoursBefore,
                         registedAt)
                 .orElse(null);
+        SUGARBLOODSTATUS beforeStatus = (beforeBloodSuger == null) ? null :
+                SUGARBLOODSTATUS.getSugarBloodStatus(
+                        BLOODSUGARCATEGORY.valueOf(beforeBloodSuger.getCategory()),
+                        beforeBloodSuger.getLevel()
+                );
         BloodSugarEntity afterBloodSuger = bloodSugarRepository.findOneByUserPkAndCategoryAndRegistedAt(userPk,
                         BLOODSUGARCATEGORY.AFTER.name(),
                         registedAt,
                         threeHoursAfter)
                 .orElse(null);
+        SUGARBLOODSTATUS afterStatus = (afterBloodSuger == null) ? null :
+                SUGARBLOODSTATUS.getSugarBloodStatus(
+                        BLOODSUGARCATEGORY.valueOf(afterBloodSuger.getCategory()),
+                        afterBloodSuger.getLevel()
+                );
         MenuSelectDTO.BloodSugar repBloodSugar = MenuSelectDTO.BloodSugar.builder()
                 .beforeLevel((beforeBloodSuger != null) ? beforeBloodSuger.getLevel() : null)
+                .beforeStatus(beforeStatus)
                 .afterLevel((afterBloodSuger != null) ? afterBloodSuger.getLevel() : null)
+                .afterStatus(afterStatus)
                 .build();
 
         List<FoodEntity> foods = menu.getFoodList();
@@ -167,7 +180,7 @@ public class MenuServiceImpl implements MenuService {
 
         menu.modifyRegistedAt(request.getRegistedAt());
 
-        if(request.getCreatedMenuImages() != null && !request.getCreatedMenuImages().isEmpty()) {
+        if (request.getCreatedMenuImages() != null && !request.getCreatedMenuImages().isEmpty()) {
             menuImageService.saveImage(menuPk, ImageTypeEnum.FOOD, request.getCreatedMenuImages());
         }
 
